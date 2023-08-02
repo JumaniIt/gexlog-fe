@@ -1,0 +1,11 @@
+@import "../components/Header/header.scss";
+@import "../components/Banner/banner.scss";
+@import "../components/Footer/footer.scss";
+@import "../components/ImageText/imageText.scss";
+
+.main-page {
+
+  &__cards {
+    margin: 50px 0;
+  }
+}

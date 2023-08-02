@@ -1,11 +1,14 @@
-import './App.css';
-import { ChakraProvider } from '@chakra-ui/react'
+import logo from './gexlog-logo.svg';
+import Main from './pages/main';
 
 function App() {
   return (
-    <ChakraProvider>
-      <div></div>
-    </ChakraProvider>
+    <div className="App">
+      {/* <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+      </header> */}
+      <Main />
+    </div>
   );
 }
 

@@ -1,0 +1,99 @@
+@font-face {
+  font-family: "Batangas";
+  src: url("../../fonts/Batangas-Bold-700.otf"); }
+
+.header {
+  display: flex;
+  align-items: center;
+  margin: 5px 50px;
+  justify-content: space-between; }
+  .header img {
+    width: 35px; }
+  .header--left, .header--right {
+    display: flex; }
+  .header--right {
+    font-weight: bold; }
+  .header .button-contact {
+    margin-right: 22px; }
+  .header .button-access {
+    display: flex;
+    align-items: center; }
+    .header .button-access svg {
+      margin-left: 5px; }
+  .header .logo-name {
+    font-family: 'Batangas';
+    text-transform: uppercase;
+    font-size: 32px;
+    margin-left: 6px;
+    color: #338dbf; }
+
+.banner {
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: "DM Sans", sans-serif; }
+  .banner-bg {
+    height: 352px;
+    width: 100%;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding-left: 50px;
+    justify-content: center; }
+  .banner-title {
+    color: white;
+    z-index: 1;
+    font-size: 56px;
+    max-width: 700px;
+    font-weight: 800; }
+  .banner-description {
+    color: white;
+    font-size: 26px;
+    max-width: 580px; }
+  .banner img {
+    width: 100vw; }
+
+.footer {
+  margin: 5px 0;
+  position: absolute;
+  width: 100%; }
+  .footer-content {
+    margin: 0 50px;
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 0;
+    color: #4a4a4a; }
+
+.image-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto; }
+  .image-text--image {
+    width: 580px; }
+  .image-text--content {
+    font-family: "Geologica";
+    margin-left: 40px; }
+    .image-text--content__big {
+      font-weight: 500;
+      font-size: 24px; }
+    .image-text--content__small {
+      font-weight: 200; }
+  .image-text--bottom-list {
+    display: flex; }
+  .image-text--top-list {
+    display: flex;
+    height: 40px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px; }
+
+.main-page__cards {
+  margin: 50px 0; }
+
+body {
+  margin: 0;
+  height: 100vh; }

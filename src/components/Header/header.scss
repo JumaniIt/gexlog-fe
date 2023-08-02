@@ -1,0 +1,39 @@
+.header {
+  display: flex;
+  align-items: center;
+  margin: 5px 50px;
+  justify-content: space-between;
+
+  img {
+    width: 35px;
+  }
+
+  &--left, &--right {
+    display: flex;
+  }
+
+  &--right {
+    font-weight: bold;
+  }
+
+  .button-contact {
+    margin-right: 22px;
+  }
+
+  .button-access {
+    display: flex;
+    align-items: center;
+
+    svg {
+      margin-left: 5px;
+    }
+  }
+
+  .logo-name {
+    font-family: 'Batangas';
+    text-transform: uppercase;
+    font-size: 32px;
+    margin-left: 6px;
+    color: #338dbf;
+  }
+}

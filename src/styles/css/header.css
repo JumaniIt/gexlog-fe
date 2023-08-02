@@ -1,0 +1,24 @@
+.header {
+  display: flex;
+  align-items: center;
+  margin: 5px 50px;
+  justify-content: space-between; }
+  .header img {
+    width: 35px; }
+  .header--left, .header--right {
+    display: flex; }
+  .header--right {
+    font-weight: bold; }
+  .header .button-contact {
+    margin-right: 22px; }
+  .header .button-access {
+    display: flex;
+    align-items: center; }
+    .header .button-access svg {
+      margin-left: 5px; }
+  .header .logo-name {
+    font-family: 'Batangas';
+    text-transform: uppercase;
+    font-size: 32px;
+    margin-left: 6px;
+    color: #338dbf; }

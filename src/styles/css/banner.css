@@ -1,0 +1,28 @@
+.banner {
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: "DM Sans", sans-serif; }
+  .banner-bg {
+    height: 352px;
+    width: 100%;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding-left: 50px;
+    justify-content: center; }
+  .banner-title {
+    color: white;
+    z-index: 1;
+    font-size: 56px;
+    max-width: 700px;
+    font-weight: 800; }
+  .banner-description {
+    color: white;
+    font-size: 26px;
+    max-width: 580px; }
+  .banner img {
+    width: 100vw; }
