@@ -1,5 +1,4 @@
 import React from 'react';
-import { Text } from '@chakra-ui/react';
 import logo from "../gexlog-logo.svg";
 import bannerImage from "../banner-image-2.jpg";
 import Header from '../components/Header/header';

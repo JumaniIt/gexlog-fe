@@ -55,6 +55,7 @@
 .footer {
   margin: 5px 0;
   position: absolute;
+  bottom: 0;
   width: 100%; }
   .footer-content {
     margin: 0 50px;
@@ -64,28 +65,38 @@
     color: #4a4a4a; }
 
 .image-text {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto; }
+  margin: 0 auto;
+  max-width: 1020px; }
   .image-text--image {
     width: 580px; }
   .image-text--content {
-    font-family: "Geologica";
-    margin-left: 40px; }
+    font-family: "Geologica"; }
     .image-text--content__big {
       font-weight: 500;
       font-size: 24px; }
     .image-text--content__small {
-      font-weight: 200; }
+      font-size: 18px;
+      font-weight: 200;
+      max-width: 500px; }
+      .image-text--content__small.right {
+        max-width: 433px; }
   .image-text--bottom-list {
-    display: flex; }
+    display: flex;
+    margin-top: 15px;
+    justify-content: space-between; }
   .image-text--top-list {
     display: flex;
     height: 40px;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 15px; }
+
+.main-page__container {
+  min-height: 100vh;
+  position: relative; }
+
+.main-page__content {
+  padding-bottom: 50px; }
 
 .main-page__cards {
   margin: 50px 0; }

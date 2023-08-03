@@ -95,6 +95,13 @@
     justify-content: space-between;
     margin-bottom: 15px; }
 
+.main-page__container {
+  min-height: 100vh;
+  position: relative; }
+
+.main-page__content {
+  padding-bottom: 50px; }
+
 .main-page__cards {
   margin: 50px 0; }
 

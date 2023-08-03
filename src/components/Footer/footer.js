@@ -6,7 +6,7 @@ const Footer = ({ className }) => {
     <footer className={`footer ${className}`}>
       <Divider />
       <div className="footer-content">
-        <p>administración@gexlog.com</p>
+        <p>administracion@gexlog.com</p>
         <p>+54 11 3651 7326</p>
       </div>
     </footer>
