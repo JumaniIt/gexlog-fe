@@ -1,6 +1,9 @@
 @import "../components/Header/header.scss";
 @import "../components/Banner/banner.scss";
 @import "../components/Footer/footer.scss";
+@import "../components/Cards/cards.scss";
+@import "../components/ImageText/image-text.scss";
+@import "../components/TextSection/text-section.scss";
 
 .main-page {
   &__container {
@@ -13,6 +16,7 @@
   }
 
   &__cards {
-    margin: 50px 0;
+    display: flex;
+    margin: 50px 150px;
   }
 }

@@ -5,34 +5,52 @@
   justify-content: center;
   text-align: center;
   font-family: "DM Sans", sans-serif;
+  margin-top: 75px;
 
   &-bg {
-    height: 352px;
+    height: auto;
     width: 100%;
     background-position: center;
     display: flex;
     flex-direction: column;
-    text-align: left;
-    padding-left: 50px;
+    text-align: center;
     justify-content: center;
+    padding: 35px;
   }
 
   &-title {
     color: white;
     z-index: 1;
-    font-size: 56px;
+    font-size: 42px;
     max-width: 700px;
     font-weight: 800;
-    
   }
 
   &-description {
     color: white;
-    font-size: 26px;
+    font-size: 20px;
     max-width: 580px;
   }
 
   img {
     width: 100vw;
+  }
+}
+
+@media (min-width: 769px) {
+  .banner {
+    &-bg {
+      height: 430px;
+      padding-left: 50px;
+      text-align: left;
+    }
+
+    &-title {
+      font-size: 56px;
+    }
+
+    &-description {
+      font-size: 26px;
+    }
   }
 }

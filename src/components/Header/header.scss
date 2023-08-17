@@ -1,15 +1,25 @@
 .header {
   display: flex;
   align-items: center;
-  margin: 5px 50px;
+  padding: 5px 16px;
   justify-content: space-between;
+  position: fixed;
+  height: 67px;
+  background: white;
+  width: 100%;
+  top: 0;
+  z-index: 2;
 
   img {
-    width: 35px;
+    width: 25px;
   }
 
-  &--left, &--right {
+  &--left {
     display: flex;
+  }
+
+  &--right {
+    display: none;
   }
 
   &--right {
@@ -30,10 +40,30 @@
   }
 
   .logo-name {
-    font-family: 'Batangas';
+    font-family: "Batangas";
     text-transform: uppercase;
-    font-size: 32px;
+    font-size: 26px;
     margin-left: 6px;
     color: #338dbf;
+  }
+}
+
+@media (min-width: 769px) {
+  .header {
+    padding: 5px 50px;
+    height: 75px;
+
+    img {
+      width: 35px;
+    }
+
+    .logo-name {
+      font-size: 32px;
+    }
+
+    &--right {
+      display: flex;
+      font-weight: bold;
+    }
   }
 }

@@ -1,12 +1,20 @@
 .header {
   display: flex;
   align-items: center;
-  margin: 5px 50px;
-  justify-content: space-between; }
+  padding: 5px 16px;
+  justify-content: space-between;
+  position: fixed;
+  height: 67px;
+  background: white;
+  width: 100%;
+  top: 0;
+  z-index: 2; }
   .header img {
-    width: 35px; }
-  .header--left, .header--right {
+    width: 25px; }
+  .header--left {
     display: flex; }
+  .header--right {
+    display: none; }
   .header--right {
     font-weight: bold; }
   .header .button-contact {
@@ -17,8 +25,20 @@
     .header .button-access svg {
       margin-left: 5px; }
   .header .logo-name {
-    font-family: 'Batangas';
+    font-family: "Batangas";
     text-transform: uppercase;
-    font-size: 32px;
+    font-size: 26px;
     margin-left: 6px;
     color: #338dbf; }
+
+@media (min-width: 769px) {
+  .header {
+    padding: 5px 50px;
+    height: 75px; }
+    .header img {
+      width: 35px; }
+    .header .logo-name {
+      font-size: 32px; }
+    .header--right {
+      display: flex;
+      font-weight: bold; } }

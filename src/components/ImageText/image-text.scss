@@ -1,0 +1,81 @@
+.image-text-section {
+  margin: 60px 25px 20px;
+
+  .image-text {
+    &--container {
+      margin: 0 50px;
+    }
+
+    &--heading {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    &--image {
+      width: 330px;
+      margin: 0 auto;
+      padding-bottom: 35px;
+    }
+
+    &--content {
+      margin-top: 20px;
+      text-align: center;
+      max-width: 432px;
+      margin: 0 auto;
+
+      p {
+        line-height: 1.7;
+      }
+    }
+
+    &--bullets-list {
+      padding-top: 20px;
+    }
+
+    &--button {
+      margin-top: 30px;
+      background-color: #338dbf;
+    }
+  }
+
+  .chakra-heading.image-text--heading {
+    font-family: "DM Sans", sans-serif;
+  }
+}
+
+@media (min-width: 769px) {
+  .image-text-section {
+    padding: 50px 25px;
+
+    .image-text {
+      &--container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+      }
+
+      &--content {
+        text-align: left;
+        margin: 0;
+        max-width: unset;
+        padding-left: 70px;
+
+        p {
+          max-width: 570px;
+        }
+      }
+
+      &--heading {
+        margin-bottom: 45px;
+      }
+
+      &--image {
+        width: 550px;
+        height: auto;
+        margin: 0;
+        // padding-bottom: 35px;
+      }
+    }
+  }
+}

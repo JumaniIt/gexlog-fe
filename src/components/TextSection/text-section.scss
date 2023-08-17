@@ -1,0 +1,31 @@
+.text-section {
+  padding: 50px 25px;
+  margin: 60px 25px 20px;
+
+  &--heading {
+    text-align: center;
+  }
+
+  &--container {
+    text-align: center;
+    padding-top: 70px;
+    margin: 0 auto;
+    max-width: 594px;
+  }
+
+  &--icon {
+    margin-right: 10px;
+  }
+
+  .chakra-icon.text-section--icon {
+    color: #338dbf;
+  }
+
+  .main-text {
+    padding-bottom: 20px;
+  }
+
+  .chakra-heading.image-text--heading {
+    font-family: "DM Sans", sans-serif;
+  }
+}
