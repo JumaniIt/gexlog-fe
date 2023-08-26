@@ -1,0 +1,13 @@
+.contact-form {
+  .chakra-form-control:not(:first-child) {
+    margin-top: 30px;
+  }
+
+  .chakra-button {
+    margin-top: 20px;
+  }
+
+  .chakra-card__body {
+    padding: 35px;
+  }
+}

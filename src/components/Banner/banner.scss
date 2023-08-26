@@ -12,9 +12,10 @@
     width: 100%;
     background-position: center;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     text-align: center;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: center;
     padding: 35px;
   }
 
@@ -35,14 +36,30 @@
   img {
     width: 100vw;
   }
+
+  &-form-input {
+    label {
+      padding-top: 30px;
+    }
+  }
+
+  .contact-form {
+    .chakra-card__body {
+      width: 480px;
+    }
+
+    .chakra-button {
+      width: 100%;
+    }
+  }
 }
 
 @media (min-width: 769px) {
   .banner {
     &-bg {
-      height: 430px;
-      padding-left: 50px;
+      height: 550px;
       text-align: left;
+      padding: 0 70px;
     }
 
     &-title {
