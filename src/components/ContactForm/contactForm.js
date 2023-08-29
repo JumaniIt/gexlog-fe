@@ -64,7 +64,8 @@ const ContactForm = ({ className }) => {
       setReasonError('');
     }
 
-    if (!message) {
+
+    if (reason !== "Quiero un usuario" && !message) {
       isValid = false;
       setMessageError('Campo requerido');
     } else {
@@ -75,6 +76,8 @@ const ContactForm = ({ className }) => {
   };
 
   const onClick = async () => {
+    setSuccessMessage('')
+    setErrorMessage('')
   	if (!validate()) {
       return;
     }
@@ -86,15 +89,19 @@ const ContactForm = ({ className }) => {
     try {
       setSubmitting(true);
       const subject = '[SISTEMA - Landing] ' + reason;
-      const body = `
+      let body = `
         Nombre: ${name}
         Email: ${email}
         Teléfono: ${phone}
         Motivo de consulta: ${reason}
-        
+    `;
+
+      if (message) {
+        body += `
         Consulta:
         ${message}
-    `;
+      `;
+      }
 
       const response = await fetch('http://gexlog-be.us-east-2.elasticbeanstalk.com/internal/send-email', {
         method: 'POST',
@@ -133,12 +140,6 @@ const ContactForm = ({ className }) => {
     const selectedReason = e.target.value;
     setReason(selectedReason);
     setReasonError('');
-
-    if (selectedReason === "Quiero un usuario") {
-      setMessage(selectedReason);
-    } else {
-      setMessage("");
-    }
   };
 
 
@@ -198,7 +199,6 @@ const ContactForm = ({ className }) => {
               setMessage(e.target.value)
               setMessageError('')
             }}
-            isDisabled={reason === "Quiero un usuario"}
           />
           <FormErrorMessage>{messageError}</FormErrorMessage>
         </FormControl>
