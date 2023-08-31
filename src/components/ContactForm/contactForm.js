@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardBody,
+  Flex,
   FormControl,
   Input,
   Select,
@@ -10,6 +11,8 @@ import {
   FormErrorMessage,
   Alert,
   AlertIcon,
+  Heading,
+  Text
 } from '@chakra-ui/react';
 
 const ContactForm = ({ className }) => {
@@ -28,6 +31,9 @@ const ContactForm = ({ className }) => {
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  const CREATE_USER_OPTION = "Quiero un usuario";
+  const ERROR_MESSAGE = "Ha ocurrido un error";
 
 
   const validate = () => {
@@ -65,7 +71,7 @@ const ContactForm = ({ className }) => {
     }
 
 
-    if (reason !== "Quiero un usuario" && !message) {
+    if (reason !== CREATE_USER_OPTION && !message) {
       isValid = false;
       setMessageError('Campo requerido');
     } else {
@@ -76,8 +82,8 @@ const ContactForm = ({ className }) => {
   };
 
   const onClick = async () => {
-    setSuccessMessage('')
-    setErrorMessage('')
+    hideSuccessMessage()
+    hideErrorMessage()
   	if (!validate()) {
       return;
     }
@@ -118,7 +124,7 @@ const ContactForm = ({ className }) => {
       if (response.status === 204) {
         setSuccessMessage('Consulta enviada');
       } else {
-        setErrorMessage('Ha ocurrido un error');
+        setErrorMessage(ERROR_MESSAGE);
         const errorData = await response.json() // TODO show error notification
         if (response.status === 400) {
           console.error('Client side error:', errorData);
@@ -128,7 +134,7 @@ const ContactForm = ({ className }) => {
       }
 
     } catch (error) {
-      setErrorMessage('Ha ocurrido un error');
+      setErrorMessage(ERROR_MESSAGE);
       console.error('Internal error:', error);
 
     } finally {
@@ -142,10 +148,38 @@ const ContactForm = ({ className }) => {
     setReasonError('');
   };
 
+  const hideSuccessMessage = () => {
+    setSuccessMessage('');
+  };
+
+  const hideErrorMessage = () => {
+    setErrorMessage('');
+  };
+
+  useEffect(() => {
+    if (successMessage) {
+      const successTimeout = setTimeout(hideSuccessMessage, 5000); // 5000 milliseconds = 5 seconds
+      return () => clearTimeout(successTimeout);
+    }
+
+    if (errorMessage) {
+      const errorTimeout = setTimeout(hideErrorMessage, 5000); // 5000 milliseconds = 5 seconds
+      return () => clearTimeout(errorTimeout);
+    }
+  }, [successMessage, errorMessage]);
+
 
   return (
     <Card className="contact-form">
       <CardBody>
+      <Flex Flex direction="column" alignItems="center">
+          <Heading as="h2" size="xl" mb={4}>
+            Contactanos
+          </Heading>
+          <Text mb={6} fontSize="lg">
+            ¿Cómo podemos ayudarte?
+          </Text>
+        </Flex>
         <FormControl className={className} isRequired isInvalid={!!nameError}>
           <Input
             placeholder="Nombre"
@@ -186,7 +220,7 @@ const ContactForm = ({ className }) => {
             value={reason}
             onChange={handleReasonChange}
           >
-            <option>Quiero un usuario</option>
+            <option>{CREATE_USER_OPTION}</option>
             <option>Tengo una pregunta</option>
           </Select>
           <FormErrorMessage>{reasonError}</FormErrorMessage>
