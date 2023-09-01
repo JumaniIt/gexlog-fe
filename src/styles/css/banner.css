@@ -10,30 +10,70 @@
     height: auto;
     width: 100%;
     background-position: center;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    justify-content: center;
+    background-repeat: no-repeat;
     padding: 35px; }
+    .banner-bg--right {
+      margin-top: 30px; }
   .banner-title {
     color: white;
     z-index: 1;
-    font-size: 42px;
+    font-size: 40px;
     max-width: 700px;
-    font-weight: 800; }
+    font-weight: 800;
+    text-align: left;
+    line-height: 1.25;
+    padding-bottom: 10px; }
   .banner-description {
     color: white;
     font-size: 20px;
-    max-width: 580px; }
+    max-width: 580px;
+    line-height: 1.25;
+    text-align: left; }
   .banner img {
     width: 100vw; }
+  .banner-form-input label {
+    padding-top: 30px; }
+  .banner .contact-form .chakra-card__body {
+    padding: 18px; }
+  .banner .contact-form .chakra-button {
+    background: #338dbf;
+    width: 100%; }
+  .banner .contact-form .chakra-heading {
+    margin: 2px; }
+  .banner .contact-form .chakra-text {
+    margin: 0; }
 
 @media (min-width: 769px) {
   .banner-bg {
-    height: 430px;
-    padding-left: 50px;
-    text-align: left; }
+    height: 100%;
+    text-align: left;
+    padding: 40px 40px;
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    justify-content: space-between;
+    background-size: cover; }
+    .banner-bg--right {
+      width: 50%;
+      margin-top: 0;
+      padding-left: 30px; }
+      .banner-bg--right .chakra-card {
+        max-width: 465px;
+        margin: 0 auto; }
+    .banner-bg--left {
+      width: 50%;
+      margin-left: 2%; }
+  .banner-title {
+    line-height: 1.6; }
+  .banner-description {
+    line-height: 1.5; }
+  .banner .contact-form .chakra-button {
+    width: 100%; } }
+
+@media (min-width: 1024px) {
   .banner-title {
     font-size: 56px; }
   .banner-description {
-    font-size: 26px; } }
+    font-size: 28px; }
+  .banner-bg--left {
+    margin-left: 5%; } }

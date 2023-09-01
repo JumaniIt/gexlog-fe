@@ -12,20 +12,19 @@ import { CheckIcon } from '@chakra-ui/icons'
 const ImageText = ({ title, text, itemsList, img }) => {
   return (
     <div className="image-text-section">
-      <Heading size='2xl' className="image-text--heading">{title}</Heading>
+      <Heading size='xl' className="image-text--heading">{title}</Heading>
       <div className='image-text--container'>
         <img src={img} className="image-text--image" />
         <div className='image-text--content'>
-          <Text fontSize='xl' color="gray.600">{text}</Text>
-          <List spacing={3} className="image-text--bullets-list">
+          <Text fontSize='md' color="gray.600">{text}</Text>
+          <List spacing={2} className="image-text--bullets-list">
             {itemsList?.map((item, index) => (
-              <ListItem color="gray.600" key={index} fontSize='xl'>
+              <ListItem color="gray.600" key={index} fontSize='md'>
                 <ListIcon as={CheckIcon} color="blue.500" />
                 {item}
               </ListItem>
             ))}
           </List>
-          <Button className="image-text--button" size="lg" colorScheme='blue'>Solicitar usuario</Button>
         </div>
       </div>
     </div>

@@ -35,7 +35,6 @@ const ContactForm = ({ className }) => {
   const CREATE_USER_OPTION = "Quiero un usuario";
   const ERROR_MESSAGE = "Ha ocurrido un error";
 
-
   const validate = () => {
     let isValid = true;
 
@@ -173,10 +172,10 @@ const ContactForm = ({ className }) => {
     <Card className="contact-form">
       <CardBody>
       <Flex Flex direction="column" alignItems="center">
-          <Heading as="h2" size="xl" mb={4}>
+          <Heading as="h2" size="lg" mb={4}>
             Contactanos
           </Heading>
-          <Text mb={6} fontSize="lg">
+          <Text mb={6} fontSize="md">
             ¿Cómo podemos ayudarte?
           </Text>
         </Flex>
@@ -184,6 +183,7 @@ const ContactForm = ({ className }) => {
           <Input
             placeholder="Nombre"
             value={name}
+            size='sm'
             onChange={(e) => {
               setName(e.target.value)
               setNameError('')
@@ -194,6 +194,7 @@ const ContactForm = ({ className }) => {
         <FormControl className={className} isRequired isInvalid={!!emailError}>
           <Input
             type="email"
+            size='sm'
             placeholder="Email"
             value={email}
             onChange={(e) => {
@@ -206,6 +207,7 @@ const ContactForm = ({ className }) => {
         <FormControl className={className} isRequired isInvalid={!!phoneError}>
           <Input
             placeholder="Teléfono"
+            size='sm'
             value={phone}
             onChange={(e) => {
               setPhone(e.target.value)
@@ -217,6 +219,7 @@ const ContactForm = ({ className }) => {
         <FormControl className={className} isRequired isInvalid={!!reasonError}>
           <Select
             placeholder="Motivo de consulta"
+            size='sm'
             value={reason}
             onChange={handleReasonChange}
           >
@@ -229,6 +232,7 @@ const ContactForm = ({ className }) => {
           <Textarea
             placeholder="Escribí acá tu consulta..."
             value={message}
+            size='sm'
             onChange={(e) => {
               setMessage(e.target.value)
               setMessageError('')

@@ -12,7 +12,7 @@ import { CheckIcon } from '@chakra-ui/icons'
 const CardSection = ({ title, cardContent }) => {
   return (
     <div className="card-section">
-      <Heading size='2xl' className="card-section--heading">{title}</Heading>
+      <Heading size='xl' className="card-section--heading">{title}</Heading>
       <div className='card-section--cards-container'>
         {cardContent.map((content, index) => (
           <Card className="card-section--card" align="center" variant="outline" key={index}>
@@ -22,9 +22,9 @@ const CardSection = ({ title, cardContent }) => {
             </CardHeader>
             <Divider />
             <CardBody className='card-body'>
-              <List spacing={content?.bullets?.length < 5 ? 6 : 4} className="cards--bullet-list">
+              <List spacing={2} className="cards--bullet-list">
                 {content?.bullets?.map((bullet, index) => (
-                  <ListItem  color="gray.600" key={index} fontSize='lg'>
+                  <ListItem  color="gray.600" key={index} fontSize='md'>
                     <ListIcon as={CheckIcon} color="blue.500" />
                     {bullet}
                   </ListItem>
