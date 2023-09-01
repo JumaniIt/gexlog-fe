@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Button, ButtonGroup } from '@chakra-ui/react'
+import React from 'react';
 import { Text } from '@chakra-ui/react'
 import { Heading } from '@chakra-ui/react';
 import {
@@ -14,7 +13,7 @@ const ImageText = ({ title, text, itemsList, img }) => {
     <div className="image-text-section">
       <Heading size='xl' className="image-text--heading">{title}</Heading>
       <div className='image-text--container'>
-        <img src={img} className="image-text--image" />
+        <img src={img} className="image-text--image"  alt="description"/>
         <div className='image-text--content'>
           <Text fontSize='md' color="gray.600">{text}</Text>
           <List spacing={2} className="image-text--bullets-list">

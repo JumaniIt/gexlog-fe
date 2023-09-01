@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '@chakra-ui/react'
 import { Text } from '@chakra-ui/react'
 import { Heading } from '@chakra-ui/react';
 import { PhoneIcon, EmailIcon } from '@chakra-ui/icons'

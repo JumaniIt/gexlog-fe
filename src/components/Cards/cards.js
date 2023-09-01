@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardHeader, CardBody } from '@chakra-ui/react';
 import { Divider } from '@chakra-ui/react';
 import { Heading } from '@chakra-ui/react';
