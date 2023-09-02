@@ -108,7 +108,7 @@ const ContactForm = ({ className }) => {
       `;
       }
 
-      const response = await fetch('http://gexlog-be.us-east-2.elasticbeanstalk.com/internal/send-email', {
+      const response = await fetch('https://gexlog-be.com/internal/send-mail', {
         method: 'POST',
         headers: {
           'x-auth-origin': 'gexlog-fe',
