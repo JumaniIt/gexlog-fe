@@ -108,7 +108,7 @@ const ContactForm = ({ className }) => {
       `;
       }
 
-      const response = await fetch('https://gexlog-be.com/internal/send-mail', {
+      const response = await fetch('https://gexlog-be.com/internal/send-email', {
         method: 'POST',
         headers: {
           'x-auth-origin': 'gexlog-fe',
