@@ -93,7 +93,7 @@ const ContactForm = ({ className }) => {
 
     try {
       setSubmitting(true);
-      const subject = '[SISTEMA - Landing] ' + reason;
+      const subject = '[Landing] ' + reason;
       let body = `
         Nombre: ${name}
         Email: ${email}
