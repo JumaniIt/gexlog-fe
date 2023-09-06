@@ -64,7 +64,7 @@ const LoginForm = () => {
             size="lg"
           />
         </FormControl>
-        <Button className="button" type="submit">
+        <Button className="button" type="submit" w="100%" mt={10}>
           Iniciar sesión
         </Button>
       </form>
