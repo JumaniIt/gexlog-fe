@@ -12,78 +12,78 @@ import {
   Alert,
   AlertIcon,
   Heading,
-  Text
-} from '@chakra-ui/react';
+  Text,
+} from "@chakra-ui/react";
+
+import { sendEmail } from "../../app/services/emailService";
 
 const ContactForm = ({ className }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [reason, setReason] = useState('');
-  const [message, setMessage] = useState('');
-  const [nameError, setNameError] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [phoneError, setPhoneError] = useState('');
-  const [reasonError, setReasonError] = useState('');
-  const [messageError, setMessageError] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [reason, setReason] = useState("");
+  const [message, setMessage] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [reasonError, setReasonError] = useState("");
+  const [messageError, setMessageError] = useState("");
 
   // on submission
   const [submitting, setSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const CREATE_USER_OPTION = "Quiero un usuario";
-  const ERROR_MESSAGE = "Ha ocurrido un error";
 
   const validate = () => {
     let isValid = true;
 
     if (!name) {
       isValid = false;
-      setNameError('Campo requerido');
+      setNameError("Campo requerido");
     } else {
-      setNameError('');
+      setNameError("");
     }
 
     if (!email) {
       isValid = false;
-      setEmailError('Campo requerido');
+      setEmailError("Campo requerido");
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       isValid = false;
-      setEmailError('Email inválido');
+      setEmailError("Email inválido");
     } else {
-      setEmailError('');
+      setEmailError("");
     }
 
     if (!phone) {
       isValid = false;
-      setPhoneError('Campo requerido');
+      setPhoneError("Campo requerido");
     } else {
-      setPhoneError('');
+      setPhoneError("");
     }
 
     if (!reason) {
       isValid = false;
-      setReasonError('Campo requerido');
+      setReasonError("Campo requerido");
     } else {
-      setReasonError('');
+      setReasonError("");
     }
-
 
     if (reason !== CREATE_USER_OPTION && !message) {
       isValid = false;
-      setMessageError('Campo requerido');
+      setMessageError("Campo requerido");
     } else {
-      setMessageError('');
+      setMessageError("");
     }
 
     return isValid;
   };
 
   const onClick = async () => {
-    hideSuccessMessage()
-    hideErrorMessage()
-  	if (!validate()) {
+    hideSuccessMessage();
+    hideErrorMessage();
+    if (!validate()) {
       return;
     }
 
@@ -91,68 +91,44 @@ const ContactForm = ({ className }) => {
       return;
     }
 
-    try {
-      setSubmitting(true);
-      const subject = '[Landing] ' + reason;
-      let body = `
+    setSubmitting(true);
+    const subject = "[Landing] " + reason;
+    let body = `
         Nombre: ${name}
         Email: ${email}
         Teléfono: ${phone}
         Motivo de consulta: ${reason}
     `;
 
-      if (message) {
-        body += `
+    if (message) {
+      body += `
         Consulta:
         ${message}
       `;
-      }
-
-      const response = await fetch('https://gexlog-be.com/internal/send-email', {
-        method: 'POST',
-        headers: {
-          'x-auth-origin': 'gexlog-fe',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          subject,
-          body
-        })
-      });
-
-      if (response.status === 204) {
-        setSuccessMessage('Consulta enviada');
-      } else {
-        setErrorMessage(ERROR_MESSAGE);
-        const errorData = await response.json() // TODO show error notification
-        if (response.status === 400) {
-          console.error('Client side error:', errorData);
-        } else {
-          console.log('Server side error:', errorData);
-        } 
-      }
-
-    } catch (error) {
-      setErrorMessage(ERROR_MESSAGE);
-      console.error('Internal error:', error);
-
-    } finally {
-      setSubmitting(false);
     }
+
+    const error = await sendEmail(subject, body);
+    if (error === undefined) {
+      setSuccessMessage("Consulta enviada");
+    } else {
+      setErrorMessage("Ha ocurrido un error");
+    }
+
+    setSubmitting(false);
   };
 
   const handleReasonChange = (e) => {
     const selectedReason = e.target.value;
     setReason(selectedReason);
-    setReasonError('');
+    setReasonError("");
   };
 
   const hideSuccessMessage = () => {
-    setSuccessMessage('');
+    setSuccessMessage("");
   };
 
   const hideErrorMessage = () => {
-    setErrorMessage('');
+    setErrorMessage("");
   };
 
   useEffect(() => {
@@ -167,11 +143,10 @@ const ContactForm = ({ className }) => {
     }
   }, [successMessage, errorMessage]);
 
-
   return (
     <Card className="contact-form">
       <CardBody>
-      <Flex Flex direction="column" alignItems="center">
+        <Flex Flex direction="column" alignItems="center">
           <Heading as="h2" size="lg" mb={4}>
             Contactanos
           </Heading>
@@ -183,10 +158,10 @@ const ContactForm = ({ className }) => {
           <Input
             placeholder="Nombre"
             value={name}
-            size='sm'
+            size="sm"
             onChange={(e) => {
-              setName(e.target.value)
-              setNameError('')
+              setName(e.target.value);
+              setNameError("");
             }}
           />
           <FormErrorMessage>{nameError}</FormErrorMessage>
@@ -194,12 +169,12 @@ const ContactForm = ({ className }) => {
         <FormControl className={className} isRequired isInvalid={!!emailError}>
           <Input
             type="email"
-            size='sm'
+            size="sm"
             placeholder="Email"
             value={email}
             onChange={(e) => {
-              setEmail(e.target.value)
-              setEmailError('')
+              setEmail(e.target.value);
+              setEmailError("");
             }}
           />
           <FormErrorMessage>{emailError}</FormErrorMessage>
@@ -207,11 +182,11 @@ const ContactForm = ({ className }) => {
         <FormControl className={className} isRequired isInvalid={!!phoneError}>
           <Input
             placeholder="Teléfono"
-            size='sm'
+            size="sm"
             value={phone}
             onChange={(e) => {
-              setPhone(e.target.value)
-              setPhoneError('')
+              setPhone(e.target.value);
+              setPhoneError("");
             }}
           />
           <FormErrorMessage>{phoneError}</FormErrorMessage>
@@ -219,7 +194,7 @@ const ContactForm = ({ className }) => {
         <FormControl className={className} isRequired isInvalid={!!reasonError}>
           <Select
             placeholder="Motivo de consulta"
-            size='sm'
+            size="sm"
             value={reason}
             onChange={handleReasonChange}
           >
@@ -228,14 +203,18 @@ const ContactForm = ({ className }) => {
           </Select>
           <FormErrorMessage>{reasonError}</FormErrorMessage>
         </FormControl>
-        <FormControl className={className} isRequired isInvalid={!!messageError}>
+        <FormControl
+          className={className}
+          isRequired
+          isInvalid={!!messageError}
+        >
           <Textarea
             placeholder="Escribí acá tu consulta..."
             value={message}
-            size='sm'
+            size="sm"
             onChange={(e) => {
-              setMessage(e.target.value)
-              setMessageError('')
+              setMessage(e.target.value);
+              setMessageError("");
             }}
           />
           <FormErrorMessage>{messageError}</FormErrorMessage>
