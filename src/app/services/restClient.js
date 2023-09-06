@@ -8,9 +8,10 @@ const internalError = {
 
 export const post = async (uri, req) => {
   try {
-    console.log("BASE URL: " + BASE_URL)
+    console.log("BASE URL: " + BASE_URL);
     const response = await fetch(BASE_URL + uri, {
       method: "POST",
+      credentials: "include",
       headers: {
         "x-auth-origin": "gexlog-fe",
         "Content-Type": "application/json",
@@ -18,7 +19,7 @@ export const post = async (uri, req) => {
       body: JSON.stringify(req),
     });
 
-    return response
+    return response;
   } catch (error) {
     console.error("Rest error:", error);
     return internalError;
