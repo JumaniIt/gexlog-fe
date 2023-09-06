@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import {
   FormControl,
   FormLabel,
   Input,
   Button,
   Alert,
-  AlertIcon
+  AlertIcon,
 } from "@chakra-ui/react";
 
 import logo from "../../gexlog-logo.svg";
@@ -32,10 +32,10 @@ const LoginForm = () => {
 
     const loginResponse = await login(email, password);
 
-    if (loginResponse?.user) {
-      navigate('/requests', { replace: true });
+    if (loginResponse?.message) {
+      setErrorMessage(loginResponse.message);
     } else {
-      setErrorMessage(loginResponse?.message || 'error');
+      navigate("/requests", { replace: true });
     }
   };
 

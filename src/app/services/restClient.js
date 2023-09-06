@@ -8,7 +8,6 @@ const internalError = {
 
 export const post = async (uri, req) => {
   try {
-    console.log("BASE URL: " + BASE_URL);
     const response = await fetch(BASE_URL + uri, {
       method: "POST",
       credentials: "include",
@@ -25,3 +24,21 @@ export const post = async (uri, req) => {
     return internalError;
   }
 };
+
+export const get = async (uri) => {
+  try {
+    const response = await fetch(BASE_URL + uri, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "x-auth-origin": "gexlog-fe",
+        "Content-Type": "application/json",
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error("Rest error:", error);
+    return internalError;
+  }
+}
