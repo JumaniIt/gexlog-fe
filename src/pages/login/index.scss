@@ -1,0 +1,28 @@
+@import "../../components/LoginForm/loginForm.scss";
+
+.login-page {
+  font-family: 'Montserrat', sans-serif;
+
+  width: 100vw;
+  height: 100vh;
+  background-color: #f0f6fb;
+  display: flex;
+
+  .form-section {
+    background-color: white;
+    width: 50%;
+    height: 100vh;
+    border-radius: 0 50px 50px 0;
+  }
+
+  .image-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+
+    // img {
+    //   width: 90%;
+    // }
+  }
+}

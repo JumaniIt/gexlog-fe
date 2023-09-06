@@ -1,5 +1,7 @@
 import React from 'react';
-import { Link } from '@chakra-ui/react';
+// import { Link } from '@chakra-ui/react';
+
+import { Link } from "react-router-dom";
 import { PiSignInBold } from "react-icons/pi";
 
 const Header = ({ className, img, onLoginClick }) => (
@@ -9,7 +11,7 @@ const Header = ({ className, img, onLoginClick }) => (
       <h1 className="logo-name">Gexlog</h1>
     </div>
     <div className="header--right">
-      <Link className="header-button button-access" color='blue.500' onClick={onLoginClick}>
+      <Link to="/login" className="header-button button-access" color='blue.500' onClick={onLoginClick}>
         Acceso <PiSignInBold />
       </Link>
     </div>
