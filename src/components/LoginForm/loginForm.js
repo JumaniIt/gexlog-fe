@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FormControl,
@@ -15,6 +15,7 @@ import { login } from "../../app/services/loginService";
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleEmailChange = (e) => {
@@ -30,7 +31,12 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    hideErrorMessage();
+    setSubmitting(true);
+
     const loginResponse = await login(email, password);
+    
+    setSubmitting(false);
 
     if (loginResponse?.message) {
       setErrorMessage(loginResponse.message);
@@ -38,6 +44,17 @@ const LoginForm = () => {
       navigate("/requests", { replace: true });
     }
   };
+
+  const hideErrorMessage = () => {
+    setErrorMessage("");
+  };
+
+  useEffect(() => {
+    if (errorMessage) {
+      const errorTimeout = setTimeout(hideErrorMessage, 5000);
+      return () => clearTimeout(errorTimeout);
+    }
+  }, [errorMessage]);
 
   return (
     <div className="login-form-container">
@@ -66,7 +83,7 @@ const LoginForm = () => {
             size="lg"
           />
         </FormControl>
-        <Button className="button" type="submit" w="100%" mt={10}>
+        <Button className="button" type="submit" w="100%" mt={10} isLoading={submitting}>
           Iniciar sesión
         </Button>
         {errorMessage && (

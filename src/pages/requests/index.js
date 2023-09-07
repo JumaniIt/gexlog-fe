@@ -13,10 +13,11 @@ const Requests = () => {
         <h1>id: {currentUser.id}</h1>
         <h1>nickname: {currentUser.nickname}</h1>
         <h1>email: {currentUser.email}</h1>
-        <h1>admin: {currentUser.admin && 'true' || 'false'}</h1>
+        <h1>admin: {currentUser.admin ? 'true' : 'false'}</h1>
       </div>
     );
   } catch (error) {
+
     navigate('/login', { replace: true });
   }
 };

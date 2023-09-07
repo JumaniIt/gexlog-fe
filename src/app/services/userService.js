@@ -1,9 +1,9 @@
 import { getCookie } from "./cookieService";
 
-export const getCurrentUser = (async) => {
+export const getCurrentUser = () => {
   const currentUser = getCookie("currentUser");
 
-  if (currentUser === undefined) {
+  if (!currentUser) {
     throw new Error("session expired");
   }
 

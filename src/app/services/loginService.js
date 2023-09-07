@@ -14,8 +14,13 @@ export const login = async (email, password) => {
   const resJson = await response.json();
 
   if (response.status === 200) {
-    setCookie("jwtToken", resJson.token, {});
-    setCookie("currentUser", JSON.stringify(resJson.user), {});
+    // const inTwoHours = new Date(new Date().getTime() + 1 * 60 * 1000); // this is a minute
+    const inTwoHours = new Date(new Date().getTime() + 2 * 60 * 60 * 1000);
+
+    setCookie("jwtToken", resJson.token, { expires: inTwoHours });
+    setCookie("currentUser", JSON.stringify(resJson.user), {
+      expires: inTwoHours,
+    });
 
     return;
   } else if (response.status === 400) {
