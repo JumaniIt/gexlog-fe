@@ -11,9 +11,9 @@ export const login = async (email, password) => {
   };
 
   const response = await post("/login", req);
-  const resJson = await response.json();
+  const resJson = await response?.json();
 
-  if (response.status === 200) {
+  if (response.status === 200 && resJson) {
     // const inTwoHours = new Date(new Date().getTime() + 1 * 60 * 1000); // this is a minute
     const inTwoHours = new Date(new Date().getTime() + 2 * 60 * 60 * 1000);
 
