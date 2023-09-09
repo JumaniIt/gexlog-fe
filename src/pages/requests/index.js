@@ -3,10 +3,9 @@ import { getCurrentUser } from '../../app/services/userService';
 import { useNavigate } from 'react-router-dom';
 import { Divider } from '@chakra-ui/react';
 import { Link } from "react-router-dom";
-import { MdListAlt } from "react-icons/md";
-import { MdPeople } from "react-icons/md";
+import { MdListAlt, MdPeople } from "react-icons/md";
 import { Heading } from '@chakra-ui/react'
-
+import FilterTable from '../../components/FilterTable';
 
 const Requests = () => {
   // const navigate = useNavigate();
@@ -47,6 +46,7 @@ const Requests = () => {
         <div className="requests-table">
           <Heading as='h6' size='sm'>Solicitudes</Heading>
         </div>
+        <FilterTable />
       </div>
     </div>
   );

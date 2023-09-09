@@ -58,10 +58,10 @@ const LoginForm = () => {
 
   return (
     <div className="login-form-container">
-      <div className="login-logo">
+      {/* <div className="login-logo">
         <img src={logo} alt="gexlog" />
         <h1 className="logo-name">Gexlog</h1>
-      </div>
+      </div> */}
       <form className="login-form" onSubmit={handleSubmit}>
         <FormControl id="email" isRequired mt={10}>
           <FormLabel>E-mail</FormLabel>
@@ -70,20 +70,20 @@ const LoginForm = () => {
             placeholder="Ingrese su email"
             value={email}
             onChange={handleEmailChange}
-            size="lg"
+            size="md"
           />
         </FormControl>
-        <FormControl id="password" isRequired mt={8}>
+        <FormControl id="password" isRequired mt={6}>
           <FormLabel>Contraseña</FormLabel>
           <Input
             type="password"
             placeholder="Ingrese su contraseña"
             value={password}
             onChange={handlePasswordChange}
-            size="lg"
+            size="md"
           />
         </FormControl>
-        <Button className="button" type="submit" w="100%" mt={10} isLoading={submitting}>
+        <Button className="button" type="submit" w="100%" mt={8} isLoading={submitting}>
           Iniciar sesión
         </Button>
         {errorMessage && (
