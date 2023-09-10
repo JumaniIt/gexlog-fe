@@ -32,14 +32,21 @@ const FilterTable = () => {
   return (
     <div className="filter-table-container">
       <div className="filter-bar">
-        <Select size='sm' placeholder='Cliente'></Select>
+        <Select size='sm' placeholder='Cliente'>
+
+        </Select>
         <Input size='sm' placeholder='Legajo' />
         <input className='chakra-input css-1xt0hpo' type="date" />
         <input className='chakra-input css-1xt0hpo' type="time" />
         <Checkbox>PEMA</Checkbox>
         <Checkbox>G. PTO</Checkbox>
         <Checkbox>TTE</Checkbox>
-        <Select size='sm' placeholder='Estado'></Select>
+        <Select size='sm' placeholder='Estado'>
+          <option value='option1'>Borrador</option>
+          <option value='option2'>Procesando</option>
+          <option value='option2'>Revisión</option>
+          <option value='option3'>Finalizado</option>
+        </Select>
         <Button size='sm'> <MdSearch />Buscar</Button>
       </div>
       <div className="results-table">
