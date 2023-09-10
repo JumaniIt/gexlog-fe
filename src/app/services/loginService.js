@@ -1,10 +1,9 @@
 import { removeCookie, setCookie } from "./cookieService";
+import { getById, search } from "./orderService";
 import { post } from "./restClient";
 
-export const login = async (email, password) => {
-  removeCookie("currentUser");
-  removeCookie("jwtToken");
 
+export const login = async (email, password) => {
   const req = {
     email,
     password,
@@ -17,7 +16,7 @@ export const login = async (email, password) => {
     // const inTwoHours = new Date(new Date().getTime() + 1 * 60 * 1000); // this is a minute
     const inTwoHours = new Date(new Date().getTime() + 2 * 60 * 60 * 1000);
 
-    setCookie("jwtToken", resJson.token, { expires: inTwoHours });
+    setCookie("jwtTokenTemp", resJson.token, { expires: inTwoHours });
     setCookie("currentUser", JSON.stringify(resJson.user), {
       expires: inTwoHours,
     });
