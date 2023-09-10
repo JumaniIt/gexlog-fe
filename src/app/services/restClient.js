@@ -11,9 +11,12 @@ const internalError = {
 
 const perform = async (method, uri, req, queryParams = {}) => {
   const url = new URL(BASE_URL + uri);
-  Object.keys(queryParams).forEach((key) =>
-    url.searchParams.append(key, queryParams[key])
-  );
+  Object.keys(queryParams).forEach((key) => {
+    const value = queryParams[key]
+    if (value) {
+      url.searchParams.append(key, value)
+    }
+  });
 
   const body = req ? JSON.stringify(req) : null;
   const jwtToken = getCookie('jwtTokenTemp')

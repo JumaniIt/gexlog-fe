@@ -10,7 +10,6 @@ import FilterTable from '../../components/FilterTable';
 const Requests = () => {
   // const navigate = useNavigate();
   const currentUser = getCurrentUser();
-  console.log(currentUser, 'currentUser')
 
   // try {
   //   const currentUser = getCurrentUser();

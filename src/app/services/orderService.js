@@ -22,36 +22,8 @@ Example usage
     console.log(orders);
 */
 
-export const search = async (
-  code,
-  pema,
-  port,
-  transport,
-  dateFrom,
-  dateTo,
-  timeFrom,
-  timeTo,
-  clientId,
-  status,
-  pageSize,
-  page
-) => {
-  const queryParams = {
-    code: code,
-    pema: pema,
-    port: port,
-    transport: transport,
-    date_from: dateFrom,
-    date_to: dateTo,
-    time_from: timeFrom,
-    time_to: timeTo,
-    client_id: clientId,
-    status: status,
-    page_size: pageSize,
-    page: page,
-  };
-
-  const response = await get(BASE_PATH, queryParams);
+export const search = async (filters) => {
+  const response = await get(BASE_PATH, filters);
   return await response.json();
 };
 
