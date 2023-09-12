@@ -5,6 +5,7 @@ const PaginationFooter = ({ currentPage, totalPages, onPageChange }) => {
   return (
     <HStack justifyContent="center" mt={4}>
       <Button
+        variant="link"
         isDisabled={totalPages <= 1 || currentPage === 1}
         onClick={() => onPageChange(currentPage - 1)}
       >
@@ -12,6 +13,7 @@ const PaginationFooter = ({ currentPage, totalPages, onPageChange }) => {
       </Button>
       {[...Array(totalPages).keys()].map((page) => (
         <Button
+          variant="link"
           key={page}
           onClick={() => {
             if (currentPage !== page + 1) {
@@ -24,6 +26,7 @@ const PaginationFooter = ({ currentPage, totalPages, onPageChange }) => {
         </Button>
       ))}
       <Button
+        variant="link"
         isDisabled={totalPages <= 1 || currentPage === totalPages}
         onClick={() => onPageChange(currentPage + 1)}
       >
