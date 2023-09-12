@@ -7,7 +7,7 @@ import {
   Th,
   Td,
   TableContainer,
-  Text
+  Text,
 } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { Checkbox } from "@chakra-ui/react";
@@ -25,15 +25,19 @@ import { getNameAndCuit } from "../../app/utils/clientUtils";
 import { trimToMinutes } from "../../app/utils/dateUtils";
 import { translateStatus } from "../../app/utils/orderUtils";
 import PaginationFooter from "../Pagination/paginationFooter";
+import { getCurrentUser } from "../../app/services/userService";
 
 const FilterTable = () => {
   const [filters, setFilters] = useState({
-    page_size: 3,
+    page_size: 10,
     page: 1,
   });
   const [paginationResult, setPaginationResult] = useState();
   const [searchResults, setSearchResults] = useState();
   const [clientOptions, setClientOptions] = useState([]);
+  const [clientSelectionDisabled, setClientSelectionDisabled] = useState(false);
+  const [clientSelectionPlaceHolder, setClientSelectionPlaceHolder] =
+    useState();
   const [loading, setLoading] = useState(false);
   const [currentSearchFilters, setCurrentSearchFilters] = useState({});
 
@@ -64,7 +68,17 @@ const FilterTable = () => {
     const fetchClientOptionsData = async () => {
       try {
         const options = await searchClients({ page_size: 100 });
-        setClientOptions(options.elements);
+        const clients = options.elements;
+        setClientOptions(clients);
+        const currentUser = getCurrentUser();
+        if (!currentUser.admin) {
+          setClientSelectionDisabled(true);
+          const client = clients.length > 0 ? clients[0] : null;
+          if (client) {
+            setClientSelectionPlaceHolder(getNameAndCuit(client));
+            setFilters({ ...filters, client_id: client.id });
+          }
+        }
       } catch (error) {
         console.error("Error fetching client options:", error);
       }
@@ -78,7 +92,8 @@ const FilterTable = () => {
       <div className="filter-bar">
         <Select
           size="sm"
-          placeholder="Cliente"
+          placeholder={clientSelectionPlaceHolder || "Cliente"}
+          isDisabled={clientSelectionDisabled}
           onChange={(e) =>
             setFilters({ ...filters, client_id: e.target.value })
           }
@@ -111,7 +126,7 @@ const FilterTable = () => {
         >
           PEMA
         </Checkbox>
-{/*         <div className="filter-dropdown">
+        {/*         <div className="filter-dropdown">
           <Text>PEMA</Text>
           <Select
             size="sm"
