@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   Thead,
@@ -7,34 +7,71 @@ import {
   Th,
   Td,
   TableContainer,
+  Text
 } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { Checkbox } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
-import { Button } from "@chakra-ui/react";
+import { Button, Spinner } from "@chakra-ui/react";
 import { MdSearch, MdOutlineOpenInNew } from "react-icons/md";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
-import { search } from "../../app/services/orderService";
+import {
+  search as searchOrders,
+  statuses,
+} from "../../app/services/orderService";
+import { search as searchClients } from "../../app/services/clientService";
+import { getNameAndCuit } from "../../app/utils/clientUtils";
+import { trimToMinutes } from "../../app/utils/dateUtils";
+import { translateStatus } from "../../app/utils/orderUtils";
+import PaginationFooter from "../Pagination/paginationFooter";
 
 const FilterTable = () => {
   const [filters, setFilters] = useState({
-    page_size: 12,
+    page_size: 3,
     page: 1,
   });
+  const [paginationResult, setPaginationResult] = useState();
   const [searchResults, setSearchResults] = useState();
+  const [clientOptions, setClientOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [currentSearchFilters, setCurrentSearchFilters] = useState({});
 
   const handleClick = async () => {
+    setCurrentSearchFilters(filters);
+    await search(filters);
+  };
+
+  const search = async (f) => {
     try {
+      setLoading(true);
       // Llama a la función search con datos de prueba y espera a que se resuelva la promesa
-      const data = await search(filters);
-      console.log(data, "data");
+      const data = await searchOrders(f);
       setSearchResults(data?.elements);
+      setPaginationResult({
+        totalPages: data.total_pages,
+        page: data.page,
+      });
     } catch (error) {
       // Maneja errores si es necesario
       console.error("Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchClientOptionsData = async () => {
+      try {
+        const options = await searchClients({ page_size: 100 });
+        setClientOptions(options.elements);
+      } catch (error) {
+        console.error("Error fetching client options:", error);
+      }
+    };
+
+    fetchClientOptionsData();
+  }, []);
 
   return (
     <div className="filter-table-container">
@@ -46,8 +83,11 @@ const FilterTable = () => {
             setFilters({ ...filters, client_id: e.target.value })
           }
         >
-          <option value="4">Prueba 1</option>
-          <option value="5">Prueba 2</option>
+          {clientOptions.map((client) => (
+            <option key={client.id} value={client.id}>
+              {getNameAndCuit(client)}
+            </option>
+          ))}
         </Select>
         <Input
           size="sm"
@@ -71,6 +111,18 @@ const FilterTable = () => {
         >
           PEMA
         </Checkbox>
+{/*         <div className="filter-dropdown">
+          <Text>PEMA</Text>
+          <Select
+            size="sm"
+            value={filters.pema}
+            onChange={(e) => setFilters({ ...filters, pema: e.target.value })}
+          >
+            <option value={true}>Si</option>
+            <option value={false}>No</option>
+            <option value={undefined}>-</option>
+          </Select>
+        </div> */}
         <Checkbox
           onChange={(e) => setFilters({ ...filters, port: e.target.checked })}
         >
@@ -88,99 +140,135 @@ const FilterTable = () => {
           placeholder="Estado"
           onChange={(e) => setFilters({ ...filters, status: e.target.value })}
         >
-          <option value="DRAFT">Borrador</option>
-          <option value="REVISION">Revisión</option>
-          <option value="PROCESSING">Procesando</option>
-          <option value="FINISHED">Finalizado</option>
+          {statuses.map((status) => (
+            <option key={status.value} value={status.value}>
+              {status.translation}
+            </option>
+          ))}
         </Select>
         <Button size="sm" onClick={handleClick}>
           <MdSearch />
           Buscar
         </Button>
       </div>
-      <div className="results-table">
-        <TableContainer>
-          <Table variant="striped" size="sm">
-            <Thead>
-              <Tr>
-                <Th>ID</Th>
-                <Th>Legajo</Th>
-                <Th>Cliente</Th>
-                <Th>Fecha</Th>
-                <Th>Hora</Th>
-                <Th>PEMA</Th>
-                <Th>G. PTO</Th>
-                <Th>TTE</Th>
-                <Th>Origen</Th>
-                <Th>Dest.</Th>
-                <Th>Estado</Th>
-                <Th>Ver</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {searchResults &&
-                searchResults?.map((result) => {
-                  return (
-                    <Tr className="table-row">
-                      <Td>{result.id}</Td>
-                      <Td>{result.code}</Td>
-                      <Td>{result.client_id}</Td>
-                      <Td>{result.arrival_data?.arrival_date}</Td>
-                      <Td>{result.arrival_data?.arrival_time}</Td>
-                      <Td>
-                        {result.pema ? (
-                          <CheckIcon
-                            color="green.500"
-                            style={{ pointerEvents: "none" }}
-                          />
-                        ) : (
-                          <CloseIcon
-                            color="red.500"
-                            style={{ pointerEvents: "none" }}
-                          />
-                        )}
-                      </Td>
-                      <Td>
-                        {result.port ? (
-                          <CheckIcon
-                            color="green.500"
-                            style={{ pointerEvents: "none" }}
-                          />
-                        ) : (
-                          <CloseIcon
-                            color="red.500"
-                            style={{ pointerEvents: "none" }}
-                          />
-                        )}
-                      </Td>
-                      <Td>
-                        {result.transport ? (
-                          <CheckIcon
-                            color="green.500"
-                            style={{ pointerEvents: "none" }}
-                          />
-                        ) : (
-                          <CloseIcon
-                            color="red.500"
-                            style={{ pointerEvents: "none" }}
-                          />
-                        )}
-                      </Td>
-                      <Td>{result.arrival_data?.origin}</Td>
-                      <Td>{result.arrival_data?.turn}</Td>
-                      <Td>{result.status}</Td>
-                      <Td>
-                        <Link to={`./order/${result.id}`}>
-                          <MdOutlineOpenInNew />
-                        </Link>
-                      </Td>
-                    </Tr>
-                  );
-                })}
-            </Tbody>
-          </Table>
-        </TableContainer>
-      </div>
+      {loading ? (
+        // Render the spinner component (replace with your spinner component)
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "20vh",
+          }}
+        >
+          <Spinner size="xl" color="blue.500" thickness="4px" />
+        </div>
+      ) : (
+        <div>
+          <div className="results-table">
+            <TableContainer>
+              <Table variant="striped" size="sm">
+                <Thead>
+                  <Tr>
+                    <Th>ID</Th>
+                    <Th>Cliente</Th>
+                    <Th>Fecha</Th>
+                    <Th>Hora</Th>
+                    <Th>Origen</Th>
+                    <Th>Destino</Th>
+                    <Th>Destinación</Th>
+                    <Th>CTR</Th>
+                    <Th>Dev</Th>
+                    <Th>FC</Th>
+                    <Th>Estado</Th>
+                    <Th>Ver</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {searchResults &&
+                    searchResults?.map((result) => {
+                      return (
+                        <Tr className="table-row">
+                          <Td>{result.id}</Td>
+                          <Td>
+                            {getNameAndCuit(
+                              clientOptions.find(
+                                (c) => c.id === result.client_id
+                              )
+                            )}
+                          </Td>
+                          <Td>{result.arrival_data?.arrival_date}</Td>
+                          <Td>
+                            {result.arrival_data?.arrival_time &&
+                              trimToMinutes(result.arrival_data.arrival_time)}
+                          </Td>
+                          <Td>{result.arrival_data?.origin}</Td>
+                          <Td>{result.arrival_data?.destination_type}</Td>
+                          <Td>{result.arrival_data?.destination_name}</Td>
+                          <Td>
+                            {result.arrival_data?.free_load ? (
+                              <CheckIcon
+                                color="green.500"
+                                style={{ pointerEvents: "none" }}
+                              />
+                            ) : (
+                              <CloseIcon
+                                color="red.500"
+                                style={{ pointerEvents: "none" }}
+                              />
+                            )}
+                          </Td>
+                          <Td>
+                            {result.returned ? (
+                              <CheckIcon
+                                color="green.500"
+                                style={{ pointerEvents: "none" }}
+                              />
+                            ) : (
+                              <CloseIcon
+                                color="red.500"
+                                style={{ pointerEvents: "none" }}
+                              />
+                            )}
+                          </Td>
+                          <Td>
+                            {result.billed ? (
+                              <CheckIcon
+                                color="green.500"
+                                style={{ pointerEvents: "none" }}
+                              />
+                            ) : (
+                              <CloseIcon
+                                color="red.500"
+                                style={{ pointerEvents: "none" }}
+                              />
+                            )}
+                          </Td>
+                          <Td>{translateStatus(result.status)}</Td>
+                          <Td>
+                            <Link to={`./order/${result.id}`}>
+                              <MdOutlineOpenInNew />
+                            </Link>
+                          </Td>
+                        </Tr>
+                      );
+                    })}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </div>
+          {paginationResult && (
+            <PaginationFooter
+              currentPage={paginationResult.page}
+              totalPages={paginationResult.totalPages}
+              onPageChange={(newPage) => {
+                const filters = { ...currentSearchFilters, page: newPage };
+                search(filters);
+              }}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };

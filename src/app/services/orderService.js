@@ -31,3 +31,26 @@ export const getById = async id => {
   const response = await get(BASE_PATH + "/" + id);
   return await response.json();
 }
+
+export const statuses = [
+  {
+    value: "DRAFT",
+    translation: "BORRADOR"
+  },
+  {
+    value: "REVISION",
+    translation: "REVISION"
+  },
+  {
+    value: "PROCESSING",
+    translation: "PROCESANDO"
+  },
+  {
+    value: "FINISHED",
+    translation: "FINALIZADO"
+  },
+  {
+    value: "CANCELLED",
+    translation: "CANCELADO"
+  },
+]
