@@ -1,4 +1,7 @@
 import { getCookie } from "./cookieService";
+import { get } from "./restClient";
+
+const BASE_PATH = "/users";
 
 export const getCurrentUser = () => {
   const currentUser = getCookie("currentUser");
@@ -9,3 +12,8 @@ export const getCurrentUser = () => {
 
   return JSON.parse(currentUser);
 };
+
+export const search = async filters => {
+  const response = await get(BASE_PATH, filters);
+  return await response.json();
+}

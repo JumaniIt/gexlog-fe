@@ -27,7 +27,7 @@ import { translateStatus } from "../../app/utils/orderUtils";
 import PaginationFooter from "../Pagination/paginationFooter";
 import { getCurrentUser } from "../../app/services/userService";
 
-const FilterTable = () => {
+const OrderTable = () => {
   const [filters, setFilters] = useState({
     page_size: 10,
     page: 1,
@@ -288,4 +288,4 @@ const FilterTable = () => {
   );
 };
 
-export default FilterTable;
+export default OrderTable;
