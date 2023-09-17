@@ -7,7 +7,18 @@ export const search = async (filters) => {
   return await response.json();
 };
 
-export const getById = async id => {
+export const getById = async (id) => {
   const response = await get(BASE_PATH + "/" + id);
   return await response.json();
-}
+};
+
+export const save = async (client) => {
+  const response = await post(BASE_PATH, client);
+  return await response.json();
+};
+
+export const update = async (id, client) => {
+  const response = await put(BASE_PATH + "/" + id, client);
+  return await response.json();
+};
+
