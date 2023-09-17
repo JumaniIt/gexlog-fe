@@ -8,6 +8,7 @@ import OrderTable from "../../components/OrderTable";
 import UserTable from "../../components/UserTable";
 import ClientTable from "../../components/ClientTable";
 import ClientForm from "../../components/ClientForm";
+import UserForm from "../../components/UserForm";
 
 const Requests = () => {
   const currentUser = getCurrentUser();
@@ -37,12 +38,12 @@ const Requests = () => {
         </div>
         <Divider />
         {/* Table */}
-        {/*         <div className="requests-table">
+        <div className="requests-table">
           <Heading as="h6" size="sm">
             Solicitudes
           </Heading>
         </div>
-        <OrderTable /> */}
+        <OrderTable />
 
         {/*<div className="requests-table">
           <Heading as="h6" size="sm">
@@ -57,13 +58,6 @@ const Requests = () => {
           </Heading>
         </div>
         <ClientTable /> */}
-
-{/*         <div className="requests-table">
-          <Heading as="h6" size="sm">
-            Clientes
-          </Heading>
-        </div>
-        <ClientForm /> */}
       </div>
     </div>
   );

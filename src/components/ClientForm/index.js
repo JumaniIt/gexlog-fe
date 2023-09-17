@@ -51,14 +51,11 @@ const ClientForm = ({ id }) => {
         response = await saveClient(client);
       }
 
-      console.log("response " + JSON.stringify(response))
-
       if (response?.error) {
         setError(response.error.message);
       }
 
     } catch (err) {
-      console.log("err ", err)
       setError(err.message);
     } finally {
       setLoading(false);
