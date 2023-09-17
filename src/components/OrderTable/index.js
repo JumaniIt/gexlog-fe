@@ -191,7 +191,6 @@ const OrderTable = () => {
                     <Th>Hora</Th>
                     <Th>Origen</Th>
                     <Th>Destino</Th>
-                    <Th>Destinación</Th>
                     <Th>CTR</Th>
                     <Th>Dev</Th>
                     <Th>FC</Th>
@@ -212,16 +211,15 @@ const OrderTable = () => {
                               )
                             )}
                           </Td>
-                          <Td>{result.arrival_data?.arrival_date}</Td>
+                          <Td>{result.arrival_date}</Td>
                           <Td>
-                            {result.arrival_data?.arrival_time &&
-                              trimToMinutes(result.arrival_data.arrival_time)}
+                            {result.arrival_time &&
+                              trimToMinutes(result.arrival_time)}
                           </Td>
-                          <Td>{result.arrival_data?.origin}</Td>
-                          <Td>{result.arrival_data?.destination_type}</Td>
-                          <Td>{result.arrival_data?.destination_name}</Td>
+                          <Td>{result.origin}</Td>
+                          <Td>{result.target}</Td>
                           <Td>
-                            {result.arrival_data?.free_load ? (
+                            {result.free_load ? (
                               <CheckIcon
                                 color="green.500"
                                 style={{ pointerEvents: "none" }}
