@@ -7,6 +7,7 @@ import { Heading } from "@chakra-ui/react";
 import OrderTable from "../../components/OrderTable";
 import UserTable from "../../components/UserTable";
 import ClientTable from "../../components/ClientTable";
+import logoSrc from '../../full-logo.png';
 
 const Requests = () => {
   const currentUser = getCurrentUser();
@@ -14,8 +15,9 @@ const Requests = () => {
   return (
     <div className="requests-container">
       <div className="requests-left-bar">
-        {/* logo */}
-        <div className="logo-container"></div>
+        <div className="logo-container">
+          <img src={logoSrc} className="left-bar-logo" />
+        </div>
         <Divider />
         <div className="left-bar-actions">
           <Link to="/orders">
