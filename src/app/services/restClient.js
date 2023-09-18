@@ -48,5 +48,6 @@ export const get = async (uri, queryParams = {}) => {
 };
 
 export const put = async (uri, req) => {
+  console.log(uri)
   return perform("PUT", uri, req);
 };

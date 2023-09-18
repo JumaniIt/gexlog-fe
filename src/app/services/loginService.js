@@ -1,5 +1,4 @@
-import { removeCookie, setCookie } from "./cookieService";
-import { getById, search } from "./orderService";
+import { setCookie } from "./cookieService";
 import { post } from "./restClient";
 
 
