@@ -9,7 +9,7 @@ import {
   AlertIcon,
 } from "@chakra-ui/react";
 
-import logo from "../../gexlog-logo.svg";
+import logo from "../../full-logo.png";
 import { login } from "../../app/services/loginService";
 
 const LoginForm = () => {
@@ -41,7 +41,7 @@ const LoginForm = () => {
     if (loginResponse?.message) {
       setErrorMessage(loginResponse.message);
     } else {
-      navigate("/requests", { replace: true });
+      navigate("/orders", { replace: true });
     }
   };
 
@@ -58,10 +58,9 @@ const LoginForm = () => {
 
   return (
     <div className="login-form-container">
-      {/* <div className="login-logo">
+      <div className="login-logo">
         <img src={logo} alt="gexlog" />
-        <h1 className="logo-name">Gexlog</h1>
-      </div> */}
+      </div>
       <form className="login-form" onSubmit={handleSubmit}>
         <FormControl id="email" isRequired mt={10}>
           <FormLabel>E-mail</FormLabel>

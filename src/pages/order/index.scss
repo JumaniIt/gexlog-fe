@@ -1,0 +1,100 @@
+.order-container {
+  font-family: "Montserrat", sans-serif;
+
+  .order-heading {
+    text-align: center;
+    font-family: "Montserrat", sans-serif !important;
+    color: #a0aec0;
+  }
+
+  .order-card {
+    margin: 12px 30px;
+
+    &-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      input {
+        width: auto;
+        margin-left: 5px;
+      }
+    }
+  }
+
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: flex-end;
+    margin-bottom: 20px;
+
+    .chakra-heading {
+      font-family: "Montserrat", sans-serif !important;
+      margin-bottom: 10px;
+      color: #a0aec0;
+      text-transform: uppercase;
+    }
+
+    .services-checkbox {
+      font-weight: bold;
+      color: #006fb7;
+    }
+  }
+
+  .main-content {
+    display: flex;
+
+    .chakra-heading {
+      font-family: "Montserrat", sans-serif !important;
+      margin: 20px 0 10px;
+      color: #006fb7;
+    }
+
+    .left-column {
+      width: 20vw;
+
+      .second-row {
+        .title {
+          display: flex;
+          align-items: center;
+        }
+
+        .add-doc-icon {
+          background-color: #38a169;
+          border-radius: 20%;
+          color: white;
+          margin-left: 10px;
+        }
+      }
+    }
+
+    .right-column {
+      width: 65vw;
+      margin-left: 20px;
+      display: block;
+
+      .first-row {
+        &-stack {
+          display: flex;
+          flex-direction: row;
+        }
+      }
+
+      .second-row {
+        .right-side {
+
+          margin-left: 15px;
+        }
+      }
+
+      .third-row {
+        .subtitle {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 20px;
+        }
+      }
+    }
+  }
+}

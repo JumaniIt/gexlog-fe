@@ -5,14 +5,18 @@
 @import "../../components/Cards/cards.scss";
 @import "../../components/ImageText/image-text.scss";
 @import "../../components/TextSection/text-section.scss";
-@import "../../components/ContactForm/contactForm.scss";
+@import "../../components/ContactForm/index.scss";
+@import "../../components/Layout/index.scss";
 
 // Pages
 @import "../login/index.scss";
 @import "../default/index.scss";
 @import "../requests/index.scss";
+@import "../order/index.scss";
 
 .main-page {
+  font-family: "Montserrat", sans-serif !important;
+
   &__container {
     min-height: 100vh;
     position: relative;

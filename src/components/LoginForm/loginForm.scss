@@ -4,6 +4,7 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
+  position: relative;
 }
 
 .login-logo {
@@ -11,9 +12,11 @@
   height: 130px;
   align-items: center;
   justify-content: center;
+  position: absolute;
+  top: 15%;
 
   img {
-    height: 110px;
+    height: 65px;
   }
 
   .logo-name {

@@ -8,8 +8,7 @@ import {
 import { Input } from "@chakra-ui/react";
 import { Card, CardBody } from "@chakra-ui/react";
 import { Select } from '@chakra-ui/react';
-import ContactForm from "../ContactForm/contactForm";
-
+import ContactForm from "../ContactForm";
 
 const Banner = ({ className, title, description, img }) => {
   return (

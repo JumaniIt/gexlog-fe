@@ -126,18 +126,6 @@ const OrderTable = () => {
         >
           PEMA
         </Checkbox>
-        {/*         <div className="filter-dropdown">
-          <Text>PEMA</Text>
-          <Select
-            size="sm"
-            value={filters.pema}
-            onChange={(e) => setFilters({ ...filters, pema: e.target.value })}
-          >
-            <option value={true}>Si</option>
-            <option value={false}>No</option>
-            <option value={undefined}>-</option>
-          </Select>
-        </div> */}
         <Checkbox
           onChange={(e) => setFilters({ ...filters, port: e.target.checked })}
         >
@@ -166,41 +154,40 @@ const OrderTable = () => {
           Buscar
         </Button>
       </div>
-      {loading ? (
-        // Render the spinner component (replace with your spinner component)
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "20vh",
-          }}
-        >
-          <Spinner size="xl" color="blue.500" thickness="4px" />
-        </div>
-      ) : (
-        <div>
-          <div className="results-table">
-            <TableContainer>
-              <Table variant="striped" size="sm">
-                <Thead>
-                  <Tr>
-                    <Th>ID</Th>
-                    <Th>Cliente</Th>
-                    <Th>Fecha</Th>
-                    <Th>Hora</Th>
-                    <Th>Origen</Th>
-                    <Th>Destino</Th>
-                    <Th>CTR</Th>
-                    <Th>Dev</Th>
-                    <Th>FC</Th>
-                    <Th>Estado</Th>
-                    <Th>Ver</Th>
-                  </Tr>
-                </Thead>
+      <div>
+        <div className="results-table">
+          <TableContainer>
+            <Table variant="striped" size="sm">
+              <Thead>
+                <Tr>
+                  <Th>ID</Th>
+                  <Th>Cliente</Th>
+                  <Th>Fecha</Th>
+                  <Th>Hora</Th>
+                  <Th>Origen</Th>
+                  <Th>Destino</Th>
+                  <Th>CTR</Th>
+                  <Th>Dev</Th>
+                  <Th>FC</Th>
+                  <Th>Estado</Th>
+                  <Th>Ver</Th>
+                </Tr>
+              </Thead>
+              {loading ? (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "20vh",
+                  }}
+                >
+                  <Spinner size="xl" color="blue.500" thickness="4px" />
+                </div>
+              ) : (
                 <Tbody>
-                  {searchResults &&
-                    searchResults?.map((result) => {
+                  {searchResults?.length &&
+                    searchResults.map((result) => {
                       return (
                         <Tr className="table-row">
                           <Td>{result.id}</Td>
@@ -259,7 +246,7 @@ const OrderTable = () => {
                           </Td>
                           <Td>{translateStatus(result.status)}</Td>
                           <Td>
-                            <Link to={`./order/${result.id}`}>
+                            <Link to={`/orders/${result.id}`}>
                               <MdOutlineOpenInNew />
                             </Link>
                           </Td>
@@ -267,10 +254,11 @@ const OrderTable = () => {
                       );
                     })}
                 </Tbody>
+              )}
               </Table>
-            </TableContainer>
-          </div>
-          {paginationResult && (
+          </TableContainer>
+        </div>
+        {/* {paginationResult && (
             <PaginationFooter
               currentPage={paginationResult.page}
               totalPages={paginationResult.totalPages}
@@ -279,9 +267,9 @@ const OrderTable = () => {
                 search(filters);
               }}
             />
-          )}
-        </div>
-      )}
+          )} */}
+      </div>
+      {/* )} */}
     </div>
   );
 };

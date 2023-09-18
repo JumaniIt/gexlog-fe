@@ -1,0 +1,32 @@
+@import "../Sidebar/index.scss";
+
+.layout {
+  display: flex;
+  height: 100vh;
+  font-family: "Montserrat", sans-serif;
+
+  &-left {
+    width: 12%;
+  }
+
+  &-right {
+    width: 88%;
+  }
+
+  .heading-container {
+    height: 100px;
+    display: flex;
+    align-items: center;
+
+    h4 {
+      color: #006fb7;
+      margin-left: 30px;
+      font-family: "Montserrat", sans-serif;
+    }
+  }
+
+  .layout-heading-divider {
+    width: 300px;
+    margin: 0 0 0 30px;
+  }
+}

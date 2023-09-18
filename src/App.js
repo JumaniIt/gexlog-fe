@@ -4,6 +4,7 @@ import Login from './pages/login';
 import Main from './pages/main/main';
 import Requests from './pages/requests';
 import ErrorPage from "./error-page";
+import Order from './pages/order';
 
 const router = createBrowserRouter([
   {
@@ -16,8 +17,13 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    path: "/requests",
+    path: "/orders",
     element: <Requests />,
+  },
+
+  {
+    path: "/orders/:id",
+    element: <Order />,
   },
 ]);
 
