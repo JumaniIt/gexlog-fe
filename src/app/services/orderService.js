@@ -1,6 +1,8 @@
-import { get, post, put } from "./restClient";
+import { get, post, put, doDelete } from "./restClient";
 
 const BASE_PATH = "/orders";
+
+const DOCUMENTS = "/documents/";
 
 /*
 Example usage
@@ -27,30 +29,42 @@ export const search = async (filters) => {
   return await response.json();
 };
 
-export const getById = async id => {
+export const getById = async (id) => {
   const response = await get(BASE_PATH + "/" + id);
   return await response.json();
-}
+};
+
+export const getDocumentLink = async (orderId, docId) => {
+  const response = await get(BASE_PATH + "/" + orderId + DOCUMENTS + docId);
+  const resJson = await response.json();
+
+  return resJson.link;
+};
+
+export const deleteDocument = async (orderId, docId) => {
+  await doDelete(BASE_PATH + "/" + orderId + DOCUMENTS + docId);
+  return;
+};
 
 export const statuses = [
   {
     value: "DRAFT",
-    translation: "BORRADOR"
+    translation: "BORRADOR",
   },
   {
     value: "REVISION",
-    translation: "REVISION"
+    translation: "REVISION",
   },
   {
     value: "PROCESSING",
-    translation: "PROCESANDO"
+    translation: "PROCESANDO",
   },
   {
     value: "FINISHED",
-    translation: "FINALIZADO"
+    translation: "FINALIZADO",
   },
   {
     value: "CANCELLED",
-    translation: "CANCELADO"
+    translation: "CANCELADO",
   },
-]
+];

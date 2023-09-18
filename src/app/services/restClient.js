@@ -51,3 +51,7 @@ export const put = async (uri, req) => {
   console.log(uri)
   return perform("PUT", uri, req);
 };
+
+export const doDelete = async (uri, queryParams = {}) => {
+  return perform("DELETE", uri, null, queryParams);
+};
