@@ -1,6 +1,5 @@
 import { getCookie } from "./cookieService";
 
-
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const internalError = {
@@ -9,27 +8,33 @@ const internalError = {
   message: "Rest error",
 };
 
-const perform = async (method, uri, req, queryParams = {}) => {
+const perform = async (method, uri, req, queryParams = {}, contentType) => {
   const url = new URL(BASE_URL + uri);
   Object.keys(queryParams).forEach((key) => {
-    const value = queryParams[key]
+    const value = queryParams[key];
     if (value) {
-      url.searchParams.append(key, value)
+      url.searchParams.append(key, value);
     }
   });
 
-  const body = req ? JSON.stringify(req) : null;
-  const jwtToken = getCookie('jwtTokenTemp')
+  const jwtToken = getCookie("jwtTokenTemp");
+  const headers = new Headers();
+  headers.append("x-auth-origin", "gexlog-fe");
+  headers.append("x-auth-token", "Bearer " + jwtToken);
+
+  let body;
+  if (contentType !== "multipart/form-data;") {
+    headers.append("Content-Type", "application/json;");
+    body = req ? JSON.stringify(req) : null;
+  } else {
+    body = req;
+  }
 
   try {
     const response = await fetch(url, {
       method,
       credentials: "include",
-      headers: {
-        "x-auth-origin": "gexlog-fe",
-        "Content-Type": "application/json",
-        "x-auth-token": "Bearer " + jwtToken
-      },
+      headers,
       body,
     });
     return response;
@@ -39,16 +44,15 @@ const perform = async (method, uri, req, queryParams = {}) => {
   }
 };
 
-export const post = async (uri, req) => {
-  return perform("POST", uri, req);
+export const post = async (uri, req, contentType) => {
+  return perform("POST", uri, req, {}, contentType);
 };
 
 export const get = async (uri, queryParams = {}) => {
-  return perform("GET", uri, null, queryParams);
+  return perform("GET", uri, undefined, queryParams);
 };
 
 export const put = async (uri, req) => {
-  console.log(uri)
   return perform("PUT", uri, req);
 };
 

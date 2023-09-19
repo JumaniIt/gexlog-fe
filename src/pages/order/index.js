@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Layout from "../../components/Layout";
 import { Card, CardHeader, CardBody } from "@chakra-ui/react";
 import { Divider } from "@chakra-ui/react";
@@ -43,6 +43,7 @@ import {
   getDocumentLink,
   getById as getOrderById,
   deleteDocument,
+  addDocument,
 } from "../../app/services/orderService";
 import { useParams } from "react-router-dom";
 import { formatDestinations } from "../../app/utils/destinationUtils";
@@ -72,6 +73,9 @@ const Order = ({}) => {
   const [clientOptions, setClientOptions] = useState([]);
   const [clientOptionsLoaded, setClientOptionsLoaded] = useState(false);
   const [consigneeOptions, setConsigneeOptions] = useState([]);
+  const [loadingFiles, setLoadingFiles] = useState(false)
+
+  const fileInputRef = useRef(null);
 
   const { id } = useParams();
 
@@ -106,15 +110,17 @@ const Order = ({}) => {
 
   useEffect(() => {
     const loadConsignees = async () => {
-      try {
-        const client = await getClientById(order.client_id, "true");
-        const consignees = client?.consignees?.map((c) => ({
-          name: c.name,
-          cuit: c.cuit,
-        }));
-        setConsigneeOptions([...consignees]);
-      } catch (error) {
-        console.error("Error fetching order:", error);
+      if (order?.client_id) {
+        try {
+          const client = await getClientById(order.client_id, "true");
+          const consignees = client?.consignees?.map((c) => ({
+            name: c.name,
+            cuit: c.cuit,
+          }));
+          setConsigneeOptions([...consignees]);
+        } catch (error) {
+          console.error("Error fetching order:", error);
+        }
       }
     };
 
@@ -133,16 +139,24 @@ const Order = ({}) => {
     setOrder({ ...order, [field]: value });
   };
 
-  const onDeleteDocument = async (docId) => {
-    try {
-      await deleteDocument(order.id, docId);
-      const updatedDocuments = order.documents.filter(
-        (document) => document.id !== docId
-      );
-      setOrder({ ...order, documents: updatedDocuments });
-      
-    } catch (error) {
-      console.error("Error deleting document:", error);
+  const onDeleteDocument = async (docId, docName) => {
+    const confirmed = window.confirm(
+      `¿Estás seguro de que deseas eliminar el documento "${docName}"?\nEsta acción es irreversible!`
+    );
+
+    if (confirmed) {
+      setLoadingFiles(true)
+      try {
+        await deleteDocument(order.id, docId);
+        const updatedDocuments = order.documents.filter(
+          (document) => document.id !== docId
+        );
+        setOrder({ ...order, documents: updatedDocuments });
+      } catch (error) {
+        console.error("Error deleting document:", error);
+      } finally {
+        setLoadingFiles(false)
+      }
     }
   };
 
@@ -154,6 +168,34 @@ const Order = ({}) => {
     } catch (error) {
       console.error("Error opening document:", error);
     }
+  };
+
+  const uploadAndProcessFiles = async (selectedFiles) => {
+    setLoadingFiles(true)
+    const promises = [...selectedFiles].map(async (file) => {
+      try {
+        const document = await addDocument(order.id, file);
+        return document;
+      } catch (error) {
+        console.error("Error uploading document:", error);
+        return null;
+      }
+    });
+
+    const processedFiles = await Promise.all(promises);
+    const successfulFiles = processedFiles.filter((file) => file !== null);
+
+    console.log("succesful files", successfulFiles[0]);
+
+    // Update the order's documents array with the successful uploads
+    setOrder({
+      ...order,
+      documents: [...order.documents, ...successfulFiles],
+    });
+
+    setLoadingFiles(false)
+
+    // You can add additional logic here to handle error messages or other UI updates
   };
 
   return (
@@ -262,9 +304,23 @@ const Order = ({}) => {
                   <Heading as="h6" size="sm">
                     Documentación
                   </Heading>
+                  <Input
+                    type="file"
+                    accept=".pdf, .png, .jpg, .doc, .txt, .xml, .css"
+                    multiple
+                    style={{ display: "none" }}
+                    onChange={(e) => {
+                      uploadAndProcessFiles(e.target.files);
+                    }}
+                    ref={fileInputRef}
+                  />
                   <IconButton
                     icon={<AddIcon />}
                     size="xs"
+                    isLoading={loadingFiles}
+                    onClick={() => {
+                      fileInputRef.current.click();
+                    }}
                     className="add-doc-icon"
                   />
                 </div>
@@ -272,17 +328,22 @@ const Order = ({}) => {
                   {/* Display the list of documents */}
                   {order.documents?.map((document) => (
                     <div key={document.id} className="document-item">
-                      <span>{document.name}</span>
-                      <IconButton
-                        icon={<ViewIcon />}
-                        size="xs"
-                        onClick={() => onOpenDocument(document.id)} // Call the open document function with the document ID
-                        mr={2} // Add some right margin for spacing
-                      />
+                      <span
+                        style={{
+                          color: "blue",
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                        }}
+                        onClick={() => onOpenDocument(document.id)}
+                      >
+                        {document.name}
+                      </span>
                       <IconButton
                         icon={<DeleteIcon />}
                         size="xs"
-                        onClick={() => onDeleteDocument(document.id)} // Call the delete function with the document ID
+                        onClick={() =>
+                          onDeleteDocument(document.id, document.name)
+                        } // Call the delete function with the document ID
                       />
                     </div>
                   ))}
