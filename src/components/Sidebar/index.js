@@ -2,7 +2,7 @@ import React from "react";
 import logoSrc from '../../full-logo.png';
 import { Divider } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { MdListAlt, MdPeople } from "react-icons/md";
+import { MdListAlt, MdPeople, MdBusiness } from "react-icons/md";
 
 const Sidebar = () => (
   <div className="sidebar">
@@ -18,6 +18,10 @@ const Sidebar = () => (
       <Link to="/users">
         <MdPeople />
         Usuarios
+      </Link>
+      <Link to="/clients">
+        <MdBusiness />
+        Clientes
       </Link>
     </div>
   </div>

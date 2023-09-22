@@ -19,8 +19,11 @@ import {
   save as saveClient,
   update as updateClient,
 } from "../../app/services/clientService";
+import { useParams } from "react-router-dom";
 
-const ClientForm = ({ id }) => {
+
+const ClientForm = () => {
+  const { id } = useParams();
   const [client, setClient] = useState({
     name: "",
     phone: "",

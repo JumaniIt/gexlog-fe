@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 import Layout from "../../components/Layout";
-import UserTable from "../../components/UserTable";
 import { Heading } from "@chakra-ui/react";
+import ClientTable from "../../components/ClientTable";
 
-const UsersPage = () => {
+const ClientsPage = () => {
   return (
     <Layout>
-      <div className="users-table">
+      <div className="clients-table">
         <Heading as="h6" size="sm">
-          Usuarios
+          Clientes
         </Heading>
       </div>
-      <UserTable />
+    <ClientTable />
     </Layout>
   );
 };
 
-export default UsersPage;
+export default ClientsPage;

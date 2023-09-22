@@ -6,7 +6,7 @@ import {
   Tr,
   Th,
   Td,
-  TableContainer
+  TableContainer,
 } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
@@ -63,15 +63,16 @@ const UserTable = () => {
         <Select
           size="sm"
           placeholder="Rol"
-          onChange={(e) => setFilters({ ...filters, admin: e.target.value })}
+          onChange={(e) => {
+            setFilters({ ...filters, admin: e.target.value});
+          }}
         >
-            <option key={true} value={true}>
-              ADMIN
-            </option>
-            <option key={true} value={true}>
-              CLIENTE
-            </option>
-
+          <option key={true} value={'true'}>
+            ADMIN
+          </option>
+          <option key={true} value={'false'}>
+            CLIENTE
+          </option>
         </Select>
         <Button size="sm" onClick={handleClick}>
           <MdSearch />
@@ -111,11 +112,9 @@ const UserTable = () => {
                           <Td>{result.id}</Td>
                           <Td>{result.email}</Td>
                           <Td>{result.nickname}</Td>
+                          <Td>{result.admin ? "ADMIN" : "CLIENTE"}</Td>
                           <Td>
-                            {result.admin ? "ADMIN" : "CLIENTE"}
-                          </Td>
-                          <Td>
-                            <Link to={`./user/${result.id}`}>
+                            <Link to={`./${result.id}`}>
                               <MdOutlineOpenInNew />
                             </Link>
                           </Td>

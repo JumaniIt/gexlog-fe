@@ -14,8 +14,10 @@ import {
   save as saveUser,
   update as updateUser,
 } from "../../app/services/userService";
+import { useParams } from "react-router-dom";
 
-const UserForm = ({ id }) => {
+const UserForm = () => {
+  const { id } = useParams();
   const [user, setUser] = useState({
     nickname: "",
     email: "",

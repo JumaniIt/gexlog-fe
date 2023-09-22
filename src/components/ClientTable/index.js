@@ -136,7 +136,7 @@ const ClientTable = () => {
                           <Td>{result.cuit}</Td>
                           <Td>{result.user_id}</Td>
                           <Td>
-                            <Link to={`./cients/${result.id}`}>
+                            <Link to={`./${result.id}`}>
                               <MdOutlineOpenInNew />
                             </Link>
                           </Td>

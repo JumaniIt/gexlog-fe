@@ -8,7 +8,7 @@ const internalError = {
   message: "Rest error",
 };
 
-const perform = async (method, uri, req, queryParams = {}, contentType) => {
+const perform = async (method, uri, req, queryParams = {}, contentType = "application/json") => {
   const url = new URL(BASE_URL + uri);
   Object.keys(queryParams).forEach((key) => {
     const value = queryParams[key];

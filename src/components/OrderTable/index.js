@@ -167,6 +167,7 @@ const OrderTable = () => {
                   <Th>Origen</Th>
                   <Th>Destino</Th>
                   <Th>CTR</Th>
+                  <Th>C.Suelta</Th>
                   <Th>Dev</Th>
                   <Th>FC</Th>
                   <Th>Estado</Th>
@@ -205,19 +206,8 @@ const OrderTable = () => {
                           </Td>
                           <Td>{result.origin}</Td>
                           <Td>{result.target}</Td>
-                          <Td>
-                            {result.free_load ? (
-                              <CheckIcon
-                                color="green.500"
-                                style={{ pointerEvents: "none" }}
-                              />
-                            ) : (
-                              <CloseIcon
-                                color="red.500"
-                                style={{ pointerEvents: "none" }}
-                              />
-                            )}
-                          </Td>
+                          <Td>{result.container_qty}</Td>
+                          <Td>{result.free_load_qty}</Td>
                           <Td>
                             {result.returned ? (
                               <CheckIcon
@@ -255,7 +245,7 @@ const OrderTable = () => {
                     })}
                 </Tbody>
               )}
-              </Table>
+            </Table>
           </TableContainer>
         </div>
         {/* {paginationResult && (
