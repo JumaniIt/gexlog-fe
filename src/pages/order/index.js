@@ -185,8 +185,6 @@ const Order = ({}) => {
     const processedFiles = await Promise.all(promises);
     const successfulFiles = processedFiles.filter((file) => file !== null);
 
-    console.log("succesful files", successfulFiles[0]);
-
     // Update the order's documents array with the successful uploads
     setOrder({
       ...order,

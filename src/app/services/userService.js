@@ -1,17 +1,8 @@
+import { SESSION_EXPIRED_ERROR } from "../utils/sessionUtils";
 import { getCookie } from "./cookieService";
 import { get, post, put } from "./restClient";
 
 const BASE_PATH = "/users";
-
-export const getCurrentUser = () => {
-  const currentUser = getCookie("currentUser");
-
-  if (!currentUser) {
-    throw new Error("session expired");
-  }
-
-  return JSON.parse(currentUser);
-};
 
 export const search = async (filters) => {
   const response = await get(BASE_PATH, filters);

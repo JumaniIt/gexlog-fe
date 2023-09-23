@@ -15,7 +15,7 @@ import { Input } from "@chakra-ui/react";
 import { Button, Spinner } from "@chakra-ui/react";
 import { MdSearch, MdOutlineOpenInNew } from "react-icons/md";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   search as searchOrders,
   statuses,
@@ -25,7 +25,7 @@ import { getNameAndCuit } from "../../app/utils/clientUtils";
 import { trimToMinutes } from "../../app/utils/dateUtils";
 import { translateStatus } from "../../app/utils/orderUtils";
 import PaginationFooter from "../Pagination/paginationFooter";
-import { getCurrentUser } from "../../app/services/userService";
+import { withinSessionContext, getCurrentUser } from "../../app/utils/sessionUtils";
 
 const OrderTable = () => {
   const [filters, setFilters] = useState({
@@ -46,42 +46,47 @@ const OrderTable = () => {
     await search(filters);
   };
 
+  const navigate = useNavigate();
+
+
   const search = async (f) => {
-    try {
-      setLoading(true);
-      // Llama a la función search con datos de prueba y espera a que se resuelva la promesa
-      const data = await searchOrders(f);
-      setSearchResults(data?.elements);
-      setPaginationResult({
-        totalPages: data.total_pages,
-        page: data.page,
-      });
-    } catch (error) {
-      // Maneja errores si es necesario
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    withinSessionContext(
+      navigate,
+      () => searchOrders(f),
+      (result) => {
+        setSearchResults(result?.elements);
+        setPaginationResult({
+          totalPages: result.total_pages,
+          page: result.page,
+        });
+      },
+      (error) => console.log(error),
+      () => setLoading(false)
+    );
   };
+
 
   useEffect(() => {
     const fetchClientOptionsData = async () => {
-      try {
-        const options = await searchClients({ page_size: 100 });
-        const clients = options.elements;
-        setClientOptions(clients);
-        const currentUser = getCurrentUser();
-        if (!currentUser.admin) {
-          setClientSelectionDisabled(true);
-          const client = clients.length > 0 ? clients[0] : null;
-          if (client) {
-            setClientSelectionPlaceHolder(getNameAndCuit(client));
-            setFilters({ ...filters, client_id: client.id });
+      withinSessionContext(
+        navigate,
+        () => searchClients({ page_size: 100 }),
+        (result) => {
+          const clients = result.elements;
+          setClientOptions(clients);
+          const currentUser = getCurrentUser(navigate);
+          if (!currentUser?.admin) {
+            setClientSelectionDisabled(true);
+            const client = clients.length > 0 ? clients[0] : null;
+            if (client) {
+              setClientSelectionPlaceHolder(getNameAndCuit(client));
+              setFilters({ ...filters, client_id: client.id });
+            }
           }
-        }
-      } catch (error) {
-        console.error("Error fetching client options:", error);
-      }
+        },
+        (error) => console.log(error));
+    
     };
 
     fetchClientOptionsData();
@@ -98,7 +103,7 @@ const OrderTable = () => {
             setFilters({ ...filters, client_id: e.target.value })
           }
         >
-          {clientOptions.map((client) => (
+          {clientOptions?.map((client) => (
             <option key={client.id} value={client.id}>
               {getNameAndCuit(client)}
             </option>

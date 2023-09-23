@@ -1,3 +1,4 @@
+import { SESSION_EXPIRED_ERROR } from "../utils/sessionUtils";
 import { getCookie } from "./cookieService";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
@@ -8,7 +9,13 @@ const internalError = {
   message: "Rest error",
 };
 
-const perform = async (method, uri, req, queryParams = {}, contentType = "application/json") => {
+const perform = async (
+  method,
+  uri,
+  req,
+  queryParams = {},
+  contentType = "application/json"
+) => {
   const url = new URL(BASE_URL + uri);
   Object.keys(queryParams).forEach((key) => {
     const value = queryParams[key];
@@ -21,6 +28,7 @@ const perform = async (method, uri, req, queryParams = {}, contentType = "applic
   const headers = new Headers();
   headers.append("x-auth-origin", "gexlog-fe");
   headers.append("x-auth-token", "Bearer " + jwtToken);
+  headers.append("Accept", "application/json");
 
   let body;
   if (contentType !== "multipart/form-data;") {
@@ -37,8 +45,16 @@ const perform = async (method, uri, req, queryParams = {}, contentType = "applic
       headers,
       body,
     });
-    return response;
+    if (response.status === 401) {
+      throw SESSION_EXPIRED_ERROR;
+    } else {
+      return response;
+    }
   } catch (error) {
+    if (error === SESSION_EXPIRED_ERROR) {
+      throw error;
+    }
+    
     console.error("Rest error:", error);
     return internalError;
   }
