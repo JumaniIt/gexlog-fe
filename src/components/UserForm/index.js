@@ -22,7 +22,6 @@ const UserForm = () => {
   const [user, setUser] = useState({
     nickname: "",
     email: "",
-    password: "",
     admin: "",
   });
   const [loading, setLoading] = useState(false);
@@ -79,7 +78,7 @@ const UserForm = () => {
         async () => {
           if (id) {
             const user = await getUserById(id);
-            setUser({ ...user, password: "****" });
+            setUser(user);
           }
         },
         (error) => console.error("Error fetching client:", error)
@@ -125,9 +124,9 @@ const UserForm = () => {
         <Input
           type="text"
           name="password"
+          placeholder="****"
           value={user.password}
           onChange={handleInputChange}
-          placeholder="Contraseña"
         />
       </FormControl>
       <FormControl>

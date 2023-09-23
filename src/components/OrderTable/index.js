@@ -13,7 +13,7 @@ import { Select } from "@chakra-ui/react";
 import { Checkbox } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
 import { Button, Spinner } from "@chakra-ui/react";
-import { MdSearch, MdOutlineOpenInNew } from "react-icons/md";
+import { MdSearch, MdOutlineOpenInNew, MdCreate } from "react-icons/md";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -156,6 +156,10 @@ const OrderTable = () => {
           <MdSearch />
           Buscar
         </Button>
+        <Button size="sm" onClick={() => window.open(`/orders/new`)}>
+          <MdCreate />
+          Crear
+        </Button>
       </div>
       <div>
         <div className="results-table">
@@ -190,7 +194,7 @@ const OrderTable = () => {
                 </div>
               ) : (
                 <Tbody>
-                  {searchResults?.length &&
+                  {searchResults?.length > 0 &&
                     searchResults.map((result) => {
                       return (
                         <Tr className="table-row">
@@ -239,7 +243,7 @@ const OrderTable = () => {
                           </Td>
                           <Td>{translateStatus(result.status)}</Td>
                           <Td>
-                            <Link to={`/orders/${result.id}`}>
+                            <Link to={`/orders/${result.id}`} target="_blank">
                               <MdOutlineOpenInNew />
                             </Link>
                           </Td>

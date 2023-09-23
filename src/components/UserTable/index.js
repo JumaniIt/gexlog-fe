@@ -11,7 +11,7 @@ import {
 import { Select } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
 import { Button, Spinner } from "@chakra-ui/react";
-import { MdSearch, MdOutlineOpenInNew } from "react-icons/md";
+import { MdSearch, MdOutlineOpenInNew, MdCreate } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import { search as searchUsers } from "../../app/services/userService";
 import PaginationFooter from "../Pagination/paginationFooter";
@@ -80,6 +80,10 @@ const UserTable = () => {
         <Button size="sm" onClick={handleClick}>
           <MdSearch />
           Buscar
+        </Button>
+        <Button size="sm" onClick={() => navigate("./new", {replace: true})}>
+          <MdCreate />
+          Crear
         </Button>
       </div>
       {loading ? (

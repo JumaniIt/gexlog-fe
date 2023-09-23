@@ -197,7 +197,7 @@ const Order = ({}) => {
             if (error === SESSION_EXPIRED_ERROR) {
               throw error;
             }
-            
+
             console.error("Error uploading document:", error);
             return null;
           }
@@ -218,7 +218,7 @@ const Order = ({}) => {
   };
 
   return (
-    <Layout className="order-container" headingText={`< Volver`}>
+    <Layout className="order-container">
       <Card variant="outline" className="order-card">
         <CardHeader className="order-card-header">
           <Heading size="sm" className="order-heading">
