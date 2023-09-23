@@ -1,5 +1,3 @@
-import { SESSION_EXPIRED_ERROR } from "../utils/sessionUtils";
-import { getCookie } from "./cookieService";
 import { get, post, put } from "./restClient";
 
 const BASE_PATH = "/users";

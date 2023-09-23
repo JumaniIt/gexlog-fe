@@ -14,7 +14,8 @@ import {
   save as saveUser,
   update as updateUser,
 } from "../../app/services/userService";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { withSession } from "../../app/utils/sessionUtils";
 
 const UserForm = () => {
   const { id } = useParams();
@@ -26,6 +27,7 @@ const UserForm = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -44,39 +46,38 @@ const UserForm = () => {
   };
 
   const handleSave = async () => {
-    setLoading(true);
-    setError(null);
+    withSession(
+      navigate,
+      async () => {
+        setLoading(true);
+        setError(null);
 
-    try {
-      let response;
-      if (id) {
-        response = await updateUser(id, user);
-      } else {
-        response = await saveUser(user);
-      }
+        let response;
+        if (id) {
+          response = await updateUser(id, user);
+        } else {
+          response = await saveUser(user);
+        }
 
-      if (response?.error) {
-        setError(response.error.message);
-      } else if (response?.message) {
-        setError(response.message);
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+        if (response?.error) {
+          setError(response.error.message);
+        } else if (response?.message) {
+          setError(response.message);
+        }
+      },
+      (error) => setError(error.message),
+      () => setLoading(false)
+    );
   };
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      if (id) {
-        try {
+      withSession(navigate, async () => {
+        if (id) {
           const user = await getUserById(id);
           setUser({ ...user, password: "****" });
-        } catch (error) {
-          console.error("Error fetching client:", error);
         }
-      }
+      }, error => console.error("Error fetching client:", error))
     };
 
     fetchInitialData();

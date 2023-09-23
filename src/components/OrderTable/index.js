@@ -25,7 +25,7 @@ import { getNameAndCuit } from "../../app/utils/clientUtils";
 import { trimToMinutes } from "../../app/utils/dateUtils";
 import { translateStatus } from "../../app/utils/orderUtils";
 import PaginationFooter from "../Pagination/paginationFooter";
-import { withinSessionContext, getCurrentUser } from "../../app/utils/sessionUtils";
+import { withSession, getCurrentUser } from "../../app/utils/sessionUtils";
 
 const OrderTable = () => {
   const [filters, setFilters] = useState({
@@ -48,13 +48,12 @@ const OrderTable = () => {
 
   const navigate = useNavigate();
 
-
   const search = async (f) => {
     setLoading(true);
-    withinSessionContext(
+    withSession(
       navigate,
-      () => searchOrders(f),
-      (result) => {
+      async () => {
+        const result = await searchOrders(f)
         setSearchResults(result?.elements);
         setPaginationResult({
           totalPages: result.total_pages,
@@ -66,13 +65,12 @@ const OrderTable = () => {
     );
   };
 
-
   useEffect(() => {
     const fetchClientOptionsData = async () => {
-      withinSessionContext(
+      withSession(
         navigate,
-        () => searchClients({ page_size: 100 }),
-        (result) => {
+        async () => {
+          const result = await searchClients({ page_size: 100 });
           const clients = result.elements;
           setClientOptions(clients);
           const currentUser = getCurrentUser(navigate);
@@ -85,8 +83,8 @@ const OrderTable = () => {
             }
           }
         },
-        (error) => console.log(error));
-    
+        (error) => console.log(error)
+      );
     };
 
     fetchClientOptionsData();

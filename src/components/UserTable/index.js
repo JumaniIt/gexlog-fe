@@ -12,9 +12,10 @@ import { Select } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
 import { Button, Spinner } from "@chakra-ui/react";
 import { MdSearch, MdOutlineOpenInNew } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { search as searchUsers } from "../../app/services/userService";
 import PaginationFooter from "../Pagination/paginationFooter";
+import { withSession } from "../../app/utils/sessionUtils";
 
 const UserTable = () => {
   const [filters, setFilters] = useState({
@@ -25,6 +26,7 @@ const UserTable = () => {
   const [searchResults, setSearchResults] = useState();
   const [loading, setLoading] = useState(false);
   const [currentSearchFilters, setCurrentSearchFilters] = useState({});
+  const navigate = useNavigate();
 
   const handleClick = async () => {
     setCurrentSearchFilters(filters);
@@ -32,19 +34,20 @@ const UserTable = () => {
   };
 
   const search = async (f) => {
-    try {
-      setLoading(true);
-      const data = await searchUsers(f);
-      setSearchResults(data?.elements);
-      setPaginationResult({
-        totalPages: data.total_pages,
-        page: data.page,
-      });
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    withSession(
+      navigate,
+      async () => {
+        const result = await searchUsers(f);
+        setSearchResults(result?.elements);
+        setPaginationResult({
+          totalPages: result.total_pages,
+          page: result.page,
+        });
+      },
+      (error) => console.log(error),
+      () => setLoading(false)
+    );
   };
 
   return (
@@ -64,13 +67,13 @@ const UserTable = () => {
           size="sm"
           placeholder="Rol"
           onChange={(e) => {
-            setFilters({ ...filters, admin: e.target.value});
+            setFilters({ ...filters, admin: e.target.value });
           }}
         >
-          <option key={true} value={'true'}>
+          <option key={true} value={"true"}>
             ADMIN
           </option>
-          <option key={true} value={'false'}>
+          <option key={true} value={"false"}>
             CLIENTE
           </option>
         </Select>

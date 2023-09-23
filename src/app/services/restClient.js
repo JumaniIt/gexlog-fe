@@ -28,7 +28,6 @@ const perform = async (
   const headers = new Headers();
   headers.append("x-auth-origin", "gexlog-fe");
   headers.append("x-auth-token", "Bearer " + jwtToken);
-  headers.append("Accept", "application/json");
 
   let body;
   if (contentType !== "multipart/form-data;") {
@@ -54,7 +53,7 @@ const perform = async (
     if (error === SESSION_EXPIRED_ERROR) {
       throw error;
     }
-    
+
     console.error("Rest error:", error);
     return internalError;
   }

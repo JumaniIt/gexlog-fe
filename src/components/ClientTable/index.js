@@ -6,17 +6,18 @@ import {
   Tr,
   Th,
   Td,
-  TableContainer
+  TableContainer,
 } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
 import { Button, Spinner } from "@chakra-ui/react";
 import { MdSearch, MdOutlineOpenInNew } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { search as searchClients } from "../../app/services/clientService";
 import { search as searchUsers } from "../../app/services/userService";
 import PaginationFooter from "../Pagination/paginationFooter";
 import { getIdAndName } from "../../app/utils/userUtils";
+import { withSession } from "../../app/utils/sessionUtils";
 
 const ClientTable = () => {
   const [filters, setFilters] = useState({
@@ -29,6 +30,7 @@ const ClientTable = () => {
   const [loading, setLoading] = useState(false);
   const [currentSearchFilters, setCurrentSearchFilters] = useState({});
   const [userOptions, setUserOptions] = useState([]);
+  const navigate = useNavigate();
 
   const handleClick = async () => {
     setCurrentSearchFilters(filters);
@@ -36,30 +38,33 @@ const ClientTable = () => {
   };
 
   const search = async (f) => {
-    try {
-      setLoading(true);
-      const data = await searchClients(f);
-      setSearchResults(data?.elements);
-      setPaginationResult({
-        totalPages: data.total_pages,
-        page: data.page,
-      });
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
+    withSession(
+      navigate,
+      async () => {
+        setLoading(true);
+        const data = await searchClients(f);
+        setSearchResults(data?.elements);
+        setPaginationResult({
+          totalPages: data.total_pages,
+          page: data.page,
+        });
+      },
+      (error) => console.log("Error searching clients", error),
+      () => setLoading(false)
+    );
   };
 
   useEffect(() => {
     const fetchUserOptionsData = async () => {
-      try {
-        const options = await searchUsers({ page_size: 100, admin: "false" });
-        const users = options.elements;
-        setUserOptions(users);
-      } catch (error) {
-        console.error("Error fetching client options:", error);
-      }
+      withSession(
+        navigate,
+        async () => {
+          const options = await searchUsers({ page_size: 100, admin: "false" });
+          const users = options.elements;
+          setUserOptions(users);
+        },
+        (error) => console.error("Error fetching client options:", error)
+      );
     };
 
     fetchUserOptionsData();

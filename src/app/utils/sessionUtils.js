@@ -2,16 +2,14 @@ import { getCookie } from "../services/cookieService";
 
 export const SESSION_EXPIRED_ERROR = new Error("session expired");
 
-export const withinSessionContext = async (
+export const withSession = async (
   navigate,
   action,
-  onSuccess,
   onError,
   onFinally = () => {}
 ) => {
   try {
-    const result = await action();
-    return onSuccess(result);
+    await action();
   } catch (error) {
     console.log("the error: " + error);
     if (error === SESSION_EXPIRED_ERROR) {
