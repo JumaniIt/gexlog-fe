@@ -45,13 +45,14 @@ import {
   deleteDocument,
   addDocument,
 } from "../../app/services/orderService";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { formatDestinations } from "../../app/utils/destinationUtils";
 import {
   search as searchClients,
   getById as getClientById,
 } from "../../app/services/clientService";
 import { getNameAndCuit } from "../../app/utils/clientUtils";
+import { SESSION_EXPIRED_ERROR, withSession } from "../../app/utils/sessionUtils";
 
 const ExpandButton = () => (
   <Menu>
@@ -73,7 +74,8 @@ const Order = ({}) => {
   const [clientOptions, setClientOptions] = useState([]);
   const [clientOptionsLoaded, setClientOptionsLoaded] = useState(false);
   const [consigneeOptions, setConsigneeOptions] = useState([]);
-  const [loadingFiles, setLoadingFiles] = useState(false)
+  const [loadingFiles, setLoadingFiles] = useState(false);
+  const navigate = useNavigate();
 
   const fileInputRef = useRef(null);
 
@@ -81,49 +83,58 @@ const Order = ({}) => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      if (id) {
-        try {
-          const order = await getOrderById(id);
-          setOrder(order);
+      withSession(
+        navigate,
+        async () => {
+          if (id) {
+            const order = await getOrderById(id);
+            setOrder(order);
 
-          const client = await getClientById(order.client_id);
-          setClientOptions([...clientOptions, client]);
-        } catch (error) {
-          console.error("Error fetching order:", error);
-        }
-      }
+            const client = await getClientById(order.client_id);
+            setClientOptions([...clientOptions, client]);
+          }
+        },
+        (error) => console.error("Error fetching order:", error)
+      );
     };
 
     fetchInitialData();
   }, []);
 
   const loadClientOptions = async () => {
-    if (!clientOptionsLoaded) {
-      const options = await searchClients({ page_size: 100 });
-      const clients = options.elements.filter(
-        (c) => !id || c.id !== order.client_id
-      );
-      setClientOptions([...clientOptions, ...clients]);
-      setClientOptionsLoaded(true);
-    }
+    withSession(
+      navigate,
+      async () => {
+        if (!clientOptionsLoaded) {
+          const options = await searchClients({ page_size: 100 });
+          const clients = options.elements.filter(
+            (c) => !id || c.id !== order.client_id
+          );
+          setClientOptions([...clientOptions, ...clients]);
+          setClientOptionsLoaded(true);
+        }
+      },
+      (error) => console.log("Error loading client options", error)
+    );
   };
 
   useEffect(() => {
     const loadConsignees = async () => {
-      if (order?.client_id) {
-        try {
-          const client = await getClientById(order.client_id, "true");
-          const consignees = client?.consignees?.map((c) => ({
-            name: c.name,
-            cuit: c.cuit,
-          }));
-          setConsigneeOptions([...consignees]);
-        } catch (error) {
-          console.error("Error fetching order:", error);
-        }
-      }
+      withSession(
+        navigate,
+        async () => {
+          if (order?.client_id) {
+            const client = await getClientById(order.client_id, "true");
+            const consignees = client?.consignees?.map((c) => ({
+              name: c.name,
+              cuit: c.cuit,
+            }));
+            setConsigneeOptions([...consignees]);
+          }
+        },
+        (error) => console.log("error loading consignees", error)
+      );
     };
-
     loadConsignees();
   }, [order?.client_id]);
 
@@ -145,55 +156,65 @@ const Order = ({}) => {
     );
 
     if (confirmed) {
-      setLoadingFiles(true)
-      try {
-        await deleteDocument(order.id, docId);
-        const updatedDocuments = order.documents.filter(
-          (document) => document.id !== docId
-        );
-        setOrder({ ...order, documents: updatedDocuments });
-      } catch (error) {
-        console.error("Error deleting document:", error);
-      } finally {
-        setLoadingFiles(false)
-      }
+      withSession(
+        navigate,
+        async () => {
+          setLoadingFiles(true);
+          await deleteDocument(order.id, docId);
+          const updatedDocuments = order.documents.filter(
+            (document) => document.id !== docId
+          );
+          setOrder({ ...order, documents: updatedDocuments });
+        },
+        (error) => console.log("Error deleting document", error),
+        () => setLoadingFiles(false)
+      );
     }
   };
 
   const onOpenDocument = async (docId) => {
-    try {
-      const link = await getDocumentLink(order.id, docId);
+    withSession(
+      navigate,
+      async () => {
+        const link = await getDocumentLink(order.id, docId);
 
-      window.open(link, "_blank");
-    } catch (error) {
-      console.error("Error opening document:", error);
-    }
+        window.open(link, "_blank");
+      },
+      (error) => console.error("Error opening document:", error)
+    );
   };
 
   const uploadAndProcessFiles = async (selectedFiles) => {
-    setLoadingFiles(true)
-    const promises = [...selectedFiles].map(async (file) => {
-      try {
-        const document = await addDocument(order.id, file);
-        return document;
-      } catch (error) {
-        console.error("Error uploading document:", error);
-        return null;
-      }
-    });
+    withSession(
+      navigate,
+      async () => {
+        setLoadingFiles(true);
+        const promises = [...selectedFiles].map(async (file) => {
+          try {
+            const document = await addDocument(order.id, file);
+            return document;
+          } catch (error) {
+            if (error === SESSION_EXPIRED_ERROR) {
+              throw error;
+            }
+            
+            console.error("Error uploading document:", error);
+            return null;
+          }
+        });
 
-    const processedFiles = await Promise.all(promises);
-    const successfulFiles = processedFiles.filter((file) => file !== null);
+        const processedFiles = await Promise.all(promises);
+        const successfulFiles = processedFiles.filter((file) => file !== null);
 
-    // Update the order's documents array with the successful uploads
-    setOrder({
-      ...order,
-      documents: [...order.documents, ...successfulFiles],
-    });
-
-    setLoadingFiles(false)
-
-    // You can add additional logic here to handle error messages or other UI updates
+        // Update the order's documents array with the successful uploads
+        setOrder({
+          ...order,
+          documents: [...order.documents, ...successfulFiles],
+        });
+      },
+      (error) => console.log("Error uploading documents"),
+      () => setLoadingFiles(false)
+    );
   };
 
   return (

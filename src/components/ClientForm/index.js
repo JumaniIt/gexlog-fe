@@ -19,8 +19,8 @@ import {
   save as saveClient,
   update as updateClient,
 } from "../../app/services/clientService";
-import { useParams } from "react-router-dom";
-
+import { useNavigate, useParams } from "react-router-dom";
+import { withSession } from "../../app/utils/sessionUtils";
 
 const ClientForm = () => {
   const { id } = useParams();
@@ -33,6 +33,7 @@ const ClientForm = () => {
   const [userOptions, setUserOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -43,60 +44,60 @@ const ClientForm = () => {
   };
 
   const handleSave = async () => {
-    setLoading(true);
-    setError(null);
+    withSession(
+      navigate,
+      async () => {
+        setLoading(true);
+        setError(null);
 
-    try {
-      let response;
-      if (id) {
-        response = await updateClient(id, client);
-      } else {
-        response = await saveClient(client);
-      }
+        let response;
+        if (id) {
+          response = await updateClient(id, client);
+        } else {
+          response = await saveClient(client);
+        }
 
-      if (response?.error) {
-        setError(response.error.message);
-      }
-
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+        if (response?.error) {
+          setError(response.error.message);
+        } else {
+          navigate("/clients", { replace: true });
+        }
+      },
+      (error) => setError(error.message),
+      () => setLoading(false)
+    );
   };
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      let clientUserId;
-      if (id) {
-        try {
-          const client = await getClientById(id);
-          clientUserId = client.user_id
-          setClient(client);
-        } catch (error) {
-          console.error("Error fetching client:", error);
-        }
-      }
+      withSession(
+        navigate,
+        async () => {
+          let clientUserId;
+          if (id) {
+            const client = await getClientById(id);
+            clientUserId = client.user_id;
+            setClient(client);
+          }
 
-      try {
-        const options = await searchUsers({
-          page_size: 100,
-          admin: "false",
-          with_client: "false",
-        });
+          const options = await searchUsers({
+            page_size: 100,
+            admin: "false",
+            with_client: "false",
+          });
 
-        const users = options.elements;
-        if (id && clientUserId) {
-          const user = await getUserById(clientUserId);
-          setUserOptions([...users, user]);
-        } else {
-          setUserOptions(users);
-        }
-      } catch (error) {
-        console.error("Error fetching user options: ", error);
-      }
+          const users = options.elements;
+          if (id && clientUserId) {
+            const user = await getUserById(clientUserId);
+            setUserOptions([...users, user]);
+          } else {
+            setUserOptions(users);
+          }
+        },
+        (error) => console.log("Error fetching initial data", error)
+      );
     };
-    
+
     fetchInitialData();
   }, []);
 

@@ -63,6 +63,8 @@ const UserForm = () => {
           setError(response.error.message);
         } else if (response?.message) {
           setError(response.message);
+        } else {
+          navigate("/users", { replace: true });
         }
       },
       (error) => setError(error.message),
@@ -72,12 +74,16 @@ const UserForm = () => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      withSession(navigate, async () => {
-        if (id) {
-          const user = await getUserById(id);
-          setUser({ ...user, password: "****" });
-        }
-      }, error => console.error("Error fetching client:", error))
+      withSession(
+        navigate,
+        async () => {
+          if (id) {
+            const user = await getUserById(id);
+            setUser({ ...user, password: "****" });
+          }
+        },
+        (error) => console.error("Error fetching client:", error)
+      );
     };
 
     fetchInitialData();
