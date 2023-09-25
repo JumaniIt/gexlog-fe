@@ -4,24 +4,21 @@ import { Card, CardHeader, CardBody } from "@chakra-ui/react";
 import { Divider } from "@chakra-ui/react";
 import { Heading } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
-import { Checkbox, CheckboxGroup } from "@chakra-ui/react";
+import { Checkbox } from "@chakra-ui/react";
 import { Stack } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { Button } from "@chakra-ui/react";
 import { IconButton } from "@chakra-ui/react";
 import { Grid, GridItem } from "@chakra-ui/react";
-import { MdKeyboardBackspace } from "react-icons/md";
-
+import { Text } from '@chakra-ui/react'
 import {
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
-  TableCaption,
   TableContainer,
 } from "@chakra-ui/react";
 
@@ -476,14 +473,13 @@ const Order = ({ }) => {
                   </GridItem>
                 </Grid>
               </div>
-              {order.free_load ? (
-                <div className="third-row">
-                  <Heading as="h6" size="sm">
-                    Carga suelta
-                  </Heading>
-                  <div className="subtitle">
-                    <Button size="xs">+ Añadir</Button>
-                  </div>
+
+              <div className="third-row">
+                <Heading className="third-row-heading" as="h6" size="sm">
+                  <Text>Carga suelta</Text>
+                  <Button colorScheme="green" size="xs">+ Añadir</Button>
+                </Heading>
+                {order.free_load ? (
                   <TableContainer>
                     <Table size="sm" variant="striped">
                       <Thead>
@@ -514,55 +510,51 @@ const Order = ({ }) => {
                       </Tbody>
                     </Table>
                   </TableContainer>
-                </div>
-              ) : (
-                <div className="third-row">
-                  <Heading as="h6" size="sm">
-                    Contenedores
-                  </Heading>
-                  <div className="subtitle">
-                    <Input size="sm" placeholder="PEMA" />
-                    <Button size="xs">+ Añadir</Button>
-                  </div>
-                  <TableContainer>
-                    <Table size="sm" variant="striped">
-                      <Thead>
-                        <Tr>
-                          <Th>Código</Th>
-                          <Th>Tipo</Th>
-                          <Th>BL</Th>
-                          <Th>Destinación</Th>
-                          <Th>Reenvase</Th>
-                          <Th></Th>
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {order.containers?.map((container) => {
-                          return (
-                            <Tr className="table-row">
-                              <Td>{container.code}</Td>
-                              <Td>{container.type}</Td>
-                              <Td>{container.bl}</Td>
-                              <Td>
-                                {formatDestinations(container.destinations)}
-                              </Td>
-                              <Td>{container.repackage ? "SI" : "NO"}</Td>
-                              <Td>
-                                <ExpandButton />
-                              </Td>
-                            </Tr>
-                          );
-                        })}
-                      </Tbody>
-                    </Table>
-                  </TableContainer>
-                </div>
-              )}
+                ) : (
+                  <>
+                    <div className="subtitle">
+                      <Input size="sm" placeholder="PEMA" />
+                    </div>
+                    <TableContainer>
+                      <Table size="sm" variant="striped">
+                        <Thead>
+                          <Tr>
+                            <Th>Código</Th>
+                            <Th>Tipo</Th>
+                            <Th>BL</Th>
+                            <Th>Destinación</Th>
+                            <Th>Reenvase</Th>
+                            <Th></Th>
+                          </Tr>
+                        </Thead>
+                        <Tbody>
+                          {order.containers?.map((container) => {
+                            return (
+                              <Tr className="table-row">
+                                <Td>{container.code}</Td>
+                                <Td>{container.type}</Td>
+                                <Td>{container.bl}</Td>
+                                <Td>
+                                  {formatDestinations(container.destinations)}
+                                </Td>
+                                <Td>{container.repackage ? "SI" : "NO"}</Td>
+                                <Td>
+                                  <ExpandButton />
+                                </Td>
+                              </Tr>
+                            );
+                          })}
+                        </Tbody>
+                      </Table>
+                    </TableContainer>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </CardBody>
-      </Card>
-    </Layout>
+      </Card >
+    </Layout >
   );
 };
 
