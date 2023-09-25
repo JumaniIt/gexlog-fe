@@ -23,6 +23,10 @@ const Sidebar = () => (
         <MdBusiness />
         Clientes
       </Link>
+      <Link to="/profile">
+        <MdPeople />
+        Mis datos
+      </Link>
     </div>
   </div>
 );

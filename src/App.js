@@ -9,6 +9,7 @@ import UsersPage from './pages/users';
 import UserPage from './pages/user';
 import ClientsPage from './pages/clients';
 import ClientPage from './pages/client';
+import ProfilePage from './pages/profile';
 
 
 const router = createBrowserRouter([
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
   {
     path:"/clients/new",
     element: <ClientPage />
+  },
+  {
+    path:"/profile",
+    element: <ProfilePage />
   }
 ]);
 
