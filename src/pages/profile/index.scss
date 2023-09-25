@@ -1,0 +1,35 @@
+.profile-view {
+  .container {
+    margin: 20px 30px 0;
+
+    .data {
+      display: grid;
+      grid-template-columns: auto auto auto auto auto;
+    }
+
+    .chakra-text {
+      margin-top: 4px;
+    }
+
+    .chakra-divider {
+      margin-top: 30px;
+    }
+  }
+
+  h6 {
+    font-family: "Montserrat", sans-serif;
+    color: #006fb7;
+    margin-top: 20px;
+  }
+
+  .chakra-table__container {
+    margin-top: 10px;
+  }
+
+  .table-heading {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+  }
+}
