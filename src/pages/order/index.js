@@ -69,7 +69,7 @@ const ExpandButton = () => (
   </Menu>
 );
 
-const Order = ({}) => {
+const Order = ({ }) => {
   const [order, setOrder] = useState({});
   const [clientOptions, setClientOptions] = useState([]);
   const [clientOptionsLoaded, setClientOptionsLoaded] = useState(false);
@@ -232,6 +232,18 @@ const Order = ({}) => {
             value={order.code}
             onChange={onInputChange}
           />
+          <Menu className="header-menu">
+            <MenuButton
+              as={IconButton}
+              aria-label="Options"
+              icon={<MdMoreVert />}
+              variant="outline"
+            />
+            <MenuList>
+              <MenuItem>Notas</MenuItem>
+              <MenuItem>Algo más</MenuItem>
+            </MenuList>
+          </Menu>
         </CardHeader>
         <Divider className="order-divider" />
         <CardBody>
