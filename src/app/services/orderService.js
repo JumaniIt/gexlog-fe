@@ -28,7 +28,7 @@ export const getById = async (id) => {
 export const changeStatus = async (id, newStatus) => {
   const response = await put(BASE_PATH + "/" + id + "/status/" + newStatus);
 
-  if (response.status !== 204) {
+  if (response.status !== 200) {
     return await response.json();
   }
 };

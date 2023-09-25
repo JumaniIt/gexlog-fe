@@ -44,6 +44,9 @@ import {
   getById as getOrderById,
   deleteDocument,
   addDocument,
+  changeStatus,
+  update,
+  create,
 } from "../../app/services/orderService";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDestinations } from "../../app/utils/destinationUtils";
@@ -52,7 +55,13 @@ import {
   getById as getClientById,
 } from "../../app/services/clientService";
 import { getNameAndCuit } from "../../app/utils/clientUtils";
-import { SESSION_EXPIRED_ERROR, withSession } from "../../app/utils/sessionUtils";
+import {
+  SESSION_EXPIRED_ERROR,
+  withSession,
+  getCurrentUser,
+} from "../../app/utils/sessionUtils";
+
+import StatusModal from "../../components/StatusModal/statusModal";
 
 const ExpandButton = () => (
   <Menu>
@@ -69,13 +78,17 @@ const ExpandButton = () => (
   </Menu>
 );
 
-const Order = ({ }) => {
+const Order = ({}) => {
   const [order, setOrder] = useState({});
   const [clientOptions, setClientOptions] = useState([]);
   const [clientOptionsLoaded, setClientOptionsLoaded] = useState(false);
   const [consigneeOptions, setConsigneeOptions] = useState([]);
   const [loadingFiles, setLoadingFiles] = useState(false);
+  const [openStatusModal, setOpenStatusModal] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [readOnly, setReadOnly] = useState(false);
   const navigate = useNavigate();
+  const currentUser = getCurrentUser(navigate);
 
   const fileInputRef = useRef(null);
 
@@ -83,7 +96,7 @@ const Order = ({ }) => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      withSession(
+      await withSession(
         navigate,
         async () => {
           if (id) {
@@ -100,6 +113,19 @@ const Order = ({ }) => {
 
     fetchInitialData();
   }, []);
+
+  useEffect(() => {
+    const updateReadOnly = () => {
+      if (currentUser.admin) {
+        setReadOnly(false);
+      } else {
+        const readOnly = order?.status !== "DRAFT";
+        setReadOnly(readOnly);
+      }
+    };
+
+    updateReadOnly();
+  }, [order]);
 
   const loadClientOptions = async () => {
     withSession(
@@ -217,6 +243,72 @@ const Order = ({ }) => {
     );
   };
 
+  const handleSave = async () => {
+    setActionLoading(true);
+    withSession(
+      navigate,
+      async () => {
+        let response;
+        if (id) {
+          response = await update(id, order);
+        } else {
+          response = await create(order);
+        }
+
+        if (response.message) {
+          // TODO alert dialog
+          console.log("could not save order", response);
+        } else if (!id) {
+          navigate("/orders/" + response.id);
+        }
+      },
+      (error) => console.log("could not save order", error),
+      () => setActionLoading(false)
+    );
+  };
+
+  const openStatus = () => {
+    setOpenStatusModal(true);
+  };
+
+  const openNotes = () => {
+    console.log("opening notes...");
+  };
+
+  const openCosts = () => {
+    console.log("opening costs...");
+  };
+
+  const handleSend = async () => {
+    const confirm = window.confirm(
+      "¿Estás seguro que deseas enviar para revisión?\n Esta acción no puede revertirse"
+    );
+
+    if (confirm) {
+      await handleStatusChange("REVISION");
+    }
+  };
+
+  const handleStatusChange = async (status) => {
+    if (id) {
+      setActionLoading(true);
+      await withSession(
+        navigate,
+        async () => {
+          const response = await changeStatus(id, status);
+          if (response) {
+            console.log("could not change status", response);
+          } else {
+            console.log("Setting order status");
+            setOrder({ ...order, status });
+          }
+        },
+        (error) => console.log("could not change status", error),
+        () => setActionLoading(false)
+      );
+    }
+  };
+
   return (
     <Layout className="order-container">
       <Card variant="outline" className="order-card">
@@ -231,6 +323,7 @@ const Order = ({ }) => {
             size="sm"
             value={order.code}
             onChange={onInputChange}
+            disabled={readOnly}
           />
           <Menu className="header-menu">
             <MenuButton
@@ -238,13 +331,39 @@ const Order = ({ }) => {
               aria-label="Options"
               icon={<MdMoreVert />}
               variant="outline"
+              isLoading={actionLoading}
             />
-            <MenuList>
-              <MenuItem>Notas</MenuItem>
-              <MenuItem>Algo más</MenuItem>
+            <MenuList loading={true}>
+              <MenuItem onClick={handleSave} isDisabled={readOnly}>
+                Guardar
+              </MenuItem>
+              {(currentUser?.admin && (
+                <MenuItem onClick={openStatus} isDisabled={!id}>
+                  Estado
+                </MenuItem>
+              )) || (
+                <MenuItem onClick={handleSend} isDisabled={!id || readOnly}>
+                  Enviar
+                </MenuItem>
+              )}
+              <MenuItem onClick={openNotes} isDisabled={!id}>
+                Notas
+              </MenuItem>
+              <MenuItem onClick={openCosts} isDisabled={!id}>
+                Costos
+              </MenuItem>
             </MenuList>
           </Menu>
         </CardHeader>
+        <StatusModal
+          isOpen={openStatusModal}
+          onClose={() => setOpenStatusModal(false)}
+          onSave={async (status) => {
+            await handleStatusChange(status);
+            setOpenStatusModal(false);
+          }}
+          currentStatus={order?.status}
+        />
         <Divider className="order-divider" />
         <CardBody>
           <div className="top-row">
@@ -258,6 +377,7 @@ const Order = ({ }) => {
                   name="pema"
                   isChecked={order.pema}
                   onChange={onCheckChange}
+                  isDisabled={readOnly}
                 >
                   PEMA
                 </Checkbox>
@@ -266,6 +386,7 @@ const Order = ({ }) => {
                   name="port"
                   isChecked={order.port}
                   onChange={onCheckChange}
+                  isDisabled={readOnly}
                 >
                   Gestión portuaria
                 </Checkbox>
@@ -274,6 +395,7 @@ const Order = ({ }) => {
                   name="transport"
                   isChecked={order.transport}
                   onChange={onCheckChange}
+                  isDisabled={readOnly}
                 >
                   Transporte
                 </Checkbox>
@@ -285,6 +407,7 @@ const Order = ({ }) => {
                 name="free_load"
                 isChecked={order.free_load}
                 onChange={onCheckChange}
+                isDisabled={readOnly}
               >
                 Carga suelta
               </Checkbox>
@@ -307,6 +430,7 @@ const Order = ({ }) => {
                     value={order?.client_id}
                     onFocus={loadClientOptions}
                     onChange={onInputChange}
+                    isDisabled={readOnly}
                   >
                     {clientOptions.map((client) => (
                       <option key={client.id} value={client.id}>
@@ -321,6 +445,7 @@ const Order = ({ }) => {
                     placeholder="Factura a"
                     onChange={onInputChange}
                     value={order?.consignee}
+                    isDisabled={readOnly}
                   >
                     {consigneeOptions.map((consignee) => (
                       <option key={consignee} value={consignee}>
@@ -374,7 +499,8 @@ const Order = ({ }) => {
                         size="xs"
                         onClick={() =>
                           onDeleteDocument(document.id, document.name)
-                        } // Call the delete function with the document ID
+                        }
+                        isDisabled={readOnly}
                       />
                     </div>
                   ))}
@@ -387,22 +513,38 @@ const Order = ({ }) => {
                   Datos de servicio
                 </Heading>
                 <Stack spacing={3} className="first-row-stack">
-                  <Select size="sm" placeholder={order.arrival_date || "Fecha"}>
+                  <Select
+                    size="sm"
+                    placeholder={order.arrival_date || "Fecha"}
+                    isDisabled={readOnly}
+                  >
                     <option value="option1">Option 1</option>
                     <option value="option2">Option 2</option>
                     <option value="option3">Option 3</option>
                   </Select>
-                  <Select size="sm" placeholder={order.arrival_time || "Hora"}>
+                  <Select
+                    size="sm"
+                    placeholder={order.arrival_time || "Hora"}
+                    isDisabled={readOnly}
+                  >
                     <option value="option1">Option 1</option>
                     <option value="option2">Option 2</option>
                     <option value="option3">Option 3</option>
                   </Select>
-                  <Select size="sm" placeholder={order.origin || "Origen"}>
+                  <Select
+                    size="sm"
+                    placeholder={order.origin || "Origen"}
+                    isDisabled={readOnly}
+                  >
                     <option value="option1">Option 1</option>
                     <option value="option2">Option 2</option>
                     <option value="option3">Option 3</option>
                   </Select>
-                  <Select size="sm" placeholder={order.target || "Destino"}>
+                  <Select
+                    size="sm"
+                    placeholder={order.target || "Destino"}
+                    isDisabled={readOnly}
+                  >
                     <option value="option1">Option 1</option>
                     <option value="option2">Option 2</option>
                     <option value="option3">Option 3</option>
@@ -421,6 +563,7 @@ const Order = ({ }) => {
                           size="sm"
                           placeholder="Nombre"
                           value={order?.driver_data?.name}
+                          isDisabled={readOnly}
                         />
                       </GridItem>
                       <GridItem colSpan={2}>
@@ -428,6 +571,7 @@ const Order = ({ }) => {
                           size="sm"
                           placeholder="Teléfono"
                           value={order?.driver_data?.phone}
+                          isDisabled={readOnly}
                         />
                       </GridItem>
                       <GridItem colSpan={2}>
@@ -435,6 +579,7 @@ const Order = ({ }) => {
                           size="sm"
                           placeholder="Chasis"
                           value={order?.driver_data?.chasis}
+                          isDisabled={readOnly}
                         />
                       </GridItem>
                       <GridItem colSpan={2}>
@@ -442,6 +587,7 @@ const Order = ({ }) => {
                           size="sm"
                           placeholder="Semi"
                           value={order?.driver_data?.semi}
+                          isDisabled={readOnly}
                         />
                       </GridItem>
                       <GridItem colSpan={4}>
@@ -449,6 +595,7 @@ const Order = ({ }) => {
                           size="sm"
                           placeholder="Empresa"
                           value={order?.driver_data?.company}
+                          isDisabled={readOnly}
                         />
                       </GridItem>
                     </Grid>
@@ -463,6 +610,7 @@ const Order = ({ }) => {
                           size="sm"
                           placeholder="Nombre"
                           value={order?.customs_data?.name}
+                          isDisabled={readOnly}
                         />
                       </GridItem>
                       <GridItem>
@@ -470,6 +618,7 @@ const Order = ({ }) => {
                           size="sm"
                           placeholder="Teléfono"
                           value={order?.customs_data?.phone}
+                          isDisabled={readOnly}
                         />
                       </GridItem>
                     </Grid>
@@ -482,7 +631,9 @@ const Order = ({ }) => {
                     Carga suelta
                   </Heading>
                   <div className="subtitle">
-                    <Button size="xs">+ Añadir</Button>
+                    <Button size="xs" isDisabled={readOnly}>
+                      + Añadir
+                    </Button>
                   </div>
                   <TableContainer>
                     <Table size="sm" variant="striped">
@@ -497,7 +648,7 @@ const Order = ({ }) => {
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {order.free_loads.map((fl) => {
+                        {order.free_loads?.map((fl) => {
                           return (
                             <Tr className="table-row">
                               <Td>{fl.patent}</Td>
