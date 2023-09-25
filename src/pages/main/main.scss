@@ -7,6 +7,8 @@
 @import "../../components/TextSection/text-section.scss";
 @import "../../components/ContactForm/index.scss";
 @import "../../components/Layout/index.scss";
+@import "../../components/ClientTable/index.scss";
+@import "../../components/UserTable/index.scss";
 
 // Pages
 @import "../login/index.scss";
@@ -14,6 +16,8 @@
 @import "../requests/index.scss";
 @import "../order/index.scss";
 @import "../profile/index.scss";
+@import "../clients/index.scss";
+@import "../users/index.scss";
 
 .main-page {
   font-family: "Montserrat", sans-serif !important;
@@ -31,4 +35,10 @@
     display: flex;
     margin: 50px 150px;
   }
+}
+
+.spinner {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
 }

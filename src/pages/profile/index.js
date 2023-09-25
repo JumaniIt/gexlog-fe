@@ -12,7 +12,7 @@ const ProfilePage = () => {
   return (
     <Layout className="profile-view" headingText={`Hola ${currentUser?.nickname} :-)`}>
       <div className="container">
-        <Heading as="h6" size="md">
+        <Heading as="h6" size="sm">
           Mis datos
         </Heading>
         <ProfileView />

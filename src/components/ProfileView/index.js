@@ -41,8 +41,8 @@ const ProfileView = () => {
       </div>
       <Divider />
       <div className="table-heading">
-        <Heading className="second-heading" as="h6" size="md">Consignatarios</Heading>
-        <Button size="sm" colorScheme="green">
+        <Heading className="second-heading" as="h6" size="sm">Consignatarios</Heading>
+        <Button size="xs" colorScheme="green">
           <MdCreate />
           Crear
         </Button>

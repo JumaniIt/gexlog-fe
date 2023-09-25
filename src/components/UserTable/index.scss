@@ -1,14 +1,10 @@
-.filter-table-container {
-  margin: 0 30px;
-}
-
-.filter-bar {
+.users-filter-bar {
   margin-top: 20px;
   display: grid;
-  grid-template-columns: repeat(2, 1fr) auto auto auto auto auto repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr) auto auto;
   grid-column-gap: 10px;
 
-  button {
+  .search-button {
     background-color: #006fb7;
     color: white;
 

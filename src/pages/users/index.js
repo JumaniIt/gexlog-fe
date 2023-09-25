@@ -5,13 +5,15 @@ import { Heading } from "@chakra-ui/react";
 
 const UsersPage = () => {
   return (
-    <Layout>
-      <div className="users-table">
-        <Heading as="h6" size="sm">
-          Usuarios
-        </Heading>
+    <Layout className="users-page" headingText={"holis"}>
+      <div className="container">
+        <div className="users-table">
+          <Heading as="h6" size="sm">
+            Usuarios
+          </Heading>
+        </div>
+        <UserTable />
       </div>
-      <UserTable />
     </Layout>
   );
 };

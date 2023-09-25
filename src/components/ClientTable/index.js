@@ -72,7 +72,7 @@ const ClientTable = () => {
 
   return (
     <div className="filter-table-container">
-      <div className="filter-bar">
+      <div className="clients-filter-bar">
         <Input
           size="sm"
           placeholder="Nombre"
@@ -99,41 +99,30 @@ const ClientTable = () => {
             </option>
           ))}
         </Select>
-        <Button size="sm" onClick={handleClick}>
+        <Button className="search-button" size="sm" onClick={handleClick}>
           <MdSearch />
           Buscar
         </Button>
-        <Button size="sm" onClick={() => navigate("./new", {replace: true})}>
+        <Button size="sm" colorScheme="green" onClick={() => navigate("./new", { replace: true })}>
           <MdCreate />
           Crear
         </Button>
       </div>
-      {loading ? (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "20vh",
-          }}
-        >
-          <Spinner size="xl" color="blue.500" thickness="4px" />
-        </div>
-      ) : (
-        <div>
-          <div className="results-table">
-            <TableContainer>
-              <Table variant="striped" size="sm">
-                <Thead>
-                  <Tr>
-                    <Th>ID</Th>
-                    <Th>Nombre</Th>
-                    <Th>Telefono</Th>
-                    <Th>Cuit</Th>
-                    <Th>Usuario</Th>
-                    <Th>Ver</Th>
-                  </Tr>
-                </Thead>
+      <div>
+        <div className="results-table">
+          <TableContainer>
+            <Table variant="striped" size="sm">
+              <Thead>
+                <Tr>
+                  <Th>ID</Th>
+                  <Th>Nombre</Th>
+                  <Th>Telefono</Th>
+                  <Th>Cuit</Th>
+                  <Th>Usuario</Th>
+                  <Th>Ver</Th>
+                </Tr>
+              </Thead>
+              {!loading && (
                 <Tbody>
                   {searchResults &&
                     searchResults?.map((result) => {
@@ -153,21 +142,26 @@ const ClientTable = () => {
                       );
                     })}
                 </Tbody>
-              </Table>
-            </TableContainer>
-          </div>
-          {paginationResult && (
-            <PaginationFooter
-              currentPage={paginationResult.page}
-              totalPages={paginationResult.totalPages}
-              onPageChange={(newPage) => {
-                const filters = { ...currentSearchFilters, page: newPage };
-                search(filters);
-              }}
-            />
-          )}
+              )}
+            </Table>
+          </TableContainer>
         </div>
-      )}
+        {loading &&
+          <div className="spinner">
+            <Spinner className="spinner" size="xl" color="blue.500" thickness="4px" />
+          </div>
+        }
+        {paginationResult && (
+          <PaginationFooter
+            currentPage={paginationResult.page}
+            totalPages={paginationResult.totalPages}
+            onPageChange={(newPage) => {
+              const filters = { ...currentSearchFilters, page: newPage };
+              search(filters);
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };

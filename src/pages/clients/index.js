@@ -5,13 +5,15 @@ import ClientTable from "../../components/ClientTable";
 
 const ClientsPage = () => {
   return (
-    <Layout>
-      <div className="clients-table">
-        <Heading as="h6" size="sm">
-          Clientes
-        </Heading>
+    <Layout className="clients-page" headingText={"Hola admin"}>
+      <div className="container">
+        <div className="clients-table">
+          <Heading as="h6" size="sm">
+            Clientes
+          </Heading>
+        </div>
+        <ClientTable />
       </div>
-    <ClientTable />
     </Layout>
   );
 };

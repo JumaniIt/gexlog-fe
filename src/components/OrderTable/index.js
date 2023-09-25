@@ -181,18 +181,7 @@ const OrderTable = () => {
                   <Th>Ver</Th>
                 </Tr>
               </Thead>
-              {loading ? (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: "20vh",
-                  }}
-                >
-                  <Spinner size="xl" color="blue.500" thickness="4px" />
-                </div>
-              ) : (
+              {!loading && (
                 <Tbody>
                   {searchResults?.length > 0 &&
                     searchResults.map((result) => {
@@ -255,6 +244,11 @@ const OrderTable = () => {
             </Table>
           </TableContainer>
         </div>
+        {loading &&
+          <div className="spinner">
+            <Spinner className="spinner" size="xl" color="blue.500" thickness="4px" />
+          </div>
+        }
         {/* {paginationResult && (
             <PaginationFooter
               currentPage={paginationResult.page}
