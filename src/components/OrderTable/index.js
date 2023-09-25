@@ -152,11 +152,11 @@ const OrderTable = () => {
             </option>
           ))}
         </Select>
-        <Button size="sm" onClick={handleClick}>
+        <Button size="sm" className="search-button" onClick={handleClick}>
           <MdSearch />
           Buscar
         </Button>
-        <Button size="sm" onClick={() => window.open(`/orders/new`)}>
+        <Button size="sm" colorScheme="green" onClick={() => window.open(`/orders/new`)}>
           <MdCreate />
           Crear
         </Button>

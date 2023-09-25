@@ -77,7 +77,7 @@ const UserTable = () => {
             CLIENTE
           </option>
         </Select>
-        <Button size="sm" onClick={handleClick}>
+        <Button className="search-button" size="sm" onClick={handleClick}>
           <MdSearch />
           Buscar
         </Button>

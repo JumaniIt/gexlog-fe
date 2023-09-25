@@ -5,10 +5,10 @@
 .filter-bar {
   margin-top: 20px;
   display: grid;
-  grid-template-columns: repeat(2, 1fr) auto auto auto auto auto repeat(2, 1fr);
+  grid-template-columns: repeat(2, 1fr) auto auto auto auto auto repeat(3, 1fr);
   grid-column-gap: 10px;
 
-  button {
+  .search-button {
     background-color: #006fb7;
     color: white;
 
