@@ -20,21 +20,21 @@ const Sidebar = () => {
           <MdListAlt />
           Solicitudes
         </Link>
-        {currentUser.admin && (
+        {currentUser?.admin && (
           <Link to="/users">
             <MdPeople />
             Usuarios
           </Link>
         )}
 
-        {currentUser.admin && (
+        {currentUser?.admin && (
           <Link to="/clients">
             <MdBusiness />
             Clientes
           </Link>
         )}
 
-        {!currentUser.admin && (
+        {!currentUser?.admin && (
           <Link to="/profile">
             <MdPeople />
             Perfil

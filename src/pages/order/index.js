@@ -66,19 +66,26 @@ import { translateStatus } from "../../app/utils/orderUtils";
 import { getHalfHourOptions, trimToMinutes } from "../../app/utils/dateUtils";
 import { getOperativeSites } from "../../app/utils/customsUtils";
 import FilterableSelect from "../../components/FilterableSelect/filterableSelect";
+import ContainerModal from "../../components/ContainerModal/containerModal";
 
-const ExpandButton = (isDisabled) => (
+const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
   <Menu>
     <MenuButton
       as={IconButton}
-      aria-label="Options"
+      aria-label="Optºions"
       icon={<MdMoreVert />}
       variant="outline"
       isDisabled={isDisabled}
     />
     <MenuList>
-      <MenuItem /* icon={<AddIcon />} */>Editar</MenuItem>
-      <MenuItem /* icon={<ExternalLinkIcon />} */>Eliminar</MenuItem>
+      <MenuItem
+        onClick={() => {
+          onEdit();
+        }}
+      >
+        Editar
+      </MenuItem>
+      <MenuItem onClick={onDelete}>Eliminar</MenuItem>
     </MenuList>
   </Menu>
 );
@@ -90,6 +97,8 @@ const Order = ({}) => {
   const [consigneeOptions, setConsigneeOptions] = useState([]);
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [openStatusModal, setOpenStatusModal] = useState(false);
+  const [openContainerModal, setOpenContainerModal] = useState(false);
+  const [selectedContainerIndex, setSelectedContainerIndex] = useState(-1);
   const [actionLoading, setActionLoading] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
   const navigate = useNavigate();
@@ -358,6 +367,24 @@ const Order = ({}) => {
     }
   };
 
+  const handleContainerSave = (container) => {
+    const updatedOrder = { ...order };
+
+    if (selectedContainerIndex === -1) {
+      updatedOrder.containers.push(container);
+    } else {
+      updatedOrder.containers[selectedContainerIndex] = container;
+    }
+
+    setOrder(updatedOrder);
+  };
+
+  const deleteContainer = (index) => {
+    const updatedContainers = [...order.containers];
+    updatedContainers.splice(index, 1);
+    setOrder({ ...order, containers: updatedContainers });
+  };
+
   return (
     <Layout className="order-container">
       <Card variant="outline" className="order-card">
@@ -377,7 +404,7 @@ const Order = ({}) => {
           <Heading size="sm">
             Estado: {order?.status ? translateStatus(order.status) : "BORRADOR"}{" "}
           </Heading>
-          {currentUser.admin && (
+          {currentUser?.admin && (
             <Checkbox
               className="services-checkbox"
               name="dev"
@@ -388,7 +415,7 @@ const Order = ({}) => {
               DEV
             </Checkbox>
           )}
-          {currentUser.admin && (
+          {currentUser?.admin && (
             <Checkbox
               className="services-checkbox"
               name="dev"
@@ -438,6 +465,20 @@ const Order = ({}) => {
           }}
           currentStatus={order?.status}
         />
+
+        {openContainerModal && (
+          <ContainerModal
+            isOpen={openContainerModal}
+            initialValue={order?.containers[selectedContainerIndex]}
+            readOnly={readOnly}
+            onSave={handleContainerSave}
+            onClose={() => {
+              setSelectedContainerIndex(-1);
+              setOpenContainerModal(false);
+            }}
+          ></ContainerModal>
+        )}
+
         <Divider className="order-divider" />
         <CardBody>
           <div className="top-row">
@@ -504,7 +545,7 @@ const Order = ({}) => {
                     value={order?.client_id}
                     onFocus={loadClientOptions}
                     onChange={onInputChange}
-                    isDisabled={readOnly || !currentUser.admin}
+                    isDisabled={readOnly || !currentUser?.admin}
                   >
                     {clientOptions.map((client) => (
                       <option key={client.id} value={client.id}>
@@ -743,7 +784,15 @@ const Order = ({}) => {
               <div className="third-row">
                 <Heading className="third-row-heading" as="h6" size="sm">
                   <Text>Carga suelta</Text>
-                  <Button colorScheme="green" size="xs" isDisabled={readOnly}>
+                  <Button
+                    colorScheme="green"
+                    size="xs"
+                    isDisabled={readOnly}
+                    onClick={() => {
+                      setSelectedContainerIndex(-1);
+                      setOpenContainerModal(true);
+                    }}
+                  >
                     + Añadir
                   </Button>
                 </Heading>
@@ -784,7 +833,7 @@ const Order = ({}) => {
                       <Input
                         size="sm"
                         placeholder="PEMA"
-                        isDisabled={!currentUser.admin}
+                        isDisabled={!currentUser?.admin}
                       />
                     </div>
                     <TableContainer>
@@ -800,7 +849,7 @@ const Order = ({}) => {
                           </Tr>
                         </Thead>
                         <Tbody>
-                          {order.containers?.map((container) => {
+                          {order.containers?.map((container, index) => {
                             return (
                               <Tr className="table-row">
                                 <Td>{container.code}</Td>
@@ -811,7 +860,14 @@ const Order = ({}) => {
                                 </Td>
                                 <Td>{container.repackage ? "SI" : "NO"}</Td>
                                 <Td>
-                                  <ExpandButton isDisabled={readOnly} />
+                                  <ExpandButton
+                                    isDisabled={readOnly}
+                                    onEdit={() => {
+                                      setSelectedContainerIndex(index);
+                                      setOpenContainerModal(true);
+                                    }}
+                                    onDelete={() => deleteContainer(index)}
+                                  />
                                 </Td>
                               </Tr>
                             );

@@ -45,7 +45,7 @@ const ProfileView = () => {
       await withSession(
         navigate,
         async () => {
-          if (currentUser.admin && id) {
+          if (currentUser?.admin && id) {
             const client = await getClientById(id, "true");
             let user;
             if (client?.user_id) {
