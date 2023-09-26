@@ -616,21 +616,31 @@ const Order = ({}) => {
                   </Select>
                   <Select
                     size="sm"
-                    placeholder={order.origin || "Origen"}
+                    placeholder={"Origen"}
+                    name="origin"
                     isDisabled={readOnly}
+                    value={order?.origin}
+                    onChange={onInputChange}
                   >
-                    <option value="option1">Option 1</option>
-                    <option value="option2">Option 2</option>
-                    <option value="option3">Option 3</option>
+                    {getOperativeSites().map((os) => (
+                      <option key={os} value={os}>
+                        {os}
+                      </option>
+                    ))}
                   </Select>
                   <Select
                     size="sm"
-                    placeholder={order.target || "Destino"}
+                    placeholder={"Destino"}
+                    name="target"
                     isDisabled={readOnly}
+                    value={order?.target}
+                    onChange={onInputChange}
                   >
-                    <option value="option1">Option 1</option>
-                    <option value="option2">Option 2</option>
-                    <option value="option3">Option 3</option>
+                    {getOperativeSites().map((os) => (
+                      <option key={os} value={os}>
+                        {os}
+                      </option>
+                    ))}
                   </Select>
                   {/* <FilterableSelect
                     placeholder="Origen"
