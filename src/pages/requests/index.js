@@ -10,7 +10,7 @@ const Requests = () => {
   const currentUser = getCurrentUser(navigate);
 
   return (
-    <Layout headingText={`Hola ${currentUser?.nickname} :-)`} className="orders-layout">
+    <Layout headingText={`Hola ${currentUser?.nickname}`} className="orders-layout">
       <div className="container">
         <div className="requests-table">
           <Heading as="h6" size="sm">

@@ -20,7 +20,7 @@
 //       </div>
 //       <div className="requests-main-section">
 //         <div className="heading-container">
-//           <Heading as='h4' size='md'>Hola {currentUser?.nickname} :-)</Heading>
+//           <Heading as='h4' size='md'>Hola {currentUser?.nickname}</Heading>
 //         </div>
 //         <Divider />
 //         {/* Table */}

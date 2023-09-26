@@ -7,6 +7,10 @@ import {
   Th,
   Td,
   TableContainer,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
@@ -18,6 +22,8 @@ import { search as searchUsers } from "../../app/services/userService";
 import PaginationFooter from "../Pagination/paginationFooter";
 import { getIdAndName } from "../../app/utils/userUtils";
 import { withSession } from "../../app/utils/sessionUtils";
+import { MdMoreVert } from "react-icons/md";
+import { IconButton } from "@chakra-ui/react";
 
 const ClientTable = () => {
   const [filters, setFilters] = useState({
@@ -103,7 +109,11 @@ const ClientTable = () => {
           <MdSearch />
           Buscar
         </Button>
-        <Button size="sm" colorScheme="green" onClick={() => navigate("./new", { replace: true })}>
+        <Button
+          size="sm"
+          colorScheme="green"
+          onClick={() => navigate("./new", { replace: true })}
+        >
           <MdCreate />
           Crear
         </Button>
@@ -119,7 +129,6 @@ const ClientTable = () => {
                   <Th>Telefono</Th>
                   <Th>Cuit</Th>
                   <Th>Usuario</Th>
-                  <Th>Ver</Th>
                 </Tr>
               </Thead>
               {!loading && (
@@ -132,11 +141,40 @@ const ClientTable = () => {
                           <Td>{result.name}</Td>
                           <Td>{result.phone}</Td>
                           <Td>{result.cuit}</Td>
-                          <Td>{result.user_id}</Td>
                           <Td>
-                            <Link to={`./${result.id}`}>
-                              <MdOutlineOpenInNew />
-                            </Link>
+                            {(result.user_id &&
+                              getIdAndName(
+                                userOptions.find(
+                                  (uo) => uo.id === result.user_id
+                                )
+                              )) ||
+                              "(sin asignar)"}
+                          </Td>
+                          <Td>
+                            <Menu>
+                              <MenuButton
+                                as={IconButton}
+                                aria-label="Options"
+                                icon={<MdMoreVert />}
+                                variant="outline"
+                              />
+                              <MenuList>
+                                <MenuItem
+                                  onClick={() =>
+                                    navigate("/clients/" + result.id)
+                                  }
+                                >
+                                  Editar
+                                </MenuItem>
+                                <MenuItem
+                                  onClick={() =>
+                                    navigate("/profile/" + result.id)
+                                  }
+                                >
+                                  Perfil
+                                </MenuItem>
+                              </MenuList>
+                            </Menu>
                           </Td>
                         </Tr>
                       );
@@ -146,11 +184,16 @@ const ClientTable = () => {
             </Table>
           </TableContainer>
         </div>
-        {loading &&
+        {loading && (
           <div className="spinner">
-            <Spinner className="spinner" size="xl" color="blue.500" thickness="4px" />
+            <Spinner
+              className="spinner"
+              size="xl"
+              color="blue.500"
+              thickness="4px"
+            />
           </div>
-        }
+        )}
         {paginationResult && (
           <PaginationFooter
             currentPage={paginationResult.page}

@@ -10,10 +10,10 @@ const ProfilePage = () => {
   const currentUser = getCurrentUser(navigate);
 
   return (
-    <Layout className="profile-view" headingText={`Hola ${currentUser?.nickname} :-)`}>
+    <Layout className="profile-view" headingText={`Hola ${currentUser?.nickname}`}>
       <div className="container">
         <Heading as="h6" size="sm">
-          Mis datos
+          Perfil
         </Heading>
         <ProfileView />
       </div>

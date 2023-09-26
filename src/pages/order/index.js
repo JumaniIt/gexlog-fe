@@ -11,7 +11,7 @@ import { AddIcon } from "@chakra-ui/icons";
 import { Button } from "@chakra-ui/react";
 import { IconButton } from "@chakra-ui/react";
 import { Grid, GridItem } from "@chakra-ui/react";
-import { Text } from '@chakra-ui/react'
+import { Text } from "@chakra-ui/react";
 import {
   Table,
   Thead,
@@ -44,12 +44,15 @@ import {
   changeStatus,
   update,
   create,
+  markReturned,
+  markBilled,
 } from "../../app/services/orderService";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDestinations } from "../../app/utils/destinationUtils";
 import {
   search as searchClients,
   getById as getClientById,
+  getOneByUserId as getClientByUserId,
 } from "../../app/services/clientService";
 import { getNameAndCuit } from "../../app/utils/clientUtils";
 import {
@@ -59,14 +62,17 @@ import {
 } from "../../app/utils/sessionUtils";
 
 import StatusModal from "../../components/StatusModal/statusModal";
+import { translateStatus } from "../../app/utils/orderUtils";
+import { getHalfHourOptions, trimToMinutes } from "../../app/utils/dateUtils";
 
-const ExpandButton = () => (
+const ExpandButton = (isDisabled) => (
   <Menu>
     <MenuButton
       as={IconButton}
       aria-label="Options"
       icon={<MdMoreVert />}
       variant="outline"
+      isDisabled={isDisabled}
     />
     <MenuList>
       <MenuItem /* icon={<AddIcon />} */>Editar</MenuItem>
@@ -102,6 +108,12 @@ const Order = ({}) => {
 
             const client = await getClientById(order.client_id);
             setClientOptions([...clientOptions, client]);
+          } else if (!currentUser?.admin) {
+            const client = await getClientByUserId(currentUser.id);
+            setClientOptions([...clientOptions, client]);
+            setClientOptionsLoaded(true);
+
+            setOrder({ ...order, client_id: client.id });
           }
         },
         (error) => console.error("Error fetching order:", error)
@@ -116,7 +128,7 @@ const Order = ({}) => {
       if (currentUser.admin) {
         setReadOnly(false);
       } else {
-        const readOnly = order?.status !== "DRAFT";
+        const readOnly = id && order?.status !== "DRAFT";
         setReadOnly(readOnly);
       }
     };
@@ -306,12 +318,50 @@ const Order = ({}) => {
     }
   };
 
+  const onReturned = async () => {
+    const confirm = window.confirm(
+      "¿Estás seguro que deseas modificar el valor de DEV?"
+    );
+
+    if (confirm) {
+      setActionLoading(true);
+      const newReturned = !order.returned;
+      const response = await markReturned(order.id, newReturned);
+
+      if (response) {
+        // todo error handling
+      } else {
+        setOrder({ ...order, returned: newReturned });
+      }
+      setActionLoading(false);
+    }
+  };
+
+  const onBilled = async () => {
+    const confirm = window.confirm(
+      "¿Estás seguro que deseas modificar el valor de FC?"
+    );
+
+    if (confirm) {
+      setActionLoading(true);
+      const newBilled = !order.billed;
+      const response = await markBilled(order.id, newBilled);
+
+      if (response) {
+        // todo error handling
+      } else {
+        setOrder({ ...order, billed: newBilled });
+      }
+      setActionLoading(false);
+    }
+  };
+
   return (
     <Layout className="order-container">
       <Card variant="outline" className="order-card">
         <CardHeader className="order-card-header">
           <Heading size="sm" className="order-heading">
-            Solicitud #{order.id} /{" "}
+            Solicitud #{order?.id} /{" "}
           </Heading>
           <Input
             name="code"
@@ -322,6 +372,31 @@ const Order = ({}) => {
             onChange={onInputChange}
             disabled={readOnly}
           />
+          <Heading size="sm">
+            Estado: {order?.status ? translateStatus(order.status) : "BORRADOR"}{" "}
+          </Heading>
+          {currentUser.admin && (
+            <Checkbox
+              className="services-checkbox"
+              name="dev"
+              isChecked={order.returned}
+              onChange={onReturned}
+              disabled={!id}
+            >
+              DEV
+            </Checkbox>
+          )}
+          {currentUser.admin && (
+            <Checkbox
+              className="services-checkbox"
+              name="dev"
+              isChecked={order.billed}
+              onChange={onBilled}
+              disabled={!id}
+            >
+              FC
+            </Checkbox>
+          )}
           <Menu className="header-menu">
             <MenuButton
               as={IconButton}
@@ -427,7 +502,7 @@ const Order = ({}) => {
                     value={order?.client_id}
                     onFocus={loadClientOptions}
                     onChange={onInputChange}
-                    isDisabled={readOnly}
+                    isDisabled={readOnly || !currentUser.admin}
                   >
                     {clientOptions.map((client) => (
                       <option key={client.id} value={client.id}>
@@ -510,23 +585,32 @@ const Order = ({}) => {
                   Datos de servicio
                 </Heading>
                 <Stack spacing={3} className="first-row-stack">
+                  <input
+                    className="chakra-input css-1xt0hpo"
+                    placeholder="Fecha"
+                    value={order?.arrival_date}
+                    type="date"
+                    name="arrival_date"
+                    isDisabled={readOnly}
+                    onChange={onInputChange}
+                  />
                   <Select
                     size="sm"
-                    placeholder={order.arrival_date || "Fecha"}
+                    value={
+                      order?.arrival_time
+                        ? trimToMinutes(order.arrival_time)
+                        : null
+                    }
+                    name="arrival_time"
+                    placeholder="Hora"
                     isDisabled={readOnly}
+                    onChange={onInputChange}
                   >
-                    <option value="option1">Option 1</option>
-                    <option value="option2">Option 2</option>
-                    <option value="option3">Option 3</option>
-                  </Select>
-                  <Select
-                    size="sm"
-                    placeholder={order.arrival_time || "Hora"}
-                    isDisabled={readOnly}
-                  >
-                    <option value="option1">Option 1</option>
-                    <option value="option2">Option 2</option>
-                    <option value="option3">Option 3</option>
+                    {getHalfHourOptions().map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </Select>
                   <Select
                     size="sm"
@@ -626,10 +710,11 @@ const Order = ({}) => {
               <div className="third-row">
                 <Heading className="third-row-heading" as="h6" size="sm">
                   <Text>Carga suelta</Text>
-                  <Button colorScheme="green" size="xs" isDisabled={readOnly}>+ Añadir</Button>
+                  <Button colorScheme="green" size="xs" isDisabled={readOnly}>
+                    + Añadir
+                  </Button>
                 </Heading>
                 {order.free_load ? (
-
                   <TableContainer>
                     <Table size="sm" variant="striped">
                       <Thead>
@@ -663,7 +748,11 @@ const Order = ({}) => {
                 ) : (
                   <>
                     <div className="subtitle">
-                      <Input size="sm" placeholder="PEMA" />
+                      <Input
+                        size="sm"
+                        placeholder="PEMA"
+                        isDisabled={!currentUser.admin}
+                      />
                     </div>
                     <TableContainer>
                       <Table size="sm" variant="striped">
@@ -689,7 +778,7 @@ const Order = ({}) => {
                                 </Td>
                                 <Td>{container.repackage ? "SI" : "NO"}</Td>
                                 <Td>
-                                  <ExpandButton />
+                                  <ExpandButton isDisabled={readOnly} />
                                 </Td>
                               </Tr>
                             );
@@ -703,8 +792,8 @@ const Order = ({}) => {
             </div>
           </div>
         </CardBody>
-      </Card >
-    </Layout >
+      </Card>
+    </Layout>
   );
 };
 

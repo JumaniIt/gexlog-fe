@@ -17,7 +17,6 @@ const StatusModal = ({ isOpen, onClose, onSave, currentStatus }) => {
   const [selectedOption, setSelectedOption] = useState("");
 
   const handleSave = async () => {
-    console.log(selectedOption)
     await onSave(selectedOption);
     onClose();
   };

@@ -25,6 +25,14 @@ export const update = async (id, client) => {
 };
 
 export const addConsignee = async (id, consignee) => {
-  const response = await put(BASE_PATH + "/" + id + "/consignees", consignee);
+  const response = await post(BASE_PATH + "/" + id + "/consignees", consignee);
   return await response.json();
 };
+
+export const getOneByUserId = async (user_id) => {
+  const response = await search({user_id:user_id, page_size:1, with_consignees:"true"})
+
+  if (response?.elements) {
+    return response.elements[0]
+  }
+}
