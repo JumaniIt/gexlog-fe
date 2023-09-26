@@ -64,6 +64,8 @@ import {
 import StatusModal from "../../components/StatusModal/statusModal";
 import { translateStatus } from "../../app/utils/orderUtils";
 import { getHalfHourOptions, trimToMinutes } from "../../app/utils/dateUtils";
+import { getOperativeSites } from "../../app/utils/customsUtils";
+import FilterableSelect from "../../components/FilterableSelect/filterableSelect";
 
 const ExpandButton = (isDisabled) => (
   <Menu>
@@ -125,7 +127,7 @@ const Order = ({}) => {
 
   useEffect(() => {
     const updateReadOnly = () => {
-      if (currentUser.admin) {
+      if (currentUser?.admin) {
         setReadOnly(false);
       } else {
         const readOnly = id && order?.status !== "DRAFT";
@@ -630,6 +632,27 @@ const Order = ({}) => {
                     <option value="option2">Option 2</option>
                     <option value="option3">Option 3</option>
                   </Select>
+                  {/* <FilterableSelect
+                    placeholder="Origen"
+                    isDisabled={readOnly}
+                    initialValue={order?.origin}
+                    size="sm"
+                    options={getOperativeSites()}
+                    onSelect={(option) =>
+                      setOrder({ ...order, origin: option })
+                    }
+                  ></FilterableSelect>
+                  <FilterableSelect
+                    placeholder="Destino"
+                    initialValue={order?.target}
+                    isDisabled={readOnly}
+                    size="sm"
+                    options={getOperativeSites()}
+                    onSelect={(option) => {
+                      console.log(option);
+                      setOrder({ ...order, target: option });
+                    }}
+                  ></FilterableSelect> */}
                 </Stack>
               </div>
               <div className="second-row">
