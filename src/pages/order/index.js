@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import Layout from "../../components/Layout";
 import { Card, CardHeader, CardBody } from "@chakra-ui/react";
 import { Divider } from "@chakra-ui/react";
 import { Heading } from "@chakra-ui/react";
@@ -22,16 +21,7 @@ import {
   TableContainer,
 } from "@chakra-ui/react";
 
-import {
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuItemOption,
-  MenuGroup,
-  MenuOptionGroup,
-  MenuDivider,
-} from "@chakra-ui/react";
+import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
 
 import { DeleteIcon, ViewIcon } from "@chakra-ui/icons";
 
@@ -69,6 +59,7 @@ import FilterableSelect from "../../components/FilterableSelect/filterableSelect
 import ContainerModal from "../../components/ContainerModal/containerModal";
 import FreeLoadModal from "../../components/FreeLoadModal/freeLoadModal";
 import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
+import NotesModal from "../../components/NotesModal/notesModal";
 
 const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
   <Menu>
@@ -104,6 +95,7 @@ const Order = ({ showAlert }) => {
   const [selectedContainerIndex, setSelectedContainerIndex] = useState(-1);
   const [openFreeLoadModal, setOpenFreeLoadModal] = useState(false);
   const [selectedFreeLoadIndex, setSelectedFreeLoadIndex] = useState(-1);
+  const [openNotesModal, setOpenNotesModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
   const navigate = useNavigate();
@@ -195,7 +187,6 @@ const Order = ({ showAlert }) => {
   }, [order?.client_id]);
 
   const onInputChange = (e) => {
-    console.log(e.target.value);
     modifyOrder(e.target.name, e.target.value);
   };
 
@@ -326,9 +317,13 @@ const Order = ({ showAlert }) => {
           console.log("could not save order", response);
           showAlert(ERROR, "Cambios no guardados", response.message);
         } else if (response.causes) {
-          showAlert(ERROR, "Cambios no guardados", response.causes[0].code + " " + response.causes[0].message);
+          showAlert(
+            ERROR,
+            "Cambios no guardados",
+            response.causes[0].code + " " + response.causes[0].message
+          );
         } else {
-          setOrder(response)
+          setOrder(response);
           showAlert(SUCCESS, "Cambios guardados");
           if (!id) {
             navigate("/orders/" + response.id);
@@ -345,7 +340,7 @@ const Order = ({ showAlert }) => {
   };
 
   const openNotes = () => {
-    console.log("opening notes...");
+    setOpenNotesModal(true);
   };
 
   const openCosts = () => {
@@ -549,7 +544,7 @@ const Order = ({ showAlert }) => {
               setSelectedContainerIndex(-1);
               setOpenContainerModal(false);
             }}
-          ></ContainerModal>
+          />
         )}
 
         {openFreeLoadModal && (
@@ -562,7 +557,15 @@ const Order = ({ showAlert }) => {
               setSelectedFreeLoadIndex(-1);
               setOpenFreeLoadModal(false);
             }}
-          ></FreeLoadModal>
+          />
+        )}
+
+        {openNotesModal && (
+          <NotesModal
+            isOpen={openNotesModal}
+            onClose={() => setOpenNotesModal(false)}
+            orderId={order?.id}
+          />
         )}
 
         <Divider className="order-divider" />
