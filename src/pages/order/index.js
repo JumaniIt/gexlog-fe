@@ -85,7 +85,10 @@ const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
 );
 
 const Order = ({ showAlert }) => {
-  const [order, setOrder] = useState({});
+  const [order, setOrder] = useState({
+    containers:[],
+    free_loads:[]
+  });
   const [clientOptions, setClientOptions] = useState([]);
   const [clientOptionsLoaded, setClientOptionsLoaded] = useState(false);
   const [consigneeOptions, setConsigneeOptions] = useState([]);
@@ -539,7 +542,7 @@ const Order = ({ showAlert }) => {
         {openContainerModal && (
           <ContainerModal
             isOpen={openContainerModal}
-            initialValue={order?.containers[selectedContainerIndex]}
+            initialValue={selectedContainerIndex >= 0 && order?.containers[selectedContainerIndex]}
             readOnly={readOnly}
             onSave={handleContainerSave}
             onClose={() => {
@@ -552,7 +555,7 @@ const Order = ({ showAlert }) => {
         {openFreeLoadModal && (
           <FreeLoadModal
             isOpen={openFreeLoadModal}
-            initialValue={order?.free_loads[selectedFreeLoadIndex]}
+            initialValue={selectedFreeLoadIndex >= 0 && order?.free_loads[selectedFreeLoadIndex]}
             readOnly={readOnly}
             onSave={handleFreeLoadSave}
             onClose={() => {

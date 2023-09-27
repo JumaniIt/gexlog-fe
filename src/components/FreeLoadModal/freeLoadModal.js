@@ -25,7 +25,7 @@ const FreeLoadModal = ({ isOpen, initialValue, readOnly, onSave, onClose }) => {
     patent: "",
     type: "",
     weight: "",
-    guide: false,
+    guide: "",
     destinations: [],
   });
 
