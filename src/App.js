@@ -10,6 +10,7 @@ import UserPage from './pages/user';
 import ClientsPage from './pages/clients';
 import ClientPage from './pages/client';
 import ProfilePage from './pages/profile';
+import OrderPage from './pages/orderPage';
 
 
 const router = createBrowserRouter([
@@ -28,11 +29,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/orders/:id",
-    element: <Order />,
+    element: <OrderPage />,
   },
   {
     path: "/orders/new",
-    element: <Order />,
+    element: <OrderPage />,
   },
   {
     path:"/users",

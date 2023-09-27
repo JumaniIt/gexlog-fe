@@ -67,6 +67,8 @@ import { getHalfHourOptions, trimToMinutes } from "../../app/utils/dateUtils";
 import { getOperativeSites } from "../../app/utils/customsUtils";
 import FilterableSelect from "../../components/FilterableSelect/filterableSelect";
 import ContainerModal from "../../components/ContainerModal/containerModal";
+import FreeLoadModal from "../../components/FreeLoadModal/freeLoadModal";
+import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 
 const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
   <Menu>
@@ -90,15 +92,18 @@ const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
   </Menu>
 );
 
-const Order = ({}) => {
+const Order = ({ showAlert }) => {
   const [order, setOrder] = useState({});
   const [clientOptions, setClientOptions] = useState([]);
   const [clientOptionsLoaded, setClientOptionsLoaded] = useState(false);
   const [consigneeOptions, setConsigneeOptions] = useState([]);
+  const [pemaCode, setPemaCode] = useState("");
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [openStatusModal, setOpenStatusModal] = useState(false);
   const [openContainerModal, setOpenContainerModal] = useState(false);
   const [selectedContainerIndex, setSelectedContainerIndex] = useState(-1);
+  const [openFreeLoadModal, setOpenFreeLoadModal] = useState(false);
+  const [selectedFreeLoadIndex, setSelectedFreeLoadIndex] = useState(-1);
   const [actionLoading, setActionLoading] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
   const navigate = useNavigate();
@@ -117,13 +122,18 @@ const Order = ({}) => {
             const order = await getOrderById(id);
             setOrder(order);
 
+            if (order.containers?.length) {
+              setPemaCode(order.containers[0].pema);
+            } else if (order.free_loads?.length) {
+              setPemaCode(order.free_loads[0].pema);
+            }
+
             const client = await getClientById(order.client_id);
             setClientOptions([...clientOptions, client]);
           } else if (!currentUser?.admin) {
             const client = await getClientByUserId(currentUser.id);
             setClientOptions([...clientOptions, client]);
             setClientOptionsLoaded(true);
-
             setOrder({ ...order, client_id: client.id });
           }
         },
@@ -175,7 +185,7 @@ const Order = ({}) => {
               name: c.name,
               cuit: c.cuit,
             }));
-            setConsigneeOptions([...consignees]);
+            setConsigneeOptions(consignees);
           }
         },
         (error) => console.log("error loading consignees", error)
@@ -185,6 +195,7 @@ const Order = ({}) => {
   }, [order?.client_id]);
 
   const onInputChange = (e) => {
+    console.log(e.target.value);
     modifyOrder(e.target.name, e.target.value);
   };
 
@@ -194,6 +205,20 @@ const Order = ({}) => {
 
   const modifyOrder = (field, value) => {
     setOrder({ ...order, [field]: value });
+  };
+
+  const modifyDriverData = (e) => {
+    const updatedDriverData = { ...order.driver_data };
+
+    updatedDriverData[e.target.name] = e.target.value;
+    setOrder({ ...order, driver_data: updatedDriverData });
+  };
+
+  const modifyCustomsData = (e) => {
+    const updatedCustomsData = { ...order.customs_data };
+
+    updatedCustomsData[e.target.name] = e.target.value;
+    setOrder({ ...order, customs_data: updatedCustomsData });
   };
 
   const onDeleteDocument = async (docId, docName) => {
@@ -211,8 +236,11 @@ const Order = ({}) => {
             (document) => document.id !== docId
           );
           setOrder({ ...order, documents: updatedDocuments });
+          showAlert(SUCCESS, "Documento eliminado");
         },
-        (error) => console.log("Error deleting document", error),
+        (error) => {
+          console.log("Error deleting document", error);
+        },
         () => setLoadingFiles(false)
       );
     }
@@ -257,6 +285,7 @@ const Order = ({}) => {
           ...order,
           documents: [...order.documents, ...successfulFiles],
         });
+        showAlert(SUCCESS, "Documentos guardados");
       },
       (error) => console.log("Error uploading documents"),
       () => setLoadingFiles(false)
@@ -268,6 +297,24 @@ const Order = ({}) => {
     withSession(
       navigate,
       async () => {
+        // Set PEMA code in containers and freeloads
+        const updatedContainers = { ...order.containers };
+        const updatedFreeLoads = { ...order.free_loads };
+
+        for (const containerId in updatedContainers) {
+          const container = updatedContainers[containerId];
+          if (container) {
+            container.pema = pemaCode;
+          }
+        }
+
+        for (const freeLoadId in updatedFreeLoads) {
+          const freeLoad = updatedFreeLoads[freeLoadId];
+          if (freeLoad) {
+            freeLoad.pema = pemaCode;
+          }
+        }
+
         let response;
         if (id) {
           response = await update(id, order);
@@ -276,10 +323,16 @@ const Order = ({}) => {
         }
 
         if (response.message) {
-          // TODO alert dialog
           console.log("could not save order", response);
-        } else if (!id) {
-          navigate("/orders/" + response.id);
+          showAlert(ERROR, "Cambios no guardados", response.message);
+        } else if (response.causes) {
+          showAlert(ERROR, "Cambios no guardados", response.causes[0].code + " " + response.causes[0].message);
+        } else {
+          setOrder(response)
+          showAlert(SUCCESS, "Cambios guardados");
+          if (!id) {
+            navigate("/orders/" + response.id);
+          }
         }
       },
       (error) => console.log("could not save order", error),
@@ -319,8 +372,8 @@ const Order = ({}) => {
           if (response) {
             console.log("could not change status", response);
           } else {
-            console.log("Setting order status");
             setOrder({ ...order, status });
+            showAlert(SUCCESS, "Estado de solicitud cambiado");
           }
         },
         (error) => console.log("could not change status", error),
@@ -343,6 +396,7 @@ const Order = ({}) => {
         // todo error handling
       } else {
         setOrder({ ...order, returned: newReturned });
+        showAlert(SUCCESS, "Cambios guardados");
       }
       setActionLoading(false);
     }
@@ -362,6 +416,7 @@ const Order = ({}) => {
         // todo error handling
       } else {
         setOrder({ ...order, billed: newBilled });
+        showAlert(SUCCESS, "Cambios guardados");
       }
       setActionLoading(false);
     }
@@ -385,8 +440,26 @@ const Order = ({}) => {
     setOrder({ ...order, containers: updatedContainers });
   };
 
+  const handleFreeLoadSave = (freeLoad) => {
+    const updatedOrder = { ...order };
+
+    if (selectedFreeLoadIndex === -1) {
+      updatedOrder.free_loads.push(freeLoad);
+    } else {
+      updatedOrder.free_loads[selectedFreeLoadIndex] = freeLoad;
+    }
+
+    setOrder(updatedOrder);
+  };
+
+  const deleteFreeLoad = (index) => {
+    const updatedFreeLoads = [...order.free_loads];
+    updatedFreeLoads.splice(index, 1);
+    setOrder({ ...order, free_loads: updatedFreeLoads });
+  };
+
   return (
-    <Layout className="order-container">
+    <div className="order-container">
       <Card variant="outline" className="order-card">
         <CardHeader className="order-card-header">
           <Heading size="sm" className="order-heading">
@@ -479,6 +552,19 @@ const Order = ({}) => {
           ></ContainerModal>
         )}
 
+        {openFreeLoadModal && (
+          <FreeLoadModal
+            isOpen={openFreeLoadModal}
+            initialValue={order?.free_loads[selectedFreeLoadIndex]}
+            readOnly={readOnly}
+            onSave={handleFreeLoadSave}
+            onClose={() => {
+              setSelectedFreeLoadIndex(-1);
+              setOpenFreeLoadModal(false);
+            }}
+          ></FreeLoadModal>
+        )}
+
         <Divider className="order-divider" />
         <CardBody>
           <div className="top-row">
@@ -558,15 +644,27 @@ const Order = ({}) => {
                     size="sm"
                     name="consignee"
                     placeholder="Factura a"
-                    onChange={onInputChange}
-                    value={order?.consignee}
+                    onChange={(e) =>
+                      setOrder({
+                        ...order,
+                        consignee: JSON.parse(e.target.value),
+                      })
+                    }
+                    value={
+                      order?.consignee ? JSON.stringify(order.consignee) : ""
+                    }
                     isDisabled={readOnly}
                   >
-                    {consigneeOptions.map((consignee) => (
-                      <option key={consignee} value={consignee}>
-                        {getNameAndCuit(consignee)}
-                      </option>
-                    ))}
+                    {consigneeOptions.map((consignee) => {
+                      return (
+                        <option
+                          key={JSON.stringify(consignee)}
+                          value={JSON.stringify(consignee)}
+                        >
+                          {getNameAndCuit(consignee)}
+                        </option>
+                      );
+                    })}
                   </Select>
                 </Stack>
               </div>
@@ -634,7 +732,7 @@ const Order = ({}) => {
                     value={order?.arrival_date}
                     type="date"
                     name="arrival_date"
-                    isDisabled={readOnly}
+                    disabled={readOnly}
                     onChange={onInputChange}
                   />
                   <Select
@@ -717,40 +815,50 @@ const Order = ({}) => {
                         <Input
                           size="sm"
                           placeholder="Nombre"
+                          name="name"
                           value={order?.driver_data?.name}
                           isDisabled={readOnly}
+                          onChange={modifyDriverData}
                         />
                       </GridItem>
                       <GridItem colSpan={2}>
                         <Input
                           size="sm"
                           placeholder="Teléfono"
+                          name="phone"
                           value={order?.driver_data?.phone}
                           isDisabled={readOnly}
+                          onChange={modifyDriverData}
                         />
                       </GridItem>
                       <GridItem colSpan={2}>
                         <Input
                           size="sm"
                           placeholder="Chasis"
+                          name="chasis"
                           value={order?.driver_data?.chasis}
                           isDisabled={readOnly}
+                          onChange={modifyDriverData}
                         />
                       </GridItem>
                       <GridItem colSpan={2}>
                         <Input
                           size="sm"
                           placeholder="Semi"
+                          name="semi"
                           value={order?.driver_data?.semi}
                           isDisabled={readOnly}
+                          onChange={modifyDriverData}
                         />
                       </GridItem>
                       <GridItem colSpan={4}>
                         <Input
                           size="sm"
                           placeholder="Empresa"
+                          name="company"
                           value={order?.driver_data?.company}
                           isDisabled={readOnly}
+                          onChange={modifyDriverData}
                         />
                       </GridItem>
                     </Grid>
@@ -764,16 +872,20 @@ const Order = ({}) => {
                         <Input
                           size="sm"
                           placeholder="Nombre"
+                          name="name"
                           value={order?.customs_data?.name}
                           isDisabled={readOnly}
+                          onChange={modifyCustomsData}
                         />
                       </GridItem>
                       <GridItem>
                         <Input
                           size="sm"
                           placeholder="Teléfono"
+                          name="phone"
                           value={order?.customs_data?.phone}
                           isDisabled={readOnly}
+                          onChange={modifyCustomsData}
                         />
                       </GridItem>
                     </Grid>
@@ -783,14 +895,21 @@ const Order = ({}) => {
 
               <div className="third-row">
                 <Heading className="third-row-heading" as="h6" size="sm">
-                  <Text>Carga suelta</Text>
+                  {(order.free_load && <Text>Carga suelta</Text>) || (
+                    <Text>Contenedores</Text>
+                  )}
                   <Button
                     colorScheme="green"
                     size="xs"
                     isDisabled={readOnly}
                     onClick={() => {
-                      setSelectedContainerIndex(-1);
-                      setOpenContainerModal(true);
+                      if (order?.free_load) {
+                        setSelectedFreeLoadIndex(-1);
+                        setOpenFreeLoadModal(true);
+                      } else {
+                        setSelectedContainerIndex(-1);
+                        setOpenContainerModal(true);
+                      }
                     }}
                   >
                     + Añadir
@@ -810,7 +929,7 @@ const Order = ({}) => {
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {order.free_loads?.map((fl) => {
+                        {order.free_loads?.map((fl, index) => {
                           return (
                             <Tr className="table-row">
                               <Td>{fl.patent}</Td>
@@ -819,7 +938,14 @@ const Order = ({}) => {
                               <Td>{formatDestinations(fl.destinations)}</Td>
                               <Td>{fl.weight}</Td>
                               <Td>
-                                <ExpandButton />
+                                <ExpandButton
+                                  isDisabled={readOnly}
+                                  onEdit={() => {
+                                    setSelectedFreeLoadIndex(index);
+                                    setOpenFreeLoadModal(true);
+                                  }}
+                                  onDelete={() => deleteFreeLoad(index)}
+                                />
                               </Td>
                             </Tr>
                           );
@@ -834,6 +960,8 @@ const Order = ({}) => {
                         size="sm"
                         placeholder="PEMA"
                         isDisabled={!currentUser?.admin}
+                        value={pemaCode}
+                        onChange={(e) => setPemaCode(e.target.value)}
                       />
                     </div>
                     <TableContainer>
@@ -882,7 +1010,7 @@ const Order = ({}) => {
           </div>
         </CardBody>
       </Card>
-    </Layout>
+    </div>
   );
 };
 

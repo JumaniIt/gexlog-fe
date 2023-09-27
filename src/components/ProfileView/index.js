@@ -22,11 +22,11 @@ import {
 } from "../../app/services/clientService";
 import ConsigneeModal from "../ConsigneeModal/consigneeModal";
 import { getById as getUserById } from "../../app/services/userService";
+import { SUCCESS } from "../../app/utils/alertUtils";
 
-const ProfileView = () => {
+const ProfileView = ({showAlert}) => {
   const navigate = useNavigate();
   const currentUser = getCurrentUser(navigate);
-  const [consigneeAction, setConsigneeAction] = useState(false);
   const [consigneeModal, setConsigneeModal] = useState(false);
   const [profile, setProfile] = useState({
     nickname: "",
@@ -95,7 +95,6 @@ const ProfileView = () => {
   };
 
   const saveNewConsignee = async (consignee) => {
-    setConsigneeAction(true);
     await withSession(
       navigate,
       async () => {
@@ -108,10 +107,10 @@ const ProfileView = () => {
             ...profile,
             consignees: [...profile.consignees, response],
           });
+          showAlert(SUCCESS, "Consignatario guardado")
         }
       },
-      (error) => console.log(error),
-      () => setConsigneeAction(false)
+      (error) => console.log(error)
     );
   };
 
@@ -163,10 +162,9 @@ const ProfileView = () => {
           size="sm"
           colorScheme="green"
           onClick={openConsigneeModal}
-          isLoading={consigneeAction}
         >
           <MdCreate />
-          Crear consignatario
+          Añadir
         </Button>
       </div>
       <TableContainer>

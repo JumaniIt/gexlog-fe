@@ -26,8 +26,9 @@ import { trimToMinutes } from "../../app/utils/dateUtils";
 import { translateStatus } from "../../app/utils/orderUtils";
 import PaginationFooter from "../Pagination/paginationFooter";
 import { withSession, getCurrentUser } from "../../app/utils/sessionUtils";
+import { ERROR } from "../../app/utils/alertUtils";
 
-const OrderTable = () => {
+const OrderTable = ({showAlert}) => {
   const [filters, setFilters] = useState({
     page_size: 10,
     page: 1,
@@ -54,11 +55,15 @@ const OrderTable = () => {
       navigate,
       async () => {
         const result = await searchOrders(f)
-        setSearchResults(result?.elements);
-        setPaginationResult({
-          totalPages: result.total_pages,
-          page: result.page,
-        });
+        if (result.message) {
+          showAlert(ERROR, result.code, result.message)
+        } else {
+          setSearchResults(result?.elements);
+          setPaginationResult({
+            totalPages: result.total_pages,
+            page: result.page,
+          });
+        }
       },
       (error) => console.log(error),
       () => setLoading(false)

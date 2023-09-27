@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Layout from "../../components/Layout";
+import { useNavigate } from "react-router-dom";
 import {
   Heading,
   Alert,
@@ -7,11 +7,12 @@ import {
   AlertTitle,
   AlertDescription,
 } from "@chakra-ui/react";
-import ProfileView from "../../components/ProfileView";
-import { useNavigate } from "react-router-dom";
+import Layout from "../../components/Layout";
 import { getCurrentUser } from "../../app/utils/sessionUtils";
+import Order from "../order";
 
-const ProfilePage = () => {
+
+const OrderPage = () => {
   const navigate = useNavigate();
   const currentUser = getCurrentUser(navigate);
 
@@ -30,24 +31,23 @@ const ProfilePage = () => {
 
   return (
     <Layout
-      className="profile-view"
       headingText={`Hola ${currentUser?.nickname}`}
+      className="orders-layout"
     >
       {alert.status && (
-        <Alert status={alert.status}>
+        <Alert status={alert.status} variant='left-accent'>
           <AlertIcon />
           <AlertTitle>{alert.code}</AlertTitle>
-          <AlertDescription>{alert.message}</AlertDescription>
+          <AlertDescription>
+            {alert.message}
+          </AlertDescription>
         </Alert>
       )}
       <div className="container">
-        <Heading as="h6" size="sm">
-          Perfil
-        </Heading>
-        <ProfileView showAlert={showAlert}/>
+        <Order showAlert={showAlert} />
       </div>
     </Layout>
   );
 };
 
-export default ProfilePage;
+export default OrderPage;

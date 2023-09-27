@@ -10,17 +10,20 @@ import {
   Button,
   FormControl,
   FormLabel,
-  Input
+  Input,
 } from "@chakra-ui/react";
 
-const ConsigneeModal = ({isOpen, onSave, onClose}) => {
+const ConsigneeModal = ({ isOpen, onSave, onClose }) => {
   const [consignee, setConsignee] = useState({
     name: "",
     cuit: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
+    setLoading(true);
     await onSave(consignee);
+    setLoading(false);
     onClose();
   };
 
@@ -28,7 +31,7 @@ const ConsigneeModal = ({isOpen, onSave, onClose}) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Crear Consignatario</ModalHeader>
+        <ModalHeader>Nuevo consignatario</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           {/* Form fields for creating a new Consignatario */}
@@ -38,7 +41,9 @@ const ConsigneeModal = ({isOpen, onSave, onClose}) => {
               type="text"
               name="name"
               value={consignee.name}
-              onChange={(e) => setConsignee({...consignee, name: e.target.value})}
+              onChange={(e) =>
+                setConsignee({ ...consignee, name: e.target.value })
+              }
             />
           </FormControl>
           <FormControl mt={4}>
@@ -47,12 +52,14 @@ const ConsigneeModal = ({isOpen, onSave, onClose}) => {
               type="text"
               name="cuit"
               value={consignee.cuit}
-              onChange={(e) => setConsignee({...consignee, cuit: e.target.value})}
+              onChange={(e) =>
+                setConsignee({ ...consignee, cuit: e.target.value })
+              }
             />
           </FormControl>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" onClick={handleSave}>
+          <Button colorScheme="blue" onClick={handleSave} isLoading={loading}>
             Guardar
           </Button>
           <Button onClick={onClose}>Cancelar</Button>

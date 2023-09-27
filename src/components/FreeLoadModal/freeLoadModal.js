@@ -12,33 +12,27 @@ import {
   Divider,
   Heading,
   Checkbox,
-  Select
+  Select,
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { TRM } from "../../app/utils/destinationUtils";
 import DestinationTable from "../DestinationTable/destinationTable";
-import { getContainerTypes } from "../../app/utils/containerUtils";
+import { getFreeLoadTypes } from "../../app/utils/freeLoadUtils";
 
-const ContainerModal = ({
-  isOpen,
-  initialValue,
-  readOnly,
-  onSave,
-  onClose,
-}) => {
-  const [container, setContainer] = useState({
+const FreeLoadModal = ({ isOpen, initialValue, readOnly, onSave, onClose }) => {
+  const [freeLoad, setFreeLoad] = useState({
     id: "",
-    code: "",
+    patent: "",
     type: "",
-    bl: "",
-    repackage: false,
+    weight: "",
+    guide: false,
     destinations: [],
   });
 
   useEffect(() => {
     const fetchInitialData = () => {
       if (initialValue) {
-        setContainer(initialValue);
+        setFreeLoad(initialValue);
       }
     };
 
@@ -46,16 +40,16 @@ const ContainerModal = ({
   }, []);
 
   const handleSave = () => {
-    onSave(container);
+    onSave(freeLoad);
     onClose();
   };
 
   const onInputChange = (e) => {
-    setContainer({ ...container, [e.target.name]: e.target.value });
+    setFreeLoad({ ...freeLoad, [e.target.name]: e.target.value });
   };
 
   const toggleRepackage = () => {
-    setContainer({ ...container, repackage: !container.repackage });
+    setFreeLoad({ ...freeLoad, repackage: !freeLoad.repackage });
   };
 
   const addDestinationRow = () => {
@@ -69,15 +63,15 @@ const ContainerModal = ({
       product_details: "",
     };
 
-    setContainer({
-      ...container,
-      destinations: [...container.destinations, newDestination],
+    setFreeLoad({
+      ...freeLoad,
+      destinations: [...freeLoad.destinations, newDestination],
     });
   };
 
   const handleDestinationChange = (e, index) => {
     const { name, value } = e.target;
-    const updatedDestinations = [...container.destinations];
+    const updatedDestinations = [...freeLoad.destinations];
 
     if (name === "type" && value !== TRM) {
       updatedDestinations[index] = {
@@ -94,13 +88,13 @@ const ContainerModal = ({
       };
     }
 
-    setContainer({ ...container, destinations: updatedDestinations });
+    setFreeLoad({ ...freeLoad, destinations: updatedDestinations });
   };
 
   const deleteDestinationRow = (index) => {
-    const updatedDestinations = [...container.destinations];
+    const updatedDestinations = [...freeLoad.destinations];
     updatedDestinations.splice(index, 1);
-    setContainer({ ...container, destinations: updatedDestinations });
+    setFreeLoad({ ...freeLoad, destinations: updatedDestinations });
   };
 
   return (
@@ -108,22 +102,22 @@ const ContainerModal = ({
       <ModalOverlay />
       <ModalContent maxW="90vw">
         {initialValue ? (
-          <ModalHeader>Editar contenedor</ModalHeader>
+          <ModalHeader>Editar carga suelta</ModalHeader>
         ) : (
-          <ModalHeader>Nuevo contenedor</ModalHeader>
+          <ModalHeader>Nueva carga suelta</ModalHeader>
         )}
         <ModalCloseButton />
         <ModalBody>
           <div className="data">
             <div className="item">
               <Heading as="h6" size="sm">
-                Código
+                Patente
               </Heading>
               <Input
                 size="sm"
-                placeholder="Código"
-                name="code"
-                value={container?.code}
+                placeholder="Patente"
+                name="patent"
+                value={freeLoad?.patent}
                 onChange={onInputChange}
                 isDisabled={readOnly}
               />
@@ -136,41 +130,42 @@ const ContainerModal = ({
                 size="sm"
                 placeholder="Tipo"
                 name="type"
-                value={container?.type}
+                value={freeLoad?.type}
                 onChange={onInputChange}
                 isDisabled={readOnly}
               >
-                {getContainerTypes().map((ct) => (
-                  <option key={ct} value={ct}>
-                    {ct}
+                {getFreeLoadTypes().map((flt) => (
+                  <option key={flt} value={flt}>
+                    {flt}
                   </option>
                 ))}
               </Select>
             </div>
             <div className="item">
               <Heading as="h6" size="sm">
-                BL
+                Peso
               </Heading>
               <Input
                 size="sm"
-                placeholder="BL"
-                name="bl"
-                value={container?.bl}
+                placeholder="Peso"
+                name="weight"
+                value={freeLoad?.weight}
                 onChange={onInputChange}
                 isDisabled={readOnly}
               />
             </div>
             <div className="item">
               <Heading as="h6" size="sm">
-                Reenvase
+                Guía
               </Heading>
-              <Checkbox
-                isChecked={container.repackage}
-                onChange={toggleRepackage}
+              <Input
+                size="sm"
+                placeholder="Guía"
+                name="guide"
+                value={freeLoad?.guide}
+                onChange={onInputChange}
                 isDisabled={readOnly}
-              >
-                Reenvase
-              </Checkbox>
+              />
             </div>
           </div>
           <Divider />
@@ -185,7 +180,7 @@ const ContainerModal = ({
           </div>
           {/* Use the DestinationTable component here */}
           <DestinationTable
-            destinations={container.destinations}
+            destinations={freeLoad.destinations}
             onDestinationChange={handleDestinationChange}
             onDeleteDestination={deleteDestinationRow}
           />
@@ -201,4 +196,4 @@ const ContainerModal = ({
   );
 };
 
-export default ContainerModal;
+export default FreeLoadModal;

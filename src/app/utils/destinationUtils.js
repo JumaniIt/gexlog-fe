@@ -7,4 +7,4 @@ export const getDestinationTypes = () => destinationTypes;
 
 export const TRM = "TRM";
 
-const destinationTypes = [TRM, "TLAT", "TLEA"];
+const destinationTypes = ["TLAT", TRM, "TLEA"];
