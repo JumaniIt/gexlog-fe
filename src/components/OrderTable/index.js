@@ -254,7 +254,7 @@ const OrderTable = ({showAlert}) => {
             <Spinner className="spinner" size="xl" color="blue.500" thickness="4px" />
           </div>
         }
-        {/* {paginationResult && (
+        {paginationResult && (
             <PaginationFooter
               currentPage={paginationResult.page}
               totalPages={paginationResult.totalPages}
@@ -263,7 +263,7 @@ const OrderTable = ({showAlert}) => {
                 search(filters);
               }}
             />
-          )} */}
+          )}
       </div>
       {/* )} */}
     </div>
