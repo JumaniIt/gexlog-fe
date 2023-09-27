@@ -237,7 +237,7 @@ const OrderTable = ({showAlert}) => {
                           </Td>
                           <Td>{translateStatus(result.status)}</Td>
                           <Td>
-                            <Link to={`/orders/${result.id}`} target="_blank">
+                            <Link to={`/orders/${result.id}`}>
                               <MdOutlineOpenInNew />
                             </Link>
                           </Td>
