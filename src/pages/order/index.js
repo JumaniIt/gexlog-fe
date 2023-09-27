@@ -60,6 +60,7 @@ import ContainerModal from "../../components/ContainerModal/containerModal";
 import FreeLoadModal from "../../components/FreeLoadModal/freeLoadModal";
 import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 import NotesModal from "../../components/NotesModal/notesModal";
+import CostModal from "../../components/CostModal/costModal";
 
 const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
   <Menu>
@@ -95,7 +96,8 @@ const Order = ({ showAlert }) => {
   const [selectedContainerIndex, setSelectedContainerIndex] = useState(-1);
   const [openFreeLoadModal, setOpenFreeLoadModal] = useState(false);
   const [selectedFreeLoadIndex, setSelectedFreeLoadIndex] = useState(-1);
-  const [openNotesModal, setOpenNotesModal] = useState(false);
+  const [openNoteModal, setOpenNoteModal] = useState(false);
+  const [openCostModal, setOpenCostModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
   const navigate = useNavigate();
@@ -340,11 +342,11 @@ const Order = ({ showAlert }) => {
   };
 
   const openNotes = () => {
-    setOpenNotesModal(true);
+    setOpenNoteModal(true);
   };
 
   const openCosts = () => {
-    console.log("opening costs...");
+    setOpenCostModal(true);
   };
 
   const handleSend = async () => {
@@ -560,10 +562,18 @@ const Order = ({ showAlert }) => {
           />
         )}
 
-        {openNotesModal && (
+        {openNoteModal && (
           <NotesModal
-            isOpen={openNotesModal}
-            onClose={() => setOpenNotesModal(false)}
+            isOpen={openNoteModal}
+            onClose={() => setOpenNoteModal(false)}
+            orderId={order?.id}
+          />
+        )}
+
+        {openCostModal && (
+          <CostModal
+            isOpen={openCostModal}
+            onClose={() => setOpenCostModal(false)}
             orderId={order?.id}
           />
         )}

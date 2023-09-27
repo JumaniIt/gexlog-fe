@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Heading, Input } from "@chakra-ui/react";
+import { Heading, Input, Select } from "@chakra-ui/react";
 import { Text } from "@chakra-ui/react";
 import {
   Card,
@@ -13,20 +13,22 @@ import {
 import { toLocalDateString } from "../../app/utils/dateUtils";
 import { translateAuthor } from "../../app/utils/noteUtils";
 import { MdSave, MdCancel } from "react-icons/md";
+import { getCostTypes, translateCostType } from "../../app/utils/costUtils";
 
-const EditableNote = ({ initialValue, onSave, onCancel }) => {
-  const [note, setNote] = useState({
+const EditableCost = ({ initialValue, onSave, onCancel }) => {
+  const [cost, setCost] = useState({
     id: "",
-    author: "",
+    type: "",
     created_at: "",
-    content: "",
+    description: "",
+    amount: "",
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchInitialData = () => {
       if (initialValue) {
-        setNote(initialValue);
+        setCost(initialValue);
       }
     };
 
@@ -36,21 +38,39 @@ const EditableNote = ({ initialValue, onSave, onCancel }) => {
   const handleSave = async () => {
     setLoading(true);
 
-    await onSave(note);
+    await onSave(cost);
 
     setLoading(false);
+  };
+
+  const onInputChange = (e) => {
+    setCost({ ...cost, [e.target.name]: e.target.value });
   };
 
   return (
     <Card variant="filled">
       <CardHeader display="flex" justifyContent="space-between">
-        {note.id && (
-          <Heading size="sm">
-            {toLocalDateString(note.created_at)} -{" "}
-            {translateAuthor(note.author)}
-          </Heading>
-        )}
-
+        <Select
+          name="type"
+          size="sm"
+          placeholder="Tipo"
+          value={cost.type}
+          onChange={onInputChange}
+        >
+        {getCostTypes().map((ct) => (
+          <option key={ct.value} value={ct.value}>
+            {ct.translation}
+          </option>
+        ))}
+        </Select>
+        <Input
+          name="amount"
+          type="number"
+          size="sm"
+          placeholder="Monto"
+          value={cost.amount}
+          onChange={onInputChange}
+        />
         <div>
           <div>
             <Button onClick={handleSave} variant="ghost" isLoading={loading}>
@@ -69,8 +89,11 @@ const EditableNote = ({ initialValue, onSave, onCancel }) => {
             <Input
               pt="2"
               fontSize="md"
-              value={note.content}
-              onChange={(e) => setNote({ ...note, content: e.target.value })}
+              placeholder="Descripción"
+              value={cost.description}
+              onChange={(e) =>
+                setCost({ ...cost, description: e.target.value })
+              }
             />
           </Box>
         </Stack>
@@ -79,4 +102,4 @@ const EditableNote = ({ initialValue, onSave, onCancel }) => {
   );
 };
 
-export default EditableNote;
+export default EditableCost;
