@@ -161,7 +161,7 @@ const OrderTable = ({showAlert}) => {
           <MdSearch />
           Buscar
         </Button>
-        <Button size="sm" colorScheme="green" onClick={() => window.open(`/orders/new`)}>
+        <Button size="sm" colorScheme="green" onClick={() => navigate(`/orders/new`, {replace:true})}>
           <MdCreate />
           Crear
         </Button>
