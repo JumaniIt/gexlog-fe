@@ -11,8 +11,7 @@ import {
   Input,
   Divider,
   Heading,
-  Checkbox,
-  Select,
+  Select
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { TRM } from "../../app/utils/destinationUtils";
