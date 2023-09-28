@@ -19,7 +19,7 @@ import { AddIcon } from "@chakra-ui/icons";
 import { TRM } from "../../app/utils/destinationUtils";
 import DestinationTable from "../DestinationTable/destinationTable";
 import { getContainerTypes } from "../../app/utils/containerUtils";
-import { CreatableSelect } from "chakra-react-select";
+import { Select as FilteredSelect, CreatableSelect } from "chakra-react-select";
 
 const ContainerModal = ({
   isOpen,
@@ -28,6 +28,7 @@ const ContainerModal = ({
   onSave,
   onClose,
   initialBls = [],
+  initialDestinations = [],
 }) => {
   const [container, setContainer] = useState({
     id: "",
@@ -38,6 +39,8 @@ const ContainerModal = ({
     destinations: [],
   });
   const [bls, setBls] = useState([]);
+  const [destinations, setDestinations] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState([]);
 
   useEffect(() => {
     const fetchInitialData = () => {
@@ -46,6 +49,7 @@ const ContainerModal = ({
       }
 
       setBls([...initialBls]);
+      setDestinations([...initialDestinations]);
     };
 
     fetchInitialData();
@@ -66,14 +70,29 @@ const ContainerModal = ({
 
   const addDestinationRow = () => {
     const newDestinationId = Date.now();
-    const newDestination = {
+    let newDestination = {
       id: newDestinationId,
-      type: "",
-      code: "",
-      fob: "",
-      currency: "",
-      product_details: "",
     };
+
+    if (selectedDestination) {
+      newDestination = {
+        ...newDestination,
+        type: selectedDestination.type,
+        code: selectedDestination.code,
+        fob: selectedDestination.fob,
+        currency: selectedDestination.currency,
+        product_details: selectedDestination.product_details,
+      };
+    } else {
+      newDestination = {
+        ...newDestination,
+        type: "",
+        code: "",
+        fob: "",
+        currency: "",
+        product_details: "",
+      };
+    }
 
     setContainer({
       ...container,
@@ -101,12 +120,14 @@ const ContainerModal = ({
     }
 
     setContainer({ ...container, destinations: updatedDestinations });
+    setDestinations(updatedDestinations)
   };
 
   const deleteDestinationRow = (index) => {
     const updatedDestinations = [...container.destinations];
     updatedDestinations.splice(index, 1);
     setContainer({ ...container, destinations: updatedDestinations });
+    setDestinations(updatedDestinations)
   };
 
   return (
@@ -167,13 +188,12 @@ const ContainerModal = ({
                   label: container?.bl,
                   value: container?.bl,
                 }}
-                onChange={(e) => setContainer({...container, bl: e.value})}
+                onChange={(e) => setContainer({ ...container, bl: e.value })}
                 options={bls.map((bl) => ({
                   label: bl,
                   value: bl,
                 }))}
                 selectedOptionStyle="color"
-                noOptionsMessage="No hay bls previos"
               />
             </div>
             <div className="item">
@@ -198,6 +218,23 @@ const ContainerModal = ({
               <AddIcon />
               Agregar
             </Button>
+            <FilteredSelect
+              size="sm"
+              useBasicStyles={true}
+              placeholder={"BL"}
+              name="bl"
+              isReadOnly={readOnly}
+              value={{
+                label: selectedDestination?.code,
+                value: selectedDestination,
+              }}
+              onChange={(e) => setSelectedDestination(e.value)}
+              options={destinations.filter(d => d.code).map((d) => ({
+                label: d.code,
+                value: d,
+              }))}
+              selectedOptionStyle="color"
+            />
           </div>
           {/* Use the DestinationTable component here */}
           <DestinationTable

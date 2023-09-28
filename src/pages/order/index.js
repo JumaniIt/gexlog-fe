@@ -553,9 +553,16 @@ const Order = ({ showAlert }) => {
               setOpenContainerModal(false);
             }}
             initialBls={order?.containers
-              .map((c) => c.bl) // Extract the bl property from each container
-              .filter((bl) => bl && bl.trim() !== "") // Filter out null, empty, and whitespace-only values
+              .map((c) => c.bl)
+              .filter((bl) => bl && bl.trim() !== "")
               .filter((value, index, self) => self.indexOf(value) === index)}
+            initialDestinations={order?.containers
+              .map((c) => c.destinations)
+              .flat()
+              .filter(
+                (dest, index, self) =>
+                  self.findIndex((d) => d.code === dest.code) === index
+              )}
           />
         )}
 
@@ -572,6 +579,13 @@ const Order = ({ showAlert }) => {
               setSelectedFreeLoadIndex(-1);
               setOpenFreeLoadModal(false);
             }}
+            initialDestinations={order?.free_loads
+              .map((fl) => fl.destinations)
+              .flat()
+              .filter(
+                (dest, index, self) =>
+                  self.findIndex((d) => d.code === dest.code) === index
+              )}
           />
         )}
 

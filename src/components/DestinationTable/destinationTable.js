@@ -59,7 +59,7 @@ const DestinationTable = ({
                 size="sm"
                 name="fob"
                 value={d.fob}
-                disabled={d.type && d.type !== TRM}
+                disabled={d.type !== TRM}
                 onChange={(e) => onDestinationChange(e, index)}
               />
             </Td>
@@ -68,7 +68,7 @@ const DestinationTable = ({
                 size="sm"
                 name="currency"
                 value={d.currency}
-                disabled={d.type && d.type !== TRM}
+                disabled={d.type !== TRM}
                 onChange={(e) => onDestinationChange(e, index)}
               />
             </Td>
@@ -77,7 +77,7 @@ const DestinationTable = ({
                 size="sm"
                 name="product_details"
                 value={d.product_details}
-                disabled={d.type && d.type !== TRM}
+                disabled={d.type !== TRM}
                 onChange={(e) => onDestinationChange(e, index)}
               />
             </Td>

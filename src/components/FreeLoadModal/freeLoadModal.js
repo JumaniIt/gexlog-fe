@@ -17,8 +17,11 @@ import { AddIcon } from "@chakra-ui/icons";
 import { TRM } from "../../app/utils/destinationUtils";
 import DestinationTable from "../DestinationTable/destinationTable";
 import { getFreeLoadTypes } from "../../app/utils/freeLoadUtils";
+import { Select as FilteredSelect } from "chakra-react-select";
 
-const FreeLoadModal = ({ isOpen, initialValue, readOnly, onSave, onClose }) => {
+const FreeLoadModal = ({ isOpen, initialValue, readOnly, onSave, onClose, initialDestinations=[] }) => {
+  const [destinations, setDestinations] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState([]);
   const [freeLoad, setFreeLoad] = useState({
     id: "",
     patent: "",
@@ -33,6 +36,8 @@ const FreeLoadModal = ({ isOpen, initialValue, readOnly, onSave, onClose }) => {
       if (initialValue) {
         setFreeLoad(initialValue);
       }
+
+      setDestinations([...initialDestinations]);
     };
 
     fetchInitialData();
@@ -49,14 +54,29 @@ const FreeLoadModal = ({ isOpen, initialValue, readOnly, onSave, onClose }) => {
 
   const addDestinationRow = () => {
     const newDestinationId = Date.now();
-    const newDestination = {
+    let newDestination = {
       id: newDestinationId,
-      type: "",
-      code: "",
-      fob: "",
-      currency: "",
-      product_details: "",
     };
+
+    if (selectedDestination) {
+      newDestination = {
+        ...newDestination,
+        type: selectedDestination.type,
+        code: selectedDestination.code,
+        fob: selectedDestination.fob,
+        currency: selectedDestination.currency,
+        product_details: selectedDestination.product_details,
+      };
+    } else {
+      newDestination = {
+        ...newDestination,
+        type: "",
+        code: "",
+        fob: "",
+        currency: "",
+        product_details: "",
+      };
+    }
 
     setFreeLoad({
       ...freeLoad,
@@ -84,12 +104,14 @@ const FreeLoadModal = ({ isOpen, initialValue, readOnly, onSave, onClose }) => {
     }
 
     setFreeLoad({ ...freeLoad, destinations: updatedDestinations });
+    setDestinations(updatedDestinations)
   };
 
   const deleteDestinationRow = (index) => {
     const updatedDestinations = [...freeLoad.destinations];
     updatedDestinations.splice(index, 1);
     setFreeLoad({ ...freeLoad, destinations: updatedDestinations });
+    setDestinations(updatedDestinations)
   };
 
   return (
@@ -172,6 +194,23 @@ const FreeLoadModal = ({ isOpen, initialValue, readOnly, onSave, onClose }) => {
               <AddIcon />
               Agregar
             </Button>
+            <FilteredSelect
+              size="sm"
+              useBasicStyles={true}
+              placeholder={"BL"}
+              name="bl"
+              isReadOnly={readOnly}
+              value={{
+                label: selectedDestination?.code,
+                value: selectedDestination,
+              }}
+              onChange={(e) => setSelectedDestination(e.value)}
+              options={destinations.filter(d => d.code).map((d) => ({
+                label: d.code,
+                value: d,
+              }))}
+              selectedOptionStyle="color"
+            />
           </div>
           {/* Use the DestinationTable component here */}
           <DestinationTable

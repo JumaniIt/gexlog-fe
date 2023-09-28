@@ -28,7 +28,7 @@ import EditableNote from "../Note/editableNote";
 const NotesModal = ({ isOpen, onClose, orderId, showAlert }) => {
   const [notes, setNotes] = useState([]);
   const [editedNoteId, setEditedNoteId] = useState(null);
-  const [showSystemNotes, setShowSystemNotes] = useState(true);
+  const [showSystemNotes, setShowSystemNotes] = useState(false);
   const [isAddingNote, setIsAddingNote] = useState(false);
 
   const navigate = useNavigate();
@@ -102,7 +102,7 @@ const NotesModal = ({ isOpen, onClose, orderId, showAlert }) => {
 
       const updatedNotes = [savedNote, ...notes];
 
-      setNotes(updatedNotes)
+      setNotes(updatedNotes);
     });
 
     setIsAddingNote(false);
@@ -115,12 +115,14 @@ const NotesModal = ({ isOpen, onClose, orderId, showAlert }) => {
         <ModalHeader>Notas</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Checkbox
-            isChecked={showSystemNotes}
-            onChange={() => setShowSystemNotes((prev) => !prev)}
-          >
-            Mostrar notas de sistema
-          </Checkbox>
+          {currentUser?.admin && (
+            <Checkbox
+              isChecked={showSystemNotes}
+              onChange={() => setShowSystemNotes((prev) => !prev)}
+            >
+              Mostrar notas de sistema
+            </Checkbox>
+          )}
           <VStack align="stretch" spacing={4}>
             <SimpleGrid columns={1} spacing={4}>
               <Box>
