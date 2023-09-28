@@ -173,6 +173,7 @@ const ContainerModal = ({
                   value: bl,
                 }))}
                 selectedOptionStyle="color"
+                noOptionsMessage="No hay bls previos"
               />
             </div>
             <div className="item">
