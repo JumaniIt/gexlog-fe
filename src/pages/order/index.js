@@ -23,7 +23,7 @@ import {
 
 import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
 
-import { DeleteIcon, ViewIcon } from "@chakra-ui/icons";
+import { DeleteIcon } from "@chakra-ui/icons";
 
 import { MdMoreVert } from "react-icons/md";
 import {
@@ -55,12 +55,12 @@ import StatusModal from "../../components/StatusModal/statusModal";
 import { translateStatus } from "../../app/utils/orderUtils";
 import { getHalfHourOptions, trimToMinutes } from "../../app/utils/dateUtils";
 import { getOperativeSites } from "../../app/utils/customsUtils";
-import FilterableSelect from "../../components/FilterableSelect/filterableSelect";
 import ContainerModal from "../../components/ContainerModal/containerModal";
 import FreeLoadModal from "../../components/FreeLoadModal/freeLoadModal";
 import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 import NotesModal from "../../components/NotesModal/notesModal";
 import CostModal from "../../components/CostModal/costModal";
+import { Select as FilteredSelect } from "chakra-react-select";
 
 const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
   <Menu>
@@ -86,8 +86,8 @@ const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
 
 const Order = ({ showAlert }) => {
   const [order, setOrder] = useState({
-    containers:[],
-    free_loads:[]
+    containers: [],
+    free_loads: [],
   });
   const [clientOptions, setClientOptions] = useState([]);
   const [clientOptionsLoaded, setClientOptionsLoaded] = useState(false);
@@ -542,7 +542,10 @@ const Order = ({ showAlert }) => {
         {openContainerModal && (
           <ContainerModal
             isOpen={openContainerModal}
-            initialValue={selectedContainerIndex >= 0 && order?.containers[selectedContainerIndex]}
+            initialValue={
+              selectedContainerIndex >= 0 &&
+              order?.containers[selectedContainerIndex]
+            }
             readOnly={readOnly}
             onSave={handleContainerSave}
             onClose={() => {
@@ -555,7 +558,10 @@ const Order = ({ showAlert }) => {
         {openFreeLoadModal && (
           <FreeLoadModal
             isOpen={openFreeLoadModal}
-            initialValue={selectedFreeLoadIndex >= 0 && order?.free_loads[selectedFreeLoadIndex]}
+            initialValue={
+              selectedFreeLoadIndex >= 0 &&
+              order?.free_loads[selectedFreeLoadIndex]
+            }
             readOnly={readOnly}
             onSave={handleFreeLoadSave}
             onClose={() => {
@@ -769,55 +775,40 @@ const Order = ({ showAlert }) => {
                       </option>
                     ))}
                   </Select>
-                  <Select
+                  <FilteredSelect
                     size="sm"
+                    useBasicStyles={true}
                     placeholder={"Origen"}
                     name="origin"
-                    isDisabled={readOnly}
-                    value={order?.origin}
-                    onChange={onInputChange}
-                  >
-                    {getOperativeSites().map((os) => (
-                      <option key={os} value={os}>
-                        {os}
-                      </option>
-                    ))}
-                  </Select>
-                  <Select
+                    isReadOnly={readOnly}
+                    value={{
+                      label: order?.origin,
+                      value: order?.origin,
+                    }}
+                    onChange={(e) => modifyOrder("origin", e.value)}
+                    options={getOperativeSites().map((os) => ({
+                      label: os,
+                      value: os,
+                    }))}
+                    selectedOptionStyle="color"
+                  />
+                  <FilteredSelect
                     size="sm"
+                    useBasicStyles={true}
                     placeholder={"Destino"}
                     name="target"
-                    isDisabled={readOnly}
-                    value={order?.target}
-                    onChange={onInputChange}
-                  >
-                    {getOperativeSites().map((os) => (
-                      <option key={os} value={os}>
-                        {os}
-                      </option>
-                    ))}
-                  </Select>
-                  {/* <FilterableSelect
-                    placeholder="Origen"
-                    isDisabled={readOnly}
-                    initialValue={order?.origin}
-                    size="sm"
-                    options={getOperativeSites()}
-                    onSelect={(option) =>
-                      setOrder({ ...order, origin: option })
-                    }
-                  ></FilterableSelect>
-                  <FilterableSelect
-                    placeholder="Destino"
-                    initialValue={order?.target}
-                    isDisabled={readOnly}
-                    size="sm"
-                    options={getOperativeSites()}
-                    onSelect={(option) => {
-                      console.log(option);
-                      setOrder({ ...order, target: option });
+                    isReadOnly={readOnly}
+                    value={{
+                      label: order?.target,
+                      value: order?.target,
                     }}
-                  ></FilterableSelect> */}
+                    onChange={(e) => modifyOrder("target", e.value)}
+                    options={getOperativeSites().map((os) => ({
+                      label: os,
+                      value: os,
+                    }))}
+                    selectedOptionStyle="color"
+                  />
                 </Stack>
               </div>
               <div className="second-row">
