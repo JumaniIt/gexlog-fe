@@ -47,10 +47,6 @@ const FreeLoadModal = ({ isOpen, initialValue, readOnly, onSave, onClose }) => {
     setFreeLoad({ ...freeLoad, [e.target.name]: e.target.value });
   };
 
-  const toggleRepackage = () => {
-    setFreeLoad({ ...freeLoad, repackage: !freeLoad.repackage });
-  };
-
   const addDestinationRow = () => {
     const newDestinationId = Date.now();
     const newDestination = {

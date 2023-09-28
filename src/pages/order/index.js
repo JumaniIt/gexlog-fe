@@ -552,6 +552,10 @@ const Order = ({ showAlert }) => {
               setSelectedContainerIndex(-1);
               setOpenContainerModal(false);
             }}
+            initialBls={order?.containers
+              .map((c) => c.bl) // Extract the bl property from each container
+              .filter((bl) => bl && bl.trim() !== "") // Filter out null, empty, and whitespace-only values
+              .filter((value, index, self) => self.indexOf(value) === index)}
           />
         )}
 

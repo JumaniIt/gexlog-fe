@@ -12,12 +12,14 @@ import {
   Divider,
   Heading,
   Checkbox,
-  Select
+  Select,
 } from "@chakra-ui/react";
+
 import { AddIcon } from "@chakra-ui/icons";
 import { TRM } from "../../app/utils/destinationUtils";
 import DestinationTable from "../DestinationTable/destinationTable";
 import { getContainerTypes } from "../../app/utils/containerUtils";
+import { CreatableSelect } from "chakra-react-select";
 
 const ContainerModal = ({
   isOpen,
@@ -25,6 +27,7 @@ const ContainerModal = ({
   readOnly,
   onSave,
   onClose,
+  initialBls = [],
 }) => {
   const [container, setContainer] = useState({
     id: "",
@@ -34,12 +37,15 @@ const ContainerModal = ({
     repackage: false,
     destinations: [],
   });
+  const [bls, setBls] = useState([]);
 
   useEffect(() => {
     const fetchInitialData = () => {
       if (initialValue) {
         setContainer(initialValue);
       }
+
+      setBls([...initialBls]);
     };
 
     fetchInitialData();
@@ -151,13 +157,22 @@ const ContainerModal = ({
               <Heading as="h6" size="sm">
                 BL
               </Heading>
-              <Input
+              <CreatableSelect
                 size="sm"
-                placeholder="BL"
+                useBasicStyles={true}
+                placeholder={"BL"}
                 name="bl"
-                value={container?.bl}
-                onChange={onInputChange}
-                isDisabled={readOnly}
+                isReadOnly={readOnly}
+                value={{
+                  label: container?.bl,
+                  value: container?.bl,
+                }}
+                onChange={(e) => setContainer({...container, bl: e.value})}
+                options={bls.map((bl) => ({
+                  label: bl,
+                  value: bl,
+                }))}
+                selectedOptionStyle="color"
               />
             </div>
             <div className="item">
