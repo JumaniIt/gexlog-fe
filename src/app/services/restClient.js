@@ -32,7 +32,7 @@ const perform = async (
   let body;
   if (contentType !== "multipart/form-data;") {
     headers.append("Content-Type", "application/json;");
-    body = req ? JSON.stringify(req) : null;
+    body = req ? toJsonBody(req) : null;
   } else {
     body = req;
   }
@@ -73,4 +73,16 @@ export const put = async (uri, req) => {
 
 export const doDelete = async (uri, queryParams = {}) => {
   return perform("DELETE", uri, null, queryParams);
+};
+
+const toJsonBody = (req) => {
+  const filteredReq = {};
+
+  for (const key in req) {
+    if (!key.startsWith('_')) {
+      filteredReq[key] = req[key];
+    }
+  }
+
+  return JSON.stringify(filteredReq);
 };

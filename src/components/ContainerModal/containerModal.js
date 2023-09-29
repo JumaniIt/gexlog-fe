@@ -59,30 +59,30 @@ const ContainerModal = ({
     fetchInitialData();
   }, []);
 
-    // TODO implement me
-    const validate = () => {
-      const updatedDestinations = container.destinations.map((destination) => {
-        // Check if the destination has a code attribute defined and its length is not 16
-        const _isInvalid = destination.code && destination.code.length !== 16;
-        
-        // Update the destination with the validation status
-        return {
-          ...destination,
-          _isInvalid,
-        };
-      });
-    
-      // Update the container with the validated destinations
-      setContainer({ ...container, destinations: updatedDestinations });
+  // TODO implement me
+  const validate = () => {
+    const updatedDestinations = container.destinations.map((destination) => {
+      // Check if the destination has a code attribute defined and its length is not 16
+      const _isInvalid = destination.code && destination.code.length !== 16;
 
-      const hasInvalidDestination = updatedDestinations.some(
-        (destination) => destination._isInvalid
-      );
-    
-      // Return true if there are no invalid destinations, otherwise return false
-      return !hasInvalidDestination;
-    }
-  
+      // Update the destination with the validation status
+      return {
+        ...destination,
+        _isInvalid,
+      };
+    });
+
+    // Update the container with the validated destinations
+    setContainer({ ...container, destinations: updatedDestinations });
+
+    const hasInvalidDestination = updatedDestinations.some(
+      (destination) => destination._isInvalid
+    );
+
+    // Return true if there are no invalid destinations, otherwise return false
+    return !hasInvalidDestination;
+  };
+
   const handleSave = () => {
     if (validate()) {
       onSave(container);
