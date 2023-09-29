@@ -22,9 +22,9 @@ import {
 } from "../../app/services/clientService";
 import ConsigneeModal from "../ConsigneeModal/consigneeModal";
 import { getById as getUserById } from "../../app/services/userService";
-import { SUCCESS } from "../../app/utils/alertUtils";
+import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 
-const ProfileView = ({showAlert}) => {
+const ProfileView = ({ showAlert }) => {
   const navigate = useNavigate();
   const currentUser = getCurrentUser(navigate);
   const [consigneeModal, setConsigneeModal] = useState(false);
@@ -42,33 +42,42 @@ const ProfileView = ({showAlert}) => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      await withSession(
-        navigate,
-        async () => {
-          if (currentUser?.admin && id) {
-            const client = await getClientById(id, "true");
+      await withSession(navigate, async () => {
+        if (currentUser?.admin && id) {
+          const client = await getClientById(id, "true");
+
+          if (client._isError) {
+            showAlert(ERROR, client.code, client.message);
+          } else {
             let user;
             if (client?.user_id) {
               user = await getUserById(client.user_id);
+              if (user._isError) {
+                showAlert(ERROR, user.code, user.message);
+              } else {
+                setProfile({
+                  ...profile,
+                  client_id: client.id,
+                  name: client.name,
+                  phone: client.phone,
+                  cuit: client.cuit,
+                  consignees: client.consignees,
+                  nickname: user?.nickname || "(sin definir)",
+                  email: user?.email || "(sin definir)",
+                });
+              }
             }
-
-            setProfile({
-              ...profile,
-              client_id: client.id,
-              name: client.name,
-              phone: client.phone,
-              cuit: client.cuit,
-              consignees: client.consignees,
-              nickname: user?.nickname || "(sin definir)",
-              email: user?.email || "(sin definir)",
-            });
+          }
+        } else {
+          const result = await searchClients({
+            user_id: currentUser.id,
+            with_consignees: true,
+            page_size: 1,
+          });
+          if (result._isError) {
+            showAlert(ERROR, result.code, result.message);
           } else {
-            const result = await searchClients({
-              user_id: currentUser.id,
-              with_consignees: true,
-              page_size: 1,
-            });
-            if (result?.elements) {
+            if (result.elements) {
               const client = result.elements[0];
               setProfile({
                 ...profile,
@@ -82,9 +91,8 @@ const ProfileView = ({showAlert}) => {
               });
             }
           }
-        },
-        (error) => console.error("Error fetching order:", error)
-      );
+        }
+      });
     };
 
     fetchInitialData();
@@ -99,18 +107,16 @@ const ProfileView = ({showAlert}) => {
       navigate,
       async () => {
         const response = await addConsignee(profile.client_id, consignee);
-        if (response.message) {
-          // Todo error alert
-          console.log("error creating consignee", response);
+        if (response._isError) {
+          showAlert(ERROR, response.code, response.message);
         } else {
           setProfile({
             ...profile,
             consignees: [...profile.consignees, response],
           });
-          showAlert(SUCCESS, "Consignatario guardado")
+          showAlert(SUCCESS, "Consignatario guardado");
         }
-      },
-      (error) => console.log(error)
+      }
     );
   };
 
@@ -158,11 +164,7 @@ const ProfileView = ({showAlert}) => {
         <Heading className="second-heading" as="h6" size="sm">
           Consignatarios
         </Heading>
-        <Button
-          size="sm"
-          colorScheme="green"
-          onClick={openConsigneeModal}
-        >
+        <Button size="sm" colorScheme="green" onClick={openConsigneeModal}>
           <MdCreate />
           Añadir
         </Button>

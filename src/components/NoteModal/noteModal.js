@@ -18,14 +18,14 @@ import {
   deleteNote,
   getNotes,
   updateNote,
-  createNote,
-  addNote, // Import createNote function
+  addNote,
 } from "../../app/services/orderService";
 import { useNavigate } from "react-router-dom";
 import { ADMIN, CLIENT } from "../../app/utils/noteUtils";
 import EditableNote from "../Note/editableNote";
+import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 
-const NotesModal = ({ isOpen, onClose, orderId, showAlert }) => {
+const NoteModal = ({ isOpen, onClose, orderId, showAlert }) => {
   const [notes, setNotes] = useState([]);
   const [editedNoteId, setEditedNoteId] = useState(null);
   const [showSystemNotes, setShowSystemNotes] = useState(false);
@@ -36,18 +36,18 @@ const NotesModal = ({ isOpen, onClose, orderId, showAlert }) => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      await withSession(
-        navigate,
-        async () => {
-          const response = await getNotes(orderId, { page_size: 200 });
+      await withSession(navigate, async () => {
+        const response = await getNotes(orderId, { page_size: 200 });
+        if (response._isError) {
+          showAlert(ERROR, response.code, response.message);
+        } else {
           const orderedNotes = response.elements.sort((a, b) =>
             b.created_at.localeCompare(a.created_at)
           );
 
           setNotes(orderedNotes);
-        },
-        (error) => console.log(error)
-      );
+        }
+      });
     };
 
     fetchInitialData();
@@ -61,10 +61,13 @@ const NotesModal = ({ isOpen, onClose, orderId, showAlert }) => {
     if (confirmed) {
       await withSession(navigate, async () => {
         const response = await deleteNote(orderId, noteId);
-        if (!response) {
+        if (response._isError) {
+          showAlert(ERROR, response.code, response.message);
+        } else {
           setNotes((prevNotes) =>
             prevNotes.filter((note) => note.id !== noteId)
           );
+          showAlert(SUCCESS, "Nota eliminada");
         }
       });
     }
@@ -82,11 +85,16 @@ const NotesModal = ({ isOpen, onClose, orderId, showAlert }) => {
   const handleSaveEdit = async (editedNote) => {
     await withSession(navigate, async () => {
       const updatedNote = await updateNote(orderId, editedNote.id, editedNote);
-      setNotes((prevNotes) =>
-        prevNotes.map((note) =>
-          note.id === updatedNote.id ? updatedNote : note
-        )
-      );
+      if (updatedNote._isError) {
+        showAlert(ERROR, updateNote.code, updateNote.message);
+      } else {
+        setNotes((prevNotes) =>
+          prevNotes.map((note) =>
+            note.id === updatedNote.id ? updatedNote : note
+          )
+        );
+        showAlert(SUCCESS, "Nota guardada");
+      }
     });
 
     setEditedNoteId(null);
@@ -99,10 +107,14 @@ const NotesModal = ({ isOpen, onClose, orderId, showAlert }) => {
   const handleSaveNew = async (newNote) => {
     await withSession(navigate, async () => {
       const savedNote = await addNote(orderId, newNote);
+      if (savedNote._isError) {
+        showAlert(ERROR, savedNote.code, savedNote.message);
+      } else {
+        const updatedNotes = [savedNote, ...notes];
 
-      const updatedNotes = [savedNote, ...notes];
-
-      setNotes(updatedNotes);
+        setNotes(updatedNotes);
+        showAlert(SUCCESS, "Nota guardada");
+      }
     });
 
     setIsAddingNote(false);
@@ -173,4 +185,4 @@ const NotesModal = ({ isOpen, onClose, orderId, showAlert }) => {
   );
 };
 
-export default NotesModal;
+export default NoteModal;

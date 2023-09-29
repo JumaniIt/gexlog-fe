@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Heading,
   Alert,
   AlertIcon,
   AlertTitle,
@@ -10,6 +9,7 @@ import {
 import Layout from "../../components/Layout";
 import { getCurrentUser } from "../../app/utils/sessionUtils";
 import Order from "../order";
+import { TIMEOUT_MS } from "../../app/utils/alertUtils";
 
 
 const OrderPage = () => {
@@ -24,7 +24,7 @@ const OrderPage = () => {
 
   useEffect(() => {
     if (alert.status) {
-      const errorTimeout = setTimeout(() => setAlert({}), 5000);
+      const errorTimeout = setTimeout(() => setAlert({}), TIMEOUT_MS);
       return () => clearTimeout(errorTimeout);
     }
   }, [alert]);

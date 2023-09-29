@@ -11,6 +11,7 @@ import {
 
 import logo from "../../full-logo.png";
 import { login } from "../../app/services/loginService";
+import { TIMEOUT_MS } from "../../app/utils/alertUtils";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -51,7 +52,7 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (errorMessage) {
-      const errorTimeout = setTimeout(hideErrorMessage, 5000);
+      const errorTimeout = setTimeout(hideErrorMessage, TIMEOUT_MS);
       return () => clearTimeout(errorTimeout);
     }
   }, [errorMessage]);

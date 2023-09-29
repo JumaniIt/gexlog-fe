@@ -45,7 +45,6 @@ const UserTable = () => {
           page: result.page,
         });
       },
-      (error) => console.log(error),
       () => setLoading(false)
     );
   };

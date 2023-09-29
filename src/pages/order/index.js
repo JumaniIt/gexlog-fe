@@ -58,7 +58,7 @@ import { getOperativeSites } from "../../app/utils/customsUtils";
 import ContainerModal from "../../components/ContainerModal/containerModal";
 import FreeLoadModal from "../../components/FreeLoadModal/freeLoadModal";
 import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
-import NotesModal from "../../components/NotesModal/notesModal";
+import NotesModal from "../../components/NoteModal/noteModal";
 import CostModal from "../../components/CostModal/costModal";
 import { Select as FilteredSelect } from "chakra-react-select";
 import { containsLiteralPart } from "../../app/utils/stringUtils";
@@ -113,11 +113,12 @@ const Order = ({ showAlert }) => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      await withSession(
-        navigate,
-        async () => {
-          if (id) {
-            const order = await getOrderById(id);
+      await withSession(navigate, async () => {
+        if (id) {
+          const order = await getOrderById(id);
+          if (order._isError) {
+            showAlert(ERROR, order.code, order.message);
+          } else {
             setOrder(order);
 
             if (order.containers?.length) {
@@ -127,16 +128,23 @@ const Order = ({ showAlert }) => {
             }
 
             const client = await getClientById(order.client_id);
-            setClientOptions([...clientOptions, client]);
-          } else if (!currentUser?.admin) {
-            const client = await getClientByUserId(currentUser.id);
+            if (client._isError) {
+              showAlert(ERROR, order.code, order.message);
+            } else {
+              setClientOptions([...clientOptions, client]);
+            }
+          }
+        } else if (!currentUser?.admin) {
+          const client = await getClientByUserId(currentUser.id);
+          if (client._isError) {
+            showAlert(ERROR, order.code, order.message);
+          } else {
             setClientOptions([...clientOptions, client]);
             setClientOptionsLoaded(true);
             setOrder({ ...order, client_id: client.id });
           }
-        },
-        (error) => console.error("Error fetching order:", error)
-      );
+        }
+      });
     };
 
     fetchInitialData();
@@ -156,38 +164,38 @@ const Order = ({ showAlert }) => {
   }, [order]);
 
   const loadClientOptions = async () => {
-    withSession(
-      navigate,
-      async () => {
-        if (!clientOptionsLoaded) {
-          const options = await searchClients({ page_size: 100 });
-          const clients = options.elements.filter(
+    await withSession(navigate, async () => {
+      if (!clientOptionsLoaded) {
+        const response = await searchClients({ page_size: 100 });
+        if (response._isError) {
+          showAlert(ERROR, order.code, order.message);
+        } else {
+          const clients = response.elements.filter(
             (c) => !id || c.id !== order.client_id
           );
           setClientOptions([...clientOptions, ...clients]);
           setClientOptionsLoaded(true);
         }
-      },
-      (error) => console.log("Error loading client options", error)
-    );
+      }
+    });
   };
 
   useEffect(() => {
     const loadConsignees = async () => {
-      withSession(
-        navigate,
-        async () => {
-          if (order?.client_id) {
-            const client = await getClientById(order.client_id, "true");
-            const consignees = client?.consignees?.map((c) => ({
+      await withSession(navigate, async () => {
+        if (order?.client_id) {
+          const response = await getClientById(order.client_id, "true");
+          if (response._isError) {
+            showAlert(ERROR, order.code, order.message);
+          } else {
+            const consignees = response?.consignees?.map((c) => ({
               name: c.name,
               cuit: c.cuit,
             }));
             setConsigneeOptions(consignees);
           }
-        },
-        (error) => console.log("error loading consignees", error)
-      );
+        }
+      });
     };
     loadConsignees();
   }, [order?.client_id]);
@@ -224,19 +232,20 @@ const Order = ({ showAlert }) => {
     );
 
     if (confirmed) {
-      withSession(
+      await withSession(
         navigate,
         async () => {
           setLoadingFiles(true);
-          await deleteDocument(order.id, docId);
-          const updatedDocuments = order.documents.filter(
-            (document) => document.id !== docId
-          );
-          setOrder({ ...order, documents: updatedDocuments });
-          showAlert(SUCCESS, "Documento eliminado");
-        },
-        (error) => {
-          console.log("Error deleting document", error);
+          const response = await deleteDocument(order.id, docId);
+          if (response._isError) {
+            showAlert(ERROR, response.code, response.message);
+          } else {
+            const updatedDocuments = order.documents.filter(
+              (document) => document.id !== docId
+            );
+            setOrder({ ...order, documents: updatedDocuments });
+            showAlert(SUCCESS, "Documento eliminado");
+          }
         },
         () => setLoadingFiles(false)
       );
@@ -244,19 +253,18 @@ const Order = ({ showAlert }) => {
   };
 
   const onOpenDocument = async (docId) => {
-    withSession(
-      navigate,
-      async () => {
-        const link = await getDocumentLink(order.id, docId);
-
-        window.open(link, "_blank");
-      },
-      (error) => console.error("Error opening document:", error)
-    );
+    await withSession(navigate, async () => {
+      const response = await getDocumentLink(order.id, docId);
+      if (response._isError) {
+        showAlert(response.code, response.message);
+      } else {
+        window.open(response.link, "_blank");
+      }
+    });
   };
 
   const uploadAndProcessFiles = async (selectedFiles) => {
-    withSession(
+    await withSession(
       navigate,
       async () => {
         setLoadingFiles(true);
@@ -269,7 +277,6 @@ const Order = ({ showAlert }) => {
               throw error;
             }
 
-            console.error("Error uploading document:", error);
             return null;
           }
         });
@@ -284,14 +291,13 @@ const Order = ({ showAlert }) => {
         });
         showAlert(SUCCESS, "Documentos guardados");
       },
-      (error) => console.log("Error uploading documents"),
       () => setLoadingFiles(false)
     );
   };
 
   const handleSave = async () => {
     setActionLoading(true);
-    withSession(
+    await withSession(
       navigate,
       async () => {
         // Set PEMA code in containers and freeloads
@@ -319,15 +325,8 @@ const Order = ({ showAlert }) => {
           response = await create(order);
         }
 
-        if (response.message) {
-          console.log("could not save order", response);
-          showAlert(ERROR, "Cambios no guardados", response.message);
-        } else if (response.causes) {
-          showAlert(
-            ERROR,
-            "Cambios no guardados",
-            response.causes[0].code + " " + response.causes[0].message
-          );
+        if (response._isError) {
+          showAlert(ERROR, response.code, response.message);
         } else {
           setOrder(response);
           showAlert(SUCCESS, "Cambios guardados");
@@ -336,7 +335,6 @@ const Order = ({ showAlert }) => {
           }
         }
       },
-      (error) => console.log("could not save order", error),
       () => setActionLoading(false)
     );
   };
@@ -370,14 +368,13 @@ const Order = ({ showAlert }) => {
         navigate,
         async () => {
           const response = await changeStatus(id, status);
-          if (response) {
-            console.log("could not change status", response);
+          if (response._isError) {
+            showAlert(ERROR, response.code, response.message);
           } else {
             setOrder({ ...order, status });
             showAlert(SUCCESS, "Estado de solicitud cambiado");
           }
         },
-        (error) => console.log("could not change status", error),
         () => setActionLoading(false)
       );
     }
@@ -391,10 +388,10 @@ const Order = ({ showAlert }) => {
     if (confirm) {
       setActionLoading(true);
       const newReturned = !order.returned;
-      const response = await markReturned(order.id, newReturned);
 
-      if (response) {
-        // todo error handling
+      const response = await markReturned(order.id, newReturned);
+      if (response._isError) {
+        showAlert(ERROR, response.code, response.message);
       } else {
         setOrder({ ...order, returned: newReturned });
         showAlert(SUCCESS, "Cambios guardados");
@@ -411,10 +408,10 @@ const Order = ({ showAlert }) => {
     if (confirm) {
       setActionLoading(true);
       const newBilled = !order.billed;
-      const response = await markBilled(order.id, newBilled);
 
-      if (response) {
-        // todo error handling
+      const response = await markBilled(order.id, newBilled);
+      if (response._isError) {
+        showAlert(ERROR, response.code, response.message);
       } else {
         setOrder({ ...order, billed: newBilled });
         showAlert(SUCCESS, "Cambios guardados");
@@ -595,6 +592,7 @@ const Order = ({ showAlert }) => {
             isOpen={openNoteModal}
             onClose={() => setOpenNoteModal(false)}
             orderId={order?.id}
+            showAlert={showAlert}
           />
         )}
 
@@ -603,6 +601,7 @@ const Order = ({ showAlert }) => {
             isOpen={openCostModal}
             onClose={() => setOpenCostModal(false)}
             orderId={order?.id}
+            showAlert={showAlert}
           />
         )}
 

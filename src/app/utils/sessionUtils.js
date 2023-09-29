@@ -5,18 +5,16 @@ export const SESSION_EXPIRED_ERROR = new Error("session expired");
 export const withSession = async (
   navigate,
   action,
-  onError,
   onFinally = () => {}
 ) => {
   try {
     await action();
   } catch (error) {
-    console.log("the error: " + error);
     if (error === SESSION_EXPIRED_ERROR) {
       console.log("session expired error!!");
       navigateToLogin(navigate);
     } else {
-      onError(error);
+      console.log("Error executing withSession: " + error);
     }
   } finally {
     onFinally();

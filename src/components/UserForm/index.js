@@ -16,8 +16,9 @@ import {
 } from "../../app/services/userService";
 import { useNavigate, useParams } from "react-router-dom";
 import { withSession } from "../../app/utils/sessionUtils";
+import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 
-const UserForm = () => {
+const UserForm = ({showAlert}) => {
   const { id } = useParams();
   const [user, setUser] = useState({
     nickname: "",
@@ -45,7 +46,7 @@ const UserForm = () => {
   };
 
   const handleSave = async () => {
-    withSession(
+    await withSession(
       navigate,
       async () => {
         setLoading(true);
@@ -58,30 +59,31 @@ const UserForm = () => {
           response = await saveUser(user);
         }
 
-        if (response?.error) {
-          setError(response.error.message);
-        } else if (response?.message) {
-          setError(response.message);
+        if (response._isError) {
+          showAlert(ERROR, response.code, response.message)
         } else {
-          navigate("/users", { replace: true });
+          navigate("/users/" + response.id)
+          showAlert(SUCCESS, "Usuario guardado")
         }
       },
-      (error) => setError(error.message),
       () => setLoading(false)
     );
   };
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      withSession(
+      await withSession(
         navigate,
         async () => {
           if (id) {
             const user = await getUserById(id);
-            setUser(user);
+            if (user._isError) {
+              showAlert(ERROR, user.code, user.message)
+            } else {
+              setUser(user);
+            }
           }
-        },
-        (error) => console.error("Error fetching client:", error)
+        }
       );
     };
 

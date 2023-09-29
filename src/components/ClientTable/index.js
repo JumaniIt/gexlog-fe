@@ -16,7 +16,7 @@ import { Select } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
 import { Button, Spinner } from "@chakra-ui/react";
 import { MdSearch, MdOutlineOpenInNew, MdCreate } from "react-icons/md";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { search as searchClients } from "../../app/services/clientService";
 import { search as searchUsers } from "../../app/services/userService";
 import PaginationFooter from "../Pagination/paginationFooter";
@@ -24,8 +24,9 @@ import { getIdAndName } from "../../app/utils/userUtils";
 import { withSession } from "../../app/utils/sessionUtils";
 import { MdMoreVert } from "react-icons/md";
 import { IconButton } from "@chakra-ui/react";
+import { ERROR } from "../../app/utils/alertUtils";
 
-const ClientTable = () => {
+const ClientTable = ({ showAlert }) => {
   const [filters, setFilters] = useState({
     page_size: 12,
     page: 1,
@@ -44,33 +45,36 @@ const ClientTable = () => {
   };
 
   const search = async (f) => {
-    withSession(
+    await withSession(
       navigate,
       async () => {
         setLoading(true);
         const data = await searchClients(f);
-        setSearchResults(data?.elements);
-        setPaginationResult({
-          totalPages: data.total_pages,
-          page: data.page,
-        });
+        if (data._isError) {
+          showAlert(ERROR, data.code, data.message);
+        } else {
+          setSearchResults(data?.elements);
+          setPaginationResult({
+            totalPages: data.total_pages,
+            page: data.page,
+          });
+        }
       },
-      (error) => console.log("Error searching clients", error),
       () => setLoading(false)
     );
   };
 
   useEffect(() => {
     const fetchUserOptionsData = async () => {
-      withSession(
-        navigate,
-        async () => {
-          const options = await searchUsers({ page_size: 100, admin: "false" });
+      await withSession(navigate, async () => {
+        const options = await searchUsers({ page_size: 100, admin: "false" });
+        if (options._isError) {
+          showAlert(ERROR, options.code, options.message);
+        } else {
           const users = options.elements;
           setUserOptions(users);
-        },
-        (error) => console.error("Error fetching client options:", error)
-      );
+        }
+      });
     };
 
     fetchUserOptionsData();

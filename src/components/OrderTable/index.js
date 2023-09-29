@@ -63,32 +63,32 @@ const OrderTable = ({ showAlert }) => {
 
   const search = async (f) => {
     setLoading(true);
-    withSession(
+    await withSession(
       navigate,
       async () => {
-        const result = await searchOrders(f);
-        if (result.message) {
-          showAlert(ERROR, result.code, result.message);
+        const response = await searchOrders(f);
+        if (response._isError) {
+          showAlert(ERROR, response.code, response.message);
         } else {
-          setSearchResults(result?.elements);
+          setSearchResults(response?.elements);
           setPaginationResult({
-            totalPages: result.total_pages,
-            page: result.page,
+            totalPages: response.total_pages,
+            page: response.page,
           });
         }
       },
-      (error) => console.log(error),
       () => setLoading(false)
     );
   };
 
   useEffect(() => {
     const fetchClientOptionsData = async () => {
-      withSession(
-        navigate,
-        async () => {
-          const result = await searchClients({ page_size: 100 });
-          const clients = result.elements;
+      await withSession(navigate, async () => {
+        const response = await searchClients({ page_size: 100 });
+        if (response._isError) {
+          showAlert(ERROR, response.code, response.message);
+        } else {
+          const clients = response.elements;
           setClientOptions(clients);
           const currentUser = getCurrentUser(navigate);
           if (!currentUser?.admin) {
@@ -99,9 +99,8 @@ const OrderTable = ({ showAlert }) => {
               setFilters({ ...filters, client_id: client.id });
             }
           }
-        },
-        (error) => console.log(error)
-      );
+        }
+      });
     };
 
     fetchClientOptionsData();
@@ -223,11 +222,11 @@ const OrderTable = ({ showAlert }) => {
                               trimToMinutes(result.arrival_time)}
                           </Td>
                           <TableCellWithTooltip
-                            text={trimStringWithDot(result.origin, 16)}
+                            text={trimStringWithDot(result.origin, 15)}
                             tooltipText={result.origin}
                           />
                           <TableCellWithTooltip
-                            text={trimStringWithDot(result.target, 16)}
+                            text={trimStringWithDot(result.target, 15)}
                             tooltipText={result.target}
                           />
                           <Td>{result.container_qty}</Td>

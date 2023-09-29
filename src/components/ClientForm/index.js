@@ -21,8 +21,9 @@ import {
 } from "../../app/services/clientService";
 import { useNavigate, useParams } from "react-router-dom";
 import { withSession } from "../../app/utils/sessionUtils";
+import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 
-const ClientForm = () => {
+const ClientForm = ({ showAlert }) => {
   const { id } = useParams();
   const [client, setClient] = useState({
     name: "",
@@ -44,7 +45,7 @@ const ClientForm = () => {
   };
 
   const handleSave = async () => {
-    withSession(
+    await withSession(
       navigate,
       async () => {
         setLoading(true);
@@ -57,45 +58,55 @@ const ClientForm = () => {
           response = await saveClient(client);
         }
 
-        if (response?.error) {
-          setError(response.error.message);
+        if (response._isError) {
+          showAlert(ERROR, response.code, response.message);
         } else {
-          navigate("/clients", { replace: true });
+          setClient(response);
+          navigate("/clients/" + response.id, { replace: true });
+          showAlert(SUCCESS, "Cliente guardado");
         }
       },
-      (error) => setError(error.message),
       () => setLoading(false)
     );
   };
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      withSession(
-        navigate,
-        async () => {
-          let clientUserId;
-          if (id) {
-            const client = await getClientById(id);
+      await withSession(navigate, async () => {
+        let clientUserId;
+        if (id) {
+          const client = await getClientById(id);
+
+          if (client._isError) {
+            showAlert(ERROR, client.code, client.message);
+          } else {
             clientUserId = client.user_id;
             setClient(client);
           }
+        }
 
-          const options = await searchUsers({
-            page_size: 100,
-            admin: "false",
-            with_client: "false",
-          });
+        const options = await searchUsers({
+          page_size: 100,
+          admin: "false",
+          with_client: "false",
+        });
 
+        if (options._isError) {
+          showAlert(ERROR, options.code, options.message);
+        } else {
           const users = options.elements;
           if (id && clientUserId) {
             const user = await getUserById(clientUserId);
-            setUserOptions([...users, user]);
+            if (user._isError) {
+              showAlert(ERROR, user.code, user.message);
+            } else {
+              setUserOptions([...users, user]);
+            }
           } else {
             setUserOptions(users);
           }
-        },
-        (error) => console.log("Error fetching initial data", error)
-      );
+        }
+      });
     };
 
     fetchInitialData();

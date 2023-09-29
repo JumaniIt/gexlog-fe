@@ -10,6 +10,7 @@ import {
 import ProfileView from "../../components/ProfileView";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser } from "../../app/utils/sessionUtils";
+import { TIMEOUT_MS } from "../../app/utils/alertUtils";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (alert.status) {
-      const errorTimeout = setTimeout(() => setAlert({}), 5000);
+      const errorTimeout = setTimeout(() => setAlert({}), TIMEOUT_MS);
       return () => clearTimeout(errorTimeout);
     }
   }, [alert]);

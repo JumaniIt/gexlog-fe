@@ -10,6 +10,7 @@ import {
 import OrderTable from "../../components/OrderTable";
 import Layout from "../../components/Layout";
 import { getCurrentUser } from "../../app/utils/sessionUtils";
+import { TIMEOUT_MS } from "../../app/utils/alertUtils";
 
 const Requests = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const Requests = () => {
 
   useEffect(() => {
     if (alert.status) {
-      const errorTimeout = setTimeout(() => setAlert({}), 5000);
+      const errorTimeout = setTimeout(() => setAlert({}), TIMEOUT_MS);
       return () => clearTimeout(errorTimeout);
     }
   }, [alert]);

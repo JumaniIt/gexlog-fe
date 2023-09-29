@@ -9,28 +9,20 @@ import {
   VStack,
   Box,
   SimpleGrid,
-  Checkbox,
   Button,
   Text,
 } from "@chakra-ui/react";
-import Note from "../Note/note";
 import { withSession, getCurrentUser } from "../../app/utils/sessionUtils";
 import {
-  deleteNote,
-  getNotes,
-  updateNote,
-  createNote,
-  addNote,
   getCosts,
   updateCost,
   addCost,
   deleteCost, // Import createNote function
 } from "../../app/services/orderService";
 import { useNavigate } from "react-router-dom";
-import { ADMIN, CLIENT } from "../../app/utils/noteUtils";
-import EditableNote from "../Note/editableNote";
 import EditableCost from "../Cost/editableCost";
 import Cost from "../Cost/cost";
+import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 
 const CostModal = ({ isOpen, onClose, orderId, showAlert }) => {
   const [costs, setCosts] = useState([]);
@@ -42,18 +34,18 @@ const CostModal = ({ isOpen, onClose, orderId, showAlert }) => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      await withSession(
-        navigate,
-        async () => {
-          const response = await getCosts(orderId, { page_size: 200 });
+      await withSession(navigate, async () => {
+        const response = await getCosts(orderId, { page_size: 200 });
+        if (response._isError) {
+          showAlert(ERROR, response.code, response.message);
+        } else {
           const orderedCosts = response.elements.sort((a, b) =>
             b.created_at.localeCompare(a.created_at)
           );
 
           setCosts(orderedCosts);
-        },
-        (error) => console.log(error)
-      );
+        }
+      });
     };
 
     fetchInitialData();
@@ -67,10 +59,13 @@ const CostModal = ({ isOpen, onClose, orderId, showAlert }) => {
     if (confirmed) {
       await withSession(navigate, async () => {
         const response = await deleteCost(orderId, costId);
-        if (!response) {
+        if (response._isError) {
+          showAlert(ERROR, response.code, response.message);
+        } else {
           setCosts((prevCosts) =>
             prevCosts.filter((cost) => cost.id !== costId)
           );
+          showAlert(SUCCESS, "Costo eliminado");
         }
       });
     }
@@ -88,11 +83,16 @@ const CostModal = ({ isOpen, onClose, orderId, showAlert }) => {
   const handleSaveEdit = async (editedCost) => {
     await withSession(navigate, async () => {
       const updatedCost = await updateCost(orderId, editedCost.id, editedCost);
-      setCosts((prevCosts) =>
-        prevCosts.map((cost) =>
-          cost.id === updatedCost.id ? updatedCost : cost
-        )
-      );
+      if (updatedCost._isError) {
+        showAlert(ERROR, updatedCost.code, updatedCost.message);
+      } else {
+        setCosts((prevCosts) =>
+          prevCosts.map((cost) =>
+            cost.id === updatedCost.id ? updatedCost : cost
+          )
+        );
+        showAlert(SUCCESS, "Costo guardado");
+      }
     });
 
     setEditCostId(null);
@@ -105,10 +105,15 @@ const CostModal = ({ isOpen, onClose, orderId, showAlert }) => {
   const handleSaveNew = async (newCost) => {
     await withSession(navigate, async () => {
       const savedCost = await addCost(orderId, newCost);
+      if (savedCost._isError) {
+        showAlert(ERROR, savedCost.code, savedCost.message);
+      } else {
+        const updatedCosts = [savedCost, ...costs];
 
-      const updatedCosts = [savedCost, ...costs];
+        setCosts(updatedCosts);
 
-      setCosts(updatedCosts);
+        showAlert(SUCCESS, "Costo guardado");
+      }
     });
 
     setIsAddingCost(false);

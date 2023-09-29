@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 
 import { sendEmail } from "../../app/services/emailService";
+import { TIMEOUT_MS } from "../../app/utils/alertUtils";
 
 const ContactForm = ({ className }) => {
   const [name, setName] = useState("");
@@ -133,12 +134,12 @@ const ContactForm = ({ className }) => {
 
   useEffect(() => {
     if (successMessage) {
-      const successTimeout = setTimeout(hideSuccessMessage, 5000); // 5000 milliseconds = 5 seconds
+      const successTimeout = setTimeout(hideSuccessMessage, TIMEOUT_MS);
       return () => clearTimeout(successTimeout);
     }
 
     if (errorMessage) {
-      const errorTimeout = setTimeout(hideErrorMessage, 5000); // 5000 milliseconds = 5 seconds
+      const errorTimeout = setTimeout(hideErrorMessage, TIMEOUT_MS);
       return () => clearTimeout(errorTimeout);
     }
   }, [successMessage, errorMessage]);
