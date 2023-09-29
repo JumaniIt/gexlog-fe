@@ -61,6 +61,7 @@ import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 import NotesModal from "../../components/NotesModal/notesModal";
 import CostModal from "../../components/CostModal/costModal";
 import { Select as FilteredSelect } from "chakra-react-select";
+import { containsLiteralPart } from "../../app/utils/stringUtils";
 
 const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
   <Menu>
@@ -794,6 +795,9 @@ const Order = ({ showAlert }) => {
                     ))}
                   </Select>
                   <FilteredSelect
+                    filterOption={(option, input) =>
+                      !input || containsLiteralPart(option.label, input)
+                    }
                     size="sm"
                     useBasicStyles={true}
                     placeholder={"Origen"}
@@ -811,6 +815,9 @@ const Order = ({ showAlert }) => {
                     selectedOptionStyle="color"
                   />
                   <FilteredSelect
+                    filterOption={(option, input) =>
+                      !input || containsLiteralPart(option.label, input)
+                    }
                     size="sm"
                     useBasicStyles={true}
                     placeholder={"Destino"}

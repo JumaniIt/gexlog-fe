@@ -8,6 +8,7 @@ import {
   Td,
   TableContainer,
   Text,
+  Tooltip,
 } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { Checkbox } from "@chakra-ui/react";
@@ -27,8 +28,19 @@ import { translateStatus } from "../../app/utils/orderUtils";
 import PaginationFooter from "../Pagination/paginationFooter";
 import { withSession, getCurrentUser } from "../../app/utils/sessionUtils";
 import { ERROR } from "../../app/utils/alertUtils";
+import { trimStringWithDot } from "../../app/utils/stringUtils";
 
-const OrderTable = ({showAlert}) => {
+const TableCellWithTooltip = ({ text, tooltipText }) => {
+  return (
+    <Td>
+      <Tooltip label={tooltipText}>
+        <Text>{text}</Text>
+      </Tooltip>
+    </Td>
+  );
+};
+
+const OrderTable = ({ showAlert }) => {
   const [filters, setFilters] = useState({
     page_size: 10,
     page: 1,
@@ -54,9 +66,9 @@ const OrderTable = ({showAlert}) => {
     withSession(
       navigate,
       async () => {
-        const result = await searchOrders(f)
+        const result = await searchOrders(f);
         if (result.message) {
-          showAlert(ERROR, result.code, result.message)
+          showAlert(ERROR, result.code, result.message);
         } else {
           setSearchResults(result?.elements);
           setPaginationResult({
@@ -161,7 +173,11 @@ const OrderTable = ({showAlert}) => {
           <MdSearch />
           Buscar
         </Button>
-        <Button size="sm" colorScheme="green" onClick={() => navigate(`/orders/new`, {replace:true})}>
+        <Button
+          size="sm"
+          colorScheme="green"
+          onClick={() => navigate(`/orders/new`, { replace: true })}
+        >
           <MdCreate />
           Crear
         </Button>
@@ -193,20 +209,27 @@ const OrderTable = ({showAlert}) => {
                       return (
                         <Tr className="table-row">
                           <Td>{result.id}</Td>
-                          <Td>
-                            {getNameAndCuit(
-                              clientOptions.find(
-                                (c) => c.id === result.client_id
-                              )
-                            )}
-                          </Td>
+                          {clientOptions
+                            .filter((c) => c.id === result.client_id)
+                            .map((c) => (
+                              <TableCellWithTooltip
+                                text={c.name}
+                                tooltipText={"CUIT: " + c.cuit}
+                              />
+                            ))}
                           <Td>{result.arrival_date}</Td>
                           <Td>
                             {result.arrival_time &&
                               trimToMinutes(result.arrival_time)}
                           </Td>
-                          <Td>{result.origin}</Td>
-                          <Td>{result.target}</Td>
+                          <TableCellWithTooltip
+                            text={trimStringWithDot(result.origin, 20)}
+                            tooltipText={result.origin}
+                          />
+                          <TableCellWithTooltip
+                            text={trimStringWithDot(result.target, 20)}
+                            tooltipText={result.target}
+                          />
                           <Td>{result.container_qty}</Td>
                           <Td>{result.free_load_qty}</Td>
                           <Td>
@@ -249,21 +272,26 @@ const OrderTable = ({showAlert}) => {
             </Table>
           </TableContainer>
         </div>
-        {loading &&
+        {loading && (
           <div className="spinner">
-            <Spinner className="spinner" size="xl" color="blue.500" thickness="4px" />
-          </div>
-        }
-        {paginationResult && (
-            <PaginationFooter
-              currentPage={paginationResult.page}
-              totalPages={paginationResult.totalPages}
-              onPageChange={(newPage) => {
-                const filters = { ...currentSearchFilters, page: newPage };
-                search(filters);
-              }}
+            <Spinner
+              className="spinner"
+              size="xl"
+              color="blue.500"
+              thickness="4px"
             />
-          )}
+          </div>
+        )}
+        {paginationResult && (
+          <PaginationFooter
+            currentPage={paginationResult.page}
+            totalPages={paginationResult.totalPages}
+            onPageChange={(newPage) => {
+              const filters = { ...currentSearchFilters, page: newPage };
+              search(filters);
+            }}
+          />
+        )}
       </div>
       {/* )} */}
     </div>

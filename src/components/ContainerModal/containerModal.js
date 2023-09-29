@@ -27,6 +27,7 @@ const ContainerModal = ({
   readOnly,
   onSave,
   onClose,
+  defaultBl,
   initialBls = [],
   initialDestinations = [],
 }) => {
@@ -46,6 +47,9 @@ const ContainerModal = ({
     const fetchInitialData = () => {
       if (initialValue) {
         setContainer(initialValue);
+      } else {
+        const bl = initialBls.reduce((last, current) => current, null);
+        setContainer({ ...container, bl });
       }
 
       setBls([...initialBls]);
@@ -120,14 +124,14 @@ const ContainerModal = ({
     }
 
     setContainer({ ...container, destinations: updatedDestinations });
-    setDestinations(updatedDestinations)
+    setDestinations(updatedDestinations);
   };
 
   const deleteDestinationRow = (index) => {
     const updatedDestinations = [...container.destinations];
     updatedDestinations.splice(index, 1);
     setContainer({ ...container, destinations: updatedDestinations });
-    setDestinations(updatedDestinations)
+    setDestinations(updatedDestinations);
   };
 
   return (
@@ -229,10 +233,12 @@ const ContainerModal = ({
                 value: selectedDestination,
               }}
               onChange={(e) => setSelectedDestination(e.value)}
-              options={destinations.filter(d => d.code).map((d) => ({
-                label: d.code,
-                value: d,
-              }))}
+              options={destinations
+                .filter((d) => d.code)
+                .map((d) => ({
+                  label: d.code,
+                  value: d,
+                }))}
               selectedOptionStyle="color"
             />
           </div>
