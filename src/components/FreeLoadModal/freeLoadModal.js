@@ -11,7 +11,7 @@ import {
   Input,
   Divider,
   Heading,
-  Select
+  Select,
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { TRM } from "../../app/utils/destinationUtils";
@@ -19,7 +19,14 @@ import DestinationTable from "../DestinationTable/destinationTable";
 import { getFreeLoadTypes } from "../../app/utils/freeLoadUtils";
 import { Select as FilteredSelect } from "chakra-react-select";
 
-const FreeLoadModal = ({ isOpen, initialValue, readOnly, onSave, onClose, initialDestinations=[] }) => {
+const FreeLoadModal = ({
+  isOpen,
+  initialValue,
+  readOnly,
+  onSave,
+  onClose,
+  initialDestinations = [],
+}) => {
   const [destinations, setDestinations] = useState([]);
   const [selectedDestination, setSelectedDestination] = useState([]);
   const [freeLoad, setFreeLoad] = useState({
@@ -43,9 +50,34 @@ const FreeLoadModal = ({ isOpen, initialValue, readOnly, onSave, onClose, initia
     fetchInitialData();
   }, []);
 
+  const validate = () => {
+    const updatedDestinations = freeLoad.destinations.map((destination) => {
+      // Check if the destination has a code attribute defined and its length is not 16
+      const _isInvalid = destination.code && destination.code.length !== 16;
+
+      // Update the destination with the validation status
+      return {
+        ...destination,
+        _isInvalid,
+      };
+    });
+
+    // Update the container with the validated destinations
+    setFreeLoad({ ...freeLoad, destinations: updatedDestinations });
+
+    const hasInvalidDestination = updatedDestinations.some(
+      (destination) => destination._isInvalid
+    );
+
+    // Return true if there are no invalid destinations, otherwise return false
+    return !hasInvalidDestination;
+  };
+
   const handleSave = () => {
-    onSave(freeLoad);
-    onClose();
+    if (validate()) {
+      onSave(freeLoad);
+      onClose();
+    }
   };
 
   const onInputChange = (e) => {
@@ -95,23 +127,25 @@ const FreeLoadModal = ({ isOpen, initialValue, readOnly, onSave, onClose, initia
         fob: "",
         currency: "",
         product_details: "",
+        _isInvalid:false
       };
     } else {
       updatedDestinations[index] = {
         ...updatedDestinations[index],
         [name]: value,
+        _isInvalid:false
       };
     }
 
     setFreeLoad({ ...freeLoad, destinations: updatedDestinations });
-    setDestinations(updatedDestinations)
+    setDestinations(updatedDestinations);
   };
 
   const deleteDestinationRow = (index) => {
     const updatedDestinations = [...freeLoad.destinations];
     updatedDestinations.splice(index, 1);
     setFreeLoad({ ...freeLoad, destinations: updatedDestinations });
-    setDestinations(updatedDestinations)
+    setDestinations(updatedDestinations);
   };
 
   return (
@@ -205,10 +239,12 @@ const FreeLoadModal = ({ isOpen, initialValue, readOnly, onSave, onClose, initia
                 value: selectedDestination,
               }}
               onChange={(e) => setSelectedDestination(e.value)}
-              options={destinations.filter(d => d.code).map((d) => ({
-                label: d.code,
-                value: d,
-              }))}
+              options={destinations
+                .filter((d) => d.code)
+                .map((d) => ({
+                  label: d.code,
+                  value: d,
+                }))}
               selectedOptionStyle="color"
             />
           </div>

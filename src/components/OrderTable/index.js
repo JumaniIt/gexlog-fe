@@ -223,11 +223,11 @@ const OrderTable = ({ showAlert }) => {
                               trimToMinutes(result.arrival_time)}
                           </Td>
                           <TableCellWithTooltip
-                            text={trimStringWithDot(result.origin, 20)}
+                            text={trimStringWithDot(result.origin, 16)}
                             tooltipText={result.origin}
                           />
                           <TableCellWithTooltip
-                            text={trimStringWithDot(result.target, 20)}
+                            text={trimStringWithDot(result.target, 16)}
                             tooltipText={result.target}
                           />
                           <Td>{result.container_qty}</Td>

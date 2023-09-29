@@ -9,6 +9,7 @@ import {
   Select,
   Input,
   IconButton,
+  Tooltip,
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { TRM, getDestinationTypes } from "../../app/utils/destinationUtils";
@@ -47,12 +48,17 @@ const DestinationTable = ({
               </Select>
             </Td>
             <Td>
-              <Input
-                size="sm"
-                name="code"
-                value={d.code}
-                onChange={(e) => onDestinationChange(e, index)}
-              />
+              <Tooltip
+                label={d._isInvalid && "El código debe contener 16 caracteres"}
+              >
+                <Input
+                  isInvalid={d._isInvalid}
+                  size="sm"
+                  name="code"
+                  value={d.code}
+                  onChange={(e) => onDestinationChange(e, index)}
+                />
+              </Tooltip>
             </Td>
             <Td>
               <Input
