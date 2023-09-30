@@ -10,11 +10,12 @@ import Layout from "../../components/Layout";
 import { getCurrentUser } from "../../app/utils/sessionUtils";
 import Order from "../order";
 import { TIMEOUT_MS } from "../../app/utils/alertUtils";
-
+import LoadingBlur from "../../components/LoadingBlur/loadingBlur";
 
 const OrderPage = () => {
   const navigate = useNavigate();
   const currentUser = getCurrentUser(navigate);
+  const [blurLoading, setBlurLoading] = useState(true);
 
   const [alert, setAlert] = useState({});
 
@@ -35,16 +36,15 @@ const OrderPage = () => {
       className="orders-layout"
     >
       {alert.status && (
-        <Alert status={alert.status} variant='left-accent'>
+        <Alert status={alert.status} variant="left-accent">
           <AlertIcon />
           <AlertTitle>{alert.code}</AlertTitle>
-          <AlertDescription>
-            {alert.message}
-          </AlertDescription>
+          <AlertDescription>{alert.message}</AlertDescription>
         </Alert>
       )}
       <div className="container">
-        <Order showAlert={showAlert} />
+        <Order showAlert={showAlert} setBlurLoading={setBlurLoading} />
+        <LoadingBlur isLoading={blurLoading} />
       </div>
     </Layout>
   );

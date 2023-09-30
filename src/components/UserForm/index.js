@@ -18,7 +18,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { withSession } from "../../app/utils/sessionUtils";
 import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 
-const UserForm = ({showAlert}) => {
+const UserForm = ({ showAlert, setBlurLoading }) => {
   const { id } = useParams();
   const [user, setUser] = useState({
     nickname: "",
@@ -60,10 +60,10 @@ const UserForm = ({showAlert}) => {
         }
 
         if (response._isError) {
-          showAlert(ERROR, response.code, response.message)
+          showAlert(ERROR, response.code, response.message);
         } else {
-          navigate("/users/" + response.id)
-          showAlert(SUCCESS, "Usuario guardado")
+          navigate("/users/" + response.id);
+          showAlert(SUCCESS, "Usuario guardado");
         }
       },
       () => setLoading(false)
@@ -72,19 +72,18 @@ const UserForm = ({showAlert}) => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      await withSession(
-        navigate,
-        async () => {
-          if (id) {
-            const user = await getUserById(id);
-            if (user._isError) {
-              showAlert(ERROR, user.code, user.message)
-            } else {
-              setUser(user);
-            }
+      setBlurLoading(true);
+      await withSession(navigate, async () => {
+        if (id) {
+          const user = await getUserById(id);
+          if (user._isError) {
+            showAlert(ERROR, user.code, user.message);
+          } else {
+            setUser(user);
           }
         }
-      );
+      });
+      setBlurLoading(false);
     };
 
     fetchInitialData();

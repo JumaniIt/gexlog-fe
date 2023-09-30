@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Layout from "../../components/Layout";
 import {
-  Heading,
   Alert,
   AlertIcon,
   AlertTitle,
@@ -9,8 +8,10 @@ import {
 } from "@chakra-ui/react";
 import ClientForm from "../../components/ClientForm";
 import { TIMEOUT_MS } from "../../app/utils/alertUtils";
+import LoadingBlur from "../../components/LoadingBlur/loadingBlur";
 
 const ClientPage = () => {
+  const [isBlurLoading, setBlurLoading] = useState(true);
   const [alert, setAlert] = useState({});
 
   const showAlert = (status, code, message) => {
@@ -33,7 +34,8 @@ const ClientPage = () => {
           <AlertDescription>{alert.message}</AlertDescription>
         </Alert>
       )}
-      <ClientForm showAlert={showAlert}/>
+      <ClientForm showAlert={showAlert} setBlurLoading={setBlurLoading} />
+      <LoadingBlur isLoading={isBlurLoading} />
     </Layout>
   );
 };

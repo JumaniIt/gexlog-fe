@@ -8,8 +8,10 @@ import {
 } from "@chakra-ui/react";
 import UserForm from "../../components/UserForm";
 import { TIMEOUT_MS } from "../../app/utils/alertUtils";
+import LoadingBlur from "../../components/LoadingBlur/loadingBlur";
 
 const UserPage = () => {
+  const [isBlurLoading, setBlurLoading] = useState(true);
   const [alert, setAlert] = useState({});
 
   const showAlert = (status, code, message) => {
@@ -32,7 +34,8 @@ const UserPage = () => {
           <AlertDescription>{alert.message}</AlertDescription>
         </Alert>
       )}
-      <UserForm showAlert={showAlert}/>
+      <UserForm showAlert={showAlert} setBlurLoading={setBlurLoading} />
+      <LoadingBlur isLoading={isBlurLoading} />
     </Layout>
   );
 };

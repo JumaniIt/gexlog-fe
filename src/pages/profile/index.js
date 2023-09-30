@@ -11,10 +11,12 @@ import ProfileView from "../../components/ProfileView";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser } from "../../app/utils/sessionUtils";
 import { TIMEOUT_MS } from "../../app/utils/alertUtils";
+import LoadingBlur from "../../components/LoadingBlur/loadingBlur";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const currentUser = getCurrentUser(navigate);
+  const [isBlurLoading, setBlurLoading] = useState(true);
 
   const [alert, setAlert] = useState({});
 
@@ -45,7 +47,8 @@ const ProfilePage = () => {
         <Heading as="h6" size="sm">
           Perfil
         </Heading>
-        <ProfileView showAlert={showAlert}/>
+        <ProfileView showAlert={showAlert} setBlurLoading={setBlurLoading} />
+        <LoadingBlur isLoading={isBlurLoading} />
       </div>
     </Layout>
   );

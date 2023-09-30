@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Card, CardHeader, CardBody } from "@chakra-ui/react";
+import { Card, CardHeader, CardBody, Spinner } from "@chakra-ui/react";
 import { Divider } from "@chakra-ui/react";
 import { Heading } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
@@ -85,7 +85,7 @@ const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
   </Menu>
 );
 
-const Order = ({ showAlert }) => {
+const Order = ({ showAlert, setBlurLoading }) => {
   const [order, setOrder] = useState({
     containers: [],
     free_loads: [],
@@ -113,6 +113,7 @@ const Order = ({ showAlert }) => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
+      setBlurLoading(true);
       await withSession(navigate, async () => {
         if (id) {
           const order = await getOrderById(id);
@@ -144,6 +145,7 @@ const Order = ({ showAlert }) => {
             setOrder({ ...order, client_id: client.id });
           }
         }
+        setBlurLoading(false);
       });
     };
 
@@ -673,6 +675,7 @@ const Order = ({ showAlert }) => {
                     onChange={onInputChange}
                     isDisabled={readOnly || !currentUser?.admin}
                   >
+                    <Spinner size="xs" color="blue.500" />
                     {clientOptions.map((client) => (
                       <option key={client.id} value={client.id}>
                         {getNameAndCuit(client)}

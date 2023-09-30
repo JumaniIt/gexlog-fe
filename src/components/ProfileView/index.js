@@ -24,7 +24,7 @@ import ConsigneeModal from "../ConsigneeModal/consigneeModal";
 import { getById as getUserById } from "../../app/services/userService";
 import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 
-const ProfileView = ({ showAlert }) => {
+const ProfileView = ({ showAlert, setBlurLoading }) => {
   const navigate = useNavigate();
   const currentUser = getCurrentUser(navigate);
   const [consigneeModal, setConsigneeModal] = useState(false);
@@ -42,6 +42,7 @@ const ProfileView = ({ showAlert }) => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
+      setBlurLoading(true);
       await withSession(navigate, async () => {
         if (currentUser?.admin && id) {
           const client = await getClientById(id, "true");
@@ -93,6 +94,7 @@ const ProfileView = ({ showAlert }) => {
           }
         }
       });
+      setBlurLoading(false);
     };
 
     fetchInitialData();

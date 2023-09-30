@@ -23,7 +23,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { withSession } from "../../app/utils/sessionUtils";
 import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 
-const ClientForm = ({ showAlert }) => {
+const ClientForm = ({ showAlert, setBlurLoading }) => {
   const { id } = useParams();
   const [client, setClient] = useState({
     name: "",
@@ -72,6 +72,8 @@ const ClientForm = ({ showAlert }) => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
+      setBlurLoading(true);
+
       await withSession(navigate, async () => {
         let clientUserId;
         if (id) {
@@ -107,6 +109,7 @@ const ClientForm = ({ showAlert }) => {
           }
         }
       });
+      setBlurLoading(false);
     };
 
     fetchInitialData();
