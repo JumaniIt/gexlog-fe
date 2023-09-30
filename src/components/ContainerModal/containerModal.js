@@ -159,7 +159,6 @@ const ContainerModal = ({
     const updatedDestinations = [...container.destinations];
     updatedDestinations.splice(index, 1);
     setContainer({ ...container, destinations: updatedDestinations });
-    setDestinations(updatedDestinations);
   };
 
   return (

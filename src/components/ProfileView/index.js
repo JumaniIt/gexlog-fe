@@ -55,19 +55,18 @@ const ProfileView = ({ showAlert, setBlurLoading }) => {
               user = await getUserById(client.user_id);
               if (user._isError) {
                 showAlert(ERROR, user.code, user.message);
-              } else {
-                setProfile({
-                  ...profile,
-                  client_id: client.id,
-                  name: client.name,
-                  phone: client.phone,
-                  cuit: client.cuit,
-                  consignees: client.consignees,
-                  nickname: user?.nickname || "(sin definir)",
-                  email: user?.email || "(sin definir)",
-                });
               }
             }
+            setProfile({
+              ...profile,
+              client_id: client.id,
+              name: client.name,
+              phone: client.phone,
+              cuit: client.cuit,
+              consignees: client.consignees,
+              nickname: user?.nickname || "(sin definir)",
+              email: user?.email || "(sin definir)",
+            });
           }
         } else {
           const result = await searchClients({
@@ -105,21 +104,18 @@ const ProfileView = ({ showAlert, setBlurLoading }) => {
   };
 
   const saveNewConsignee = async (consignee) => {
-    await withSession(
-      navigate,
-      async () => {
-        const response = await addConsignee(profile.client_id, consignee);
-        if (response._isError) {
-          showAlert(ERROR, response.code, response.message);
-        } else {
-          setProfile({
-            ...profile,
-            consignees: [...profile.consignees, response],
-          });
-          showAlert(SUCCESS, "Consignatario guardado");
-        }
+    await withSession(navigate, async () => {
+      const response = await addConsignee(profile.client_id, consignee);
+      if (response._isError) {
+        showAlert(ERROR, response.code, response.message);
+      } else {
+        setProfile({
+          ...profile,
+          consignees: [...profile.consignees, response],
+        });
+        showAlert(SUCCESS, "Consignatario guardado");
       }
-    );
+    });
   };
 
   return (

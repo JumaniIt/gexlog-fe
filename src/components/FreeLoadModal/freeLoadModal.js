@@ -145,7 +145,6 @@ const FreeLoadModal = ({
     const updatedDestinations = [...freeLoad.destinations];
     updatedDestinations.splice(index, 1);
     setFreeLoad({ ...freeLoad, destinations: updatedDestinations });
-    setDestinations(updatedDestinations);
   };
 
   return (
