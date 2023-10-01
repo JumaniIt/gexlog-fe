@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 
 import { AddIcon } from "@chakra-ui/icons";
-import { TRM } from "../../app/utils/destinationUtils";
+import { TRM, toString } from "../../app/utils/destinationUtils";
 import DestinationTable from "../DestinationTable/destinationTable";
 import { getContainerTypes } from "../../app/utils/containerUtils";
 import { Select as FilteredSelect, CreatableSelect } from "chakra-react-select";
@@ -41,7 +41,7 @@ const ContainerModal = ({
   });
   const [bls, setBls] = useState([]);
   const [destinations, setDestinations] = useState([]);
-  const [selectedDestination, setSelectedDestination] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState({});
 
   useEffect(() => {
     const fetchInitialData = () => {
@@ -152,7 +152,6 @@ const ContainerModal = ({
     }
 
     setContainer({ ...container, destinations: updatedDestinations });
-    setDestinations(updatedDestinations);
   };
 
   const deleteDestinationRow = (index) => {
@@ -164,7 +163,7 @@ const ContainerModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
-      <ModalContent maxW="90vw">
+      <ModalContent maxW="90vw" className="container-modal">
         {initialValue ? (
           <ModalHeader>Editar contenedor</ModalHeader>
         ) : (
@@ -173,110 +172,114 @@ const ContainerModal = ({
         <ModalCloseButton />
         <ModalBody>
           <div className="data">
-            <div className="item">
-              <Heading as="h6" size="sm">
-                Código
-              </Heading>
-              <Input
-                size="sm"
-                placeholder="Código"
-                name="code"
-                value={container?.code}
-                onChange={onInputChange}
-                isDisabled={readOnly}
-              />
+            <div className="row">
+              <div className="code-input">
+                <Heading as="h6" size="sm">
+                  Código
+                </Heading>
+                <Input
+                  size="sm"
+                  placeholder="Código"
+                  name="code"
+                  value={container?.code}
+                  onChange={onInputChange}
+                  isDisabled={readOnly}
+                />
+              </div>
+              <div className="type-select">
+                <Heading as="h6" size="sm">
+                  Tipo
+                </Heading>
+                <Select
+                  size="sm"
+                  placeholder="Tipo"
+                  name="type"
+                  value={container?.type}
+                  onChange={onInputChange}
+                  isDisabled={readOnly}
+                >
+                  {getContainerTypes().map((ct) => (
+                    <option key={ct} value={ct}>
+                      {ct}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div className="bl-select">
+                <Heading as="h6" size="sm">
+                  BL
+                </Heading>
+                <CreatableSelect
+                  size="sm"
+                  useBasicStyles={true}
+                  placeholder={"BL"}
+                  name="bl"
+                  isReadOnly={readOnly}
+                  value={{
+                    label: container?.bl,
+                    value: container?.bl,
+                  }}
+                  onChange={(e) => setContainer({ ...container, bl: e.value })}
+                  options={bls.map((bl) => ({
+                    label: bl,
+                    value: bl,
+                  }))}
+                  selectedOptionStyle="color"
+                />
+              </div>
+              <div className="repackage-checkbox">
+                <Checkbox
+                  isChecked={container.repackage}
+                  onChange={toggleRepackage}
+                  isDisabled={readOnly}
+                >
+                  Reenvase
+                </Checkbox>
+              </div>
             </div>
-            <div className="item">
-              <Heading as="h6" size="sm">
-                Tipo
-              </Heading>
-              <Select
-                size="sm"
-                placeholder="Tipo"
-                name="type"
-                value={container?.type}
-                onChange={onInputChange}
-                isDisabled={readOnly}
-              >
-                {getContainerTypes().map((ct) => (
-                  <option key={ct} value={ct}>
-                    {ct}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div className="item">
-              <Heading as="h6" size="sm">
-                BL
-              </Heading>
-              <CreatableSelect
-                size="sm"
-                useBasicStyles={true}
-                placeholder={"BL"}
-                name="bl"
-                isReadOnly={readOnly}
-                value={{
-                  label: container?.bl,
-                  value: container?.bl,
-                }}
-                onChange={(e) => setContainer({ ...container, bl: e.value })}
-                options={bls.map((bl) => ({
-                  label: bl,
-                  value: bl,
-                }))}
-                selectedOptionStyle="color"
-              />
-            </div>
-            <div className="item">
-              <Heading as="h6" size="sm">
-                Reenvase
-              </Heading>
-              <Checkbox
-                isChecked={container.repackage}
-                onChange={toggleRepackage}
-                isDisabled={readOnly}
-              >
-                Reenvase
-              </Checkbox>
-            </div>
-          </div>
-          <Divider />
-          <div className="table-heading">
+
+            <Divider className="Divider" />
             <Heading className="second-heading" as="h6" size="sm">
               Destinaciones
             </Heading>
-            <Button size="sm" colorScheme="green" onClick={addDestinationRow}>
-              <AddIcon />
-              Agregar
-            </Button>
-            <FilteredSelect
-              size="sm"
-              useBasicStyles={true}
-              placeholder={"BL"}
-              name="bl"
-              isReadOnly={readOnly}
-              value={{
-                label: selectedDestination?.code,
-                value: selectedDestination,
-              }}
-              onChange={(e) => setSelectedDestination(e.value)}
-              options={destinations
-                .filter((d) => d.code)
-                .map((d) => ({
-                  label: d.code,
-                  value: d,
-                }))}
-              selectedOptionStyle="color"
+            <div className="row destinations-select-row">
+              <FilteredSelect
+                size="sm"
+                useBasicStyles={true}
+                name="destinations-select"
+                isReadOnly={readOnly}
+                value={
+                  selectedDestination?.code && {
+                    label: toString(selectedDestination),
+                    value: selectedDestination,
+                  }
+                }
+                onChange={(e) => setSelectedDestination(e.value)}
+                options={destinations
+                  .filter((d) => d.code)
+                  .map((d) => ({
+                    label: toString(d),
+                    value: d,
+                  }))}
+                selectedOptionStyle="color"
+                className="filtered-select"
+                placeholder="Puedes seleccionar y agregar una destinación anterior"
+              />
+              <Button size="sm" colorScheme="green" onClick={addDestinationRow}>
+                <AddIcon />
+                Agregar
+              </Button>
+            </div>
+            {/* Use the DestinationTable component here */}
+            <DestinationTable
+              destinations={container.destinations}
+              onDestinationChange={handleDestinationChange}
+              onDeleteDestination={deleteDestinationRow}
+              className="destinations-table"
             />
           </div>
-          {/* Use the DestinationTable component here */}
-          <DestinationTable
-            destinations={container.destinations}
-            onDestinationChange={handleDestinationChange}
-            onDeleteDestination={deleteDestinationRow}
-          />
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter className="footer">
           <Button colorScheme="blue" onClick={handleSave}>
             Guardar
           </Button>

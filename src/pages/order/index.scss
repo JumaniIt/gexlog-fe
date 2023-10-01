@@ -12,9 +12,16 @@
 
     &-header {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
       position: relative;
+
+      .heading-order-code {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
 
       & .chakra-menu__menu-button {
         position: absolute;
@@ -22,8 +29,12 @@
       }
 
       input {
-        width: auto;
+        width: 120px;
         margin-left: 5px;
+      }
+
+      .chakra-badge, .chakra-checkbox {
+        margin-right: 10px;
       }
     }
   }

@@ -9,6 +9,7 @@ import {
   StackDivider,
   Box,
   Button,
+  Textarea,
 } from "@chakra-ui/react";
 import { toLocalDateString } from "../../app/utils/dateUtils";
 import { translateAuthor } from "../../app/utils/noteUtils";
@@ -43,15 +44,28 @@ const EditableNote = ({ initialValue, onSave, onCancel }) => {
 
   return (
     <Card variant="filled">
-      <CardHeader display="flex" justifyContent="space-between">
-        {note.id && (
+      <CardHeader>
+        {note.id ? (
           <Heading size="sm">
             {toLocalDateString(note.created_at)} -{" "}
             {translateAuthor(note.author)}
           </Heading>
+        ) : (
+          <Heading size="sm">
+            Nueva nota
+          </Heading>
         )}
-
-        <div>
+      </CardHeader>
+      <CardBody>
+        <Stack spacing="2">
+          <Box>
+            <Textarea
+              placeholder="Ingrese el contenido de la nota"
+              fontSize="md"
+              value={note.content}
+              onChange={(e) => setNote({ ...note, content: e.target.value })}
+            />
+          </Box>
           <div>
             <Button onClick={handleSave} variant="ghost" isLoading={loading}>
               <MdSave size={20} />
@@ -60,19 +74,6 @@ const EditableNote = ({ initialValue, onSave, onCancel }) => {
               <MdCancel size={20} />
             </Button>
           </div>
-        </div>
-      </CardHeader>
-
-      <CardBody>
-        <Stack divider={<StackDivider />} spacing="2">
-          <Box>
-            <Input
-              pt="2"
-              fontSize="md"
-              value={note.content}
-              onChange={(e) => setNote({ ...note, content: e.target.value })}
-            />
-          </Box>
         </Stack>
       </CardBody>
     </Card>

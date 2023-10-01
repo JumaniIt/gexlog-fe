@@ -6,11 +6,11 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  VStack,
   Box,
   SimpleGrid,
   Button,
   Text,
+  Spinner
 } from "@chakra-ui/react";
 import { withSession, getCurrentUser } from "../../app/utils/sessionUtils";
 import {
@@ -25,6 +25,7 @@ import Cost from "../Cost/cost";
 import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 
 const CostModal = ({ isOpen, onClose, orderId, showAlert }) => {
+  const [loading, setLoading] = useState(false);
   const [costs, setCosts] = useState([]);
   const [editedCostId, setEditCostId] = useState(null);
   const [isAddingCost, setIsAddingCost] = useState(false);
@@ -34,6 +35,7 @@ const CostModal = ({ isOpen, onClose, orderId, showAlert }) => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
+      setLoading(true);
       await withSession(navigate, async () => {
         const response = await getCosts(orderId, { page_size: 200 });
         if (response._isError) {
@@ -46,6 +48,7 @@ const CostModal = ({ isOpen, onClose, orderId, showAlert }) => {
           setCosts(orderedCosts);
         }
       });
+      setLoading(false);
     };
 
     fetchInitialData();
@@ -122,58 +125,65 @@ const CostModal = ({ isOpen, onClose, orderId, showAlert }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent className="cost-modal-content">
         <ModalHeader>Costos</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <VStack align="stretch" spacing={4}>
-            <SimpleGrid columns={2} spacing={4}>
+          <div className="options-row">
+            {!editedCostId && !isAddingCost && currentUser?.admin && (
               <Box>
-                <Text as="b">
-                  Total: $
-                  {costs.reduce((total, cost) => total + cost.amount, 0)}
-                </Text>
+                <Button size="sm" onClick={handleAddCost} colorScheme="green">
+                  + Añadir
+                </Button>
               </Box>
-              {!isAddingCost && currentUser?.admin && (
-                <Box>
-                  <Button onClick={handleAddCost} colorScheme="teal">
-                    + Añadir
-                  </Button>
-                </Box>
-              )}
-            </SimpleGrid>
+            )}
+            <Box>
+              <Text as="b">
+                Total: ${costs.reduce((total, cost) => total + cost.amount, 0)}
+              </Text>
+            </Box>
+          </div>
 
-            <SimpleGrid columns={1} spacing={4}>
-              {isAddingCost && currentUser?.admin && (
-                <EditableCost
-                  onCancel={handleCancelEdit}
-                  onSave={handleSaveNew}
-                />
-              )}
-              {costs.map((cost) => (
-                <Box key={cost.id}>
-                  {editedCostId === cost.id ? (
-                    <EditableCost
-                      initialValue={cost}
-                      onCancel={handleCancelEdit}
-                      onSave={handleSaveEdit}
-                    />
-                  ) : (
-                    <Cost
-                      id={cost.id}
-                      type={cost.type}
-                      date={cost.created_at}
-                      description={cost.description}
-                      amount={cost.amount}
-                      onDelete={() => handleDelete(cost.id)}
-                      onEdit={handleEdit}
-                      editable={currentUser?.admin}
-                    />
-                  )}
-                </Box>
-              ))}
-            </SimpleGrid>
-          </VStack>
+          <SimpleGrid columns={1} spacing={4}>
+            {isAddingCost && currentUser?.admin && (
+              <EditableCost
+                onCancel={handleCancelEdit}
+                onSave={handleSaveNew}
+              />
+            )}
+            {costs.map((cost) => (
+              <Box key={cost.id}>
+                {editedCostId === cost.id ? (
+                  <EditableCost
+                    initialValue={cost}
+                    onCancel={handleCancelEdit}
+                    onSave={handleSaveEdit}
+                  />
+                ) : (
+                  <Cost
+                    id={cost.id}
+                    type={cost.type}
+                    date={cost.created_at}
+                    description={cost.description}
+                    amount={cost.amount}
+                    onDelete={() => handleDelete(cost.id)}
+                    onEdit={handleEdit}
+                    editable={currentUser?.admin}
+                  />
+                )}
+              </Box>
+            ))}
+          </SimpleGrid>
+          {loading && (
+            <div className="spinner">
+              <Spinner
+                className="spinner"
+                size="lg"
+                color="blue.500"
+                thickness="2px"
+              />
+            </div>
+          )}
         </ModalBody>
       </ModalContent>
     </Modal>

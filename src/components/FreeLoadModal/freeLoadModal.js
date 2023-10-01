@@ -14,7 +14,7 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
-import { TRM } from "../../app/utils/destinationUtils";
+import { TRM, toString } from "../../app/utils/destinationUtils";
 import DestinationTable from "../DestinationTable/destinationTable";
 import { getFreeLoadTypes } from "../../app/utils/freeLoadUtils";
 import { Select as FilteredSelect } from "chakra-react-select";
@@ -127,18 +127,17 @@ const FreeLoadModal = ({
         fob: "",
         currency: "",
         product_details: "",
-        _isInvalid:false
+        _isInvalid: false,
       };
     } else {
       updatedDestinations[index] = {
         ...updatedDestinations[index],
         [name]: value,
-        _isInvalid:false
+        _isInvalid: false,
       };
     }
 
     setFreeLoad({ ...freeLoad, destinations: updatedDestinations });
-    setDestinations(updatedDestinations);
   };
 
   const deleteDestinationRow = (index) => {
@@ -150,7 +149,7 @@ const FreeLoadModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
-      <ModalContent maxW="90vw">
+      <ModalContent maxW="90vw" className="free-load-modal">
         {initialValue ? (
           <ModalHeader>Editar carga suelta</ModalHeader>
         ) : (
@@ -159,102 +158,110 @@ const FreeLoadModal = ({
         <ModalCloseButton />
         <ModalBody>
           <div className="data">
-            <div className="item">
-              <Heading as="h6" size="sm">
-                Patente
-              </Heading>
-              <Input
-                size="sm"
-                placeholder="Patente"
-                name="patent"
-                value={freeLoad?.patent}
-                onChange={onInputChange}
-                isDisabled={readOnly}
-              />
-            </div>
-            <div className="item">
-              <Heading as="h6" size="sm">
-                Tipo
-              </Heading>
-              <Select
-                size="sm"
-                placeholder="Tipo"
-                name="type"
-                value={freeLoad?.type}
-                onChange={onInputChange}
-                isDisabled={readOnly}
-              >
-                {getFreeLoadTypes().map((flt) => (
-                  <option key={flt} value={flt}>
-                    {flt}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div className="item">
-              <Heading as="h6" size="sm">
-                Peso
-              </Heading>
-              <Input
-                size="sm"
-                placeholder="Peso"
-                name="weight"
-                value={freeLoad?.weight}
-                onChange={onInputChange}
-                isDisabled={readOnly}
-              />
-            </div>
-            <div className="item">
-              <Heading as="h6" size="sm">
-                Guía
-              </Heading>
-              <Input
-                size="sm"
-                placeholder="Guía"
-                name="guide"
-                value={freeLoad?.guide}
-                onChange={onInputChange}
-                isDisabled={readOnly}
-              />
+            <div className="row">
+              <div className="patent-input">
+                <Heading as="h6" size="sm">
+                  Patente
+                </Heading>
+                <Input
+                  size="sm"
+                  placeholder="Patente"
+                  name="patent"
+                  value={freeLoad?.patent}
+                  onChange={onInputChange}
+                  isDisabled={readOnly}
+                />
+              </div>
+              <div className="type-select">
+                <Heading as="h6" size="sm">
+                  Tipo
+                </Heading>
+                <Select
+                  size="sm"
+                  placeholder="Tipo"
+                  name="type"
+                  value={freeLoad?.type}
+                  onChange={onInputChange}
+                  isDisabled={readOnly}
+                >
+                  {getFreeLoadTypes().map((flt) => (
+                    <option key={flt} value={flt}>
+                      {flt}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div className="guide-input">
+                <Heading as="h6" size="sm">
+                  Guía
+                </Heading>
+                <Input
+                  size="sm"
+                  placeholder="Guía"
+                  name="guide"
+                  value={freeLoad?.guide}
+                  onChange={onInputChange}
+                  isDisabled={readOnly}
+                />
+              </div>
+              <div className="weight-input">
+                <Heading as="h6" size="sm">
+                  Peso
+                </Heading>
+                <Input
+                  size="sm"
+                  placeholder="Peso"
+                  name="weight"
+                  value={freeLoad?.weight}
+                  onChange={onInputChange}
+                  isDisabled={readOnly}
+                />
+              </div>
             </div>
           </div>
-          <Divider />
+          <Divider className="Divider"/>
           <div className="table-heading">
             <Heading className="second-heading" as="h6" size="sm">
               Destinaciones
             </Heading>
-            <Button size="sm" colorScheme="green" onClick={addDestinationRow}>
-              <AddIcon />
-              Agregar
-            </Button>
-            <FilteredSelect
-              size="sm"
-              useBasicStyles={true}
-              placeholder={"BL"}
-              name="bl"
-              isReadOnly={readOnly}
-              value={{
-                label: selectedDestination?.code,
-                value: selectedDestination,
-              }}
-              onChange={(e) => setSelectedDestination(e.value)}
-              options={destinations
-                .filter((d) => d.code)
-                .map((d) => ({
-                  label: d.code,
-                  value: d,
-                }))}
-              selectedOptionStyle="color"
+            <div className="row destinations-select-row">
+              <FilteredSelect
+                size="sm"
+                useBasicStyles={true}
+                name="destinations-select"
+                isReadOnly={readOnly}
+                value={
+                  selectedDestination?.code && {
+                    label: toString(selectedDestination),
+                    value: selectedDestination,
+                  }
+                }
+                onChange={(e) => setSelectedDestination(e.value)}
+                options={destinations
+                  .filter((d) => d.code)
+                  .map((d) => ({
+                    label: toString(d),
+                    value: d,
+                  }))}
+                selectedOptionStyle="color"
+                className="filtered-select"
+                placeholder="Puedes seleccionar y agregar una destinación anterior"
+              />
+              <Button size="sm" colorScheme="green" onClick={addDestinationRow}>
+                <AddIcon />
+                Agregar
+              </Button>
+            </div>
+
+            {/* Use the DestinationTable component here */}
+            <DestinationTable
+              destinations={freeLoad.destinations}
+              onDestinationChange={handleDestinationChange}
+              onDeleteDestination={deleteDestinationRow}
             />
           </div>
-          {/* Use the DestinationTable component here */}
-          <DestinationTable
-            destinations={freeLoad.destinations}
-            onDestinationChange={handleDestinationChange}
-            onDeleteDestination={deleteDestinationRow}
-          />
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter className="footer">
           <Button colorScheme="blue" onClick={handleSave}>
             Guardar
           </Button>

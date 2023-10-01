@@ -19,6 +19,7 @@ import {
   Th,
   Td,
   TableContainer,
+  Badge,
 } from "@chakra-ui/react";
 
 import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
@@ -52,7 +53,14 @@ import {
 } from "../../app/utils/sessionUtils";
 
 import StatusModal from "../../components/StatusModal/statusModal";
-import { translateStatus } from "../../app/utils/orderUtils";
+import {
+  CANCELLED,
+  DRAFT,
+  FINISHED,
+  PROCESSING,
+  REVISION,
+  translateStatus,
+} from "../../app/utils/orderUtils";
 import { getHalfHourOptions, trimToMinutes } from "../../app/utils/dateUtils";
 import { getOperativeSites } from "../../app/utils/customsUtils";
 import ContainerModal from "../../components/ContainerModal/containerModal";
@@ -458,47 +466,70 @@ const Order = ({ showAlert, setBlurLoading }) => {
     setOrder({ ...order, free_loads: updatedFreeLoads });
   };
 
+  const resolveStatusColorScheme = () => {
+    const status = order?.status || DRAFT;
+
+    switch (status) {
+      case DRAFT:
+        return "gray";
+      case REVISION:
+        return "orange";
+      case PROCESSING:
+        return "blue";
+      case FINISHED:
+        return "green";
+      case CANCELLED:
+        return "red";
+      default:
+        return "gray";
+    }
+  };
+
   return (
     <div className="order-container">
       <Card variant="outline" className="order-card">
         <CardHeader className="order-card-header">
-          <Heading size="sm" className="order-heading">
-            Solicitud #{order?.id} /{" "}
-          </Heading>
-          <Input
-            name="code"
-            variant="flushed"
-            placeholder="Legajo"
-            size="sm"
-            value={order.code}
-            onChange={onInputChange}
-            disabled={readOnly}
-          />
-          <Heading size="sm">
-            Estado: {order?.status ? translateStatus(order.status) : "BORRADOR"}{" "}
-          </Heading>
-          {currentUser?.admin && (
-            <Checkbox
-              className="services-checkbox"
-              name="dev"
-              isChecked={order.returned}
-              onChange={onReturned}
-              disabled={!id}
-            >
-              DEV
-            </Checkbox>
-          )}
-          {currentUser?.admin && (
-            <Checkbox
-              className="services-checkbox"
-              name="dev"
-              isChecked={order.billed}
-              onChange={onBilled}
-              disabled={!id}
-            >
-              FC
-            </Checkbox>
-          )}
+          <div className="heading-order-code">
+            <Heading size="sm" className="order-heading">
+              Solicitud #{order?.id} /{" "}
+            </Heading>
+            <Input
+              name="code"
+              variant="flushed"
+              placeholder="Legajo"
+              size="sm"
+              value={order.code}
+              onChange={onInputChange}
+              disabled={readOnly}
+            />
+          </div>
+          <div>
+            <Badge colorScheme={resolveStatusColorScheme()} variant="subtle">
+              {order?.status ? translateStatus(order.status) : "BORRADOR"}
+            </Badge>
+            {currentUser?.admin && (
+              <Checkbox
+                className="services-checkbox"
+                name="dev"
+                isChecked={order.returned}
+                onChange={onReturned}
+                disabled={!id}
+              >
+                DEV
+              </Checkbox>
+            )}
+            {currentUser?.admin && (
+              <Checkbox
+                className="services-checkbox"
+                name="dev"
+                isChecked={order.billed}
+                onChange={onBilled}
+                disabled={!id}
+              >
+                FC
+              </Checkbox>
+            )}
+          </div>
           <Menu className="header-menu">
             <MenuButton
               as={IconButton}
@@ -804,7 +835,7 @@ const Order = ({ showAlert, setBlurLoading }) => {
                     useBasicStyles={true}
                     placeholder={"Origen"}
                     name="origin"
-                    isReadOnly={readOnly}
+                    isDisabled={readOnly}
                     value={{
                       label: order?.origin,
                       value: order?.origin,
@@ -824,7 +855,7 @@ const Order = ({ showAlert, setBlurLoading }) => {
                     useBasicStyles={true}
                     placeholder={"Destino"}
                     name="target"
-                    isReadOnly={readOnly}
+                    isDisabled={readOnly}
                     value={{
                       label: order?.target,
                       value: order?.target,

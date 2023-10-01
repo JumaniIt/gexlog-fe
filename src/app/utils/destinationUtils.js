@@ -3,6 +3,15 @@ export const formatDestinations = (destinations) => {
   return formattedList;
 };
 
+export const toString = (destination) => {
+  let toString = destination.type + " - " + destination.code;
+  if (destination.fob) {
+    toString += " - " + destination.fob + " - " + destination.currency;
+  }
+
+  return toString;
+};
+
 export const getDestinationTypes = () => destinationTypes;
 
 export const TRM = "TRM";

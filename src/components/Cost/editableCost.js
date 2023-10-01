@@ -6,14 +6,12 @@ import {
   CardHeader,
   CardBody,
   Stack,
-  StackDivider,
   Box,
   Button,
+  Textarea,
 } from "@chakra-ui/react";
-import { toLocalDateString } from "../../app/utils/dateUtils";
-import { translateAuthor } from "../../app/utils/noteUtils";
 import { MdSave, MdCancel } from "react-icons/md";
-import { getCostTypes, translateCostType } from "../../app/utils/costUtils";
+import { getCostTypes } from "../../app/utils/costUtils";
 
 const EditableCost = ({ initialValue, onSave, onCancel }) => {
   const [cost, setCost] = useState({
@@ -49,7 +47,7 @@ const EditableCost = ({ initialValue, onSave, onCancel }) => {
 
   return (
     <Card variant="filled">
-      <CardHeader display="flex" justifyContent="space-between">
+      <CardHeader className="card-header">
         <Select
           name="type"
           size="sm"
@@ -57,11 +55,11 @@ const EditableCost = ({ initialValue, onSave, onCancel }) => {
           value={cost.type}
           onChange={onInputChange}
         >
-        {getCostTypes().map((ct) => (
-          <option key={ct.value} value={ct.value}>
-            {ct.translation}
-          </option>
-        ))}
+          {getCostTypes().map((ct) => (
+            <option key={ct.value} value={ct.value}>
+              {ct.translation}
+            </option>
+          ))}
         </Select>
         <Input
           name="amount"
@@ -71,22 +69,12 @@ const EditableCost = ({ initialValue, onSave, onCancel }) => {
           value={cost.amount}
           onChange={onInputChange}
         />
-        <div>
-          <div>
-            <Button onClick={handleSave} variant="ghost" isLoading={loading}>
-              <MdSave size={20} />
-            </Button>
-            <Button onClick={onCancel} variant="ghost">
-              <MdCancel size={20} />
-            </Button>
-          </div>
-        </div>
       </CardHeader>
 
       <CardBody>
-        <Stack divider={<StackDivider />} spacing="2">
+        <Stack spacing="2">
           <Box>
-            <Input
+            <Textarea
               pt="2"
               fontSize="md"
               placeholder="Descripción"
@@ -96,6 +84,14 @@ const EditableCost = ({ initialValue, onSave, onCancel }) => {
               }
             />
           </Box>
+          <div>
+            <Button onClick={handleSave} variant="ghost" isLoading={loading}>
+              <MdSave size={20} />
+            </Button>
+            <Button onClick={onCancel} variant="ghost">
+              <MdCancel size={20} />
+            </Button>
+          </div>
         </Stack>
       </CardBody>
     </Card>
