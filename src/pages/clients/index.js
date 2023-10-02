@@ -11,11 +11,13 @@ import ClientTable from "../../components/ClientTable";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser } from "../../app/utils/sessionUtils";
 import { TIMEOUT_MS } from "../../app/utils/alertUtils";
+import LoadingBlur from "../../components/LoadingBlur/loadingBlur";
 
 const ClientsPage = () => {
   const navigate = useNavigate();
   const currentUser = getCurrentUser(navigate);
 
+  const [isBlurLoading, setBlurLoading] = useState(true);
   const [alert, setAlert] = useState({});
 
   const showAlert = (status, code, message) => {
@@ -47,7 +49,8 @@ const ClientsPage = () => {
             Clientes
           </Heading>
         </div>
-        <ClientTable showAlert={showAlert} />
+        <ClientTable showAlert={showAlert} setBlurLoading={setBlurLoading} />
+        <LoadingBlur isLoading={isBlurLoading} />
       </div>
     </Layout>
   );

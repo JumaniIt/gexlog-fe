@@ -29,6 +29,7 @@ import PaginationFooter from "../Pagination/paginationFooter";
 import { withSession, getCurrentUser } from "../../app/utils/sessionUtils";
 import { ERROR } from "../../app/utils/alertUtils";
 import { trimStringWithDot } from "../../app/utils/stringUtils";
+import { OrderProvider, useOrderContext } from "../context/orderContext";
 
 const TableCellWithTooltip = ({ text, tooltipText }) => {
   return (
@@ -40,7 +41,9 @@ const TableCellWithTooltip = ({ text, tooltipText }) => {
   );
 };
 
-const OrderTable = ({ showAlert }) => {
+const OrderTable = ({ showAlert, setBlurLoading }) => {
+  const { orderSearchContext, setOrderSearchContext } = useOrderContext();
+
   const [filters, setFilters] = useState({
     page_size: 10,
     page: 1,
@@ -75,6 +78,7 @@ const OrderTable = ({ showAlert }) => {
             totalPages: response.total_pages,
             page: response.page,
           });
+          setOrderSearchContext({ results: response, filters: filters });
         }
       },
       () => setLoading(false)
@@ -82,7 +86,19 @@ const OrderTable = ({ showAlert }) => {
   };
 
   useEffect(() => {
-    const fetchClientOptionsData = async () => {
+    const fetchInitialData = async () => {
+      setBlurLoading(true);
+      if (orderSearchContext.results) {
+        const results = orderSearchContext.results;
+        setSearchResults(results.elements);
+        setPaginationResult({
+          totalPages: results.total_pages,
+          page: results.page,
+        });
+
+        setFilters(orderSearchContext.filters);
+      }
+
       await withSession(navigate, async () => {
         const response = await searchClients({ page_size: 100 });
         if (response._isError) {
@@ -100,10 +116,11 @@ const OrderTable = ({ showAlert }) => {
             }
           }
         }
+        setBlurLoading(false);
       });
     };
 
-    fetchClientOptionsData();
+    fetchInitialData();
   }, []);
 
   return (
@@ -116,6 +133,7 @@ const OrderTable = ({ showAlert }) => {
           onChange={(e) =>
             setFilters({ ...filters, client_id: e.target.value })
           }
+          value={filters?.client_id}
         >
           {clientOptions?.map((client) => (
             <option key={client.id} value={client.id}>
@@ -126,11 +144,13 @@ const OrderTable = ({ showAlert }) => {
         <Input
           size="sm"
           placeholder="Legajo"
+          value={filters?.code}
           onChange={(e) => setFilters({ ...filters, code: e.target.value })}
         />
         <input
           className="chakra-input css-1xt0hpo"
           type="date"
+          value={filters?.date_from}
           onChange={(e) =>
             setFilters({ ...filters, date_from: e.target.value })
           }
@@ -138,15 +158,18 @@ const OrderTable = ({ showAlert }) => {
         <input
           className="chakra-input css-1xt0hpo"
           type="date"
+          value={filters?.date_to}
           onChange={(e) => setFilters({ ...filters, date_to: e.target.value })}
         />
         <Checkbox
           onChange={(e) => setFilters({ ...filters, pema: e.target.checked })}
+          isChecked={filters?.pema}
         >
           PEMA
         </Checkbox>
         <Checkbox
           onChange={(e) => setFilters({ ...filters, port: e.target.checked })}
+          isChecked={filters?.port}
         >
           G. PTO
         </Checkbox>
@@ -154,6 +177,7 @@ const OrderTable = ({ showAlert }) => {
           onChange={(e) =>
             setFilters({ ...filters, transport: e.target.checked })
           }
+          isChecked={filters?.transport}
         >
           TTE
         </Checkbox>
@@ -161,6 +185,7 @@ const OrderTable = ({ showAlert }) => {
           size="sm"
           placeholder="Estado"
           onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+          value={filters?.status}
         >
           {statuses.map((status) => (
             <option key={status.value} value={status.value}>

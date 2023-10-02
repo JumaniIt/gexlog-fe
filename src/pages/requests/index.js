@@ -11,11 +11,14 @@ import OrderTable from "../../components/OrderTable";
 import Layout from "../../components/Layout";
 import { getCurrentUser } from "../../app/utils/sessionUtils";
 import { TIMEOUT_MS } from "../../app/utils/alertUtils";
+import { OrderProvider } from "../../components/context/orderContext";
+import LoadingBlur from "../../components/LoadingBlur/loadingBlur";
 
 const Requests = () => {
   const navigate = useNavigate();
   const currentUser = getCurrentUser(navigate);
 
+  const [isBlurLoading, setBlurLoading] = useState(true);
   const [alert, setAlert] = useState({});
 
   const showAlert = (status, code, message) => {
@@ -38,9 +41,7 @@ const Requests = () => {
         <Alert status={alert.status}>
           <AlertIcon />
           <AlertTitle>{alert.code}</AlertTitle>
-          <AlertDescription>
-            {alert.message}
-          </AlertDescription>
+          <AlertDescription>{alert.message}</AlertDescription>
         </Alert>
       )}
       <div className="container">
@@ -49,7 +50,8 @@ const Requests = () => {
             Solicitudes
           </Heading>
         </div>
-        <OrderTable showAlert={showAlert} />
+        <OrderTable showAlert={showAlert} setBlurLoading={setBlurLoading}/>
+        <LoadingBlur isLoading={isBlurLoading} />
       </div>
     </Layout>
   );

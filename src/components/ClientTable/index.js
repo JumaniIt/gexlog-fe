@@ -25,8 +25,10 @@ import { withSession } from "../../app/utils/sessionUtils";
 import { MdMoreVert } from "react-icons/md";
 import { IconButton } from "@chakra-ui/react";
 import { ERROR } from "../../app/utils/alertUtils";
+import { useClientContext } from "../context/clientContext";
 
-const ClientTable = ({ showAlert }) => {
+const ClientTable = ({ showAlert, setBlurLoading }) => {
+  const { clientSearchContext, setClientSearchContext } = useClientContext();
   const [filters, setFilters] = useState({
     page_size: 12,
     page: 1,
@@ -58,6 +60,8 @@ const ClientTable = ({ showAlert }) => {
             totalPages: data.total_pages,
             page: data.page,
           });
+
+          setClientSearchContext({ results: data, filters: filters });
         }
       },
       () => setLoading(false)
@@ -65,7 +69,9 @@ const ClientTable = ({ showAlert }) => {
   };
 
   useEffect(() => {
-    const fetchUserOptionsData = async () => {
+    const fetchInitialData = async () => {
+      setBlurLoading(true);
+
       await withSession(navigate, async () => {
         const options = await searchUsers({ page_size: 100, admin: "false" });
         if (options._isError) {
@@ -75,9 +81,22 @@ const ClientTable = ({ showAlert }) => {
           setUserOptions(users);
         }
       });
+
+      if (clientSearchContext.results) {
+        const results = clientSearchContext.results;
+        setSearchResults(results.elements);
+        setPaginationResult({
+          totalPages: results.total_pages,
+          page: results.page,
+        });
+
+        setFilters(clientSearchContext.filters);
+      }
+      
+      setBlurLoading(false);
     };
 
-    fetchUserOptionsData();
+    fetchInitialData();
   }, []);
 
   return (
@@ -87,21 +106,25 @@ const ClientTable = ({ showAlert }) => {
           size="sm"
           placeholder="Nombre"
           onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+          value={filters?.name}
         ></Input>
         <Input
           size="sm"
           placeholder="Telefono"
           onChange={(e) => setFilters({ ...filters, phone: e.target.value })}
+          value={filters?.phone}
         />
         <Input
           size="sm"
           placeholder="CUIT"
           onChange={(e) => setFilters({ ...filters, cuit: e.target.value })}
+          value={filters?.cuit}
         />
         <Select
           size="sm"
           placeholder="Usuario"
           onChange={(e) => setFilters({ ...filters, user_id: e.target.value })}
+          value={filters?.user_id}
         >
           {userOptions.map((user) => (
             <option key={user.id} value={user.id}>
@@ -156,7 +179,7 @@ const ClientTable = ({ showAlert }) => {
                           </Td>
                           <Td>
                             <Menu>
-                              <MenuButton 
+                              <MenuButton
                                 as={IconButton}
                                 aria-label="Options"
                                 icon={<MdMoreVert className="menu-button" />}

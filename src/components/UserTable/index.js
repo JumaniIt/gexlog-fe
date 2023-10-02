@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   Thead,
@@ -16,8 +16,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { search as searchUsers } from "../../app/services/userService";
 import PaginationFooter from "../Pagination/paginationFooter";
 import { withSession } from "../../app/utils/sessionUtils";
+import { useUserContext } from "../context/userContext";
+import { ERROR } from "../../app/utils/alertUtils";
 
-const UserTable = () => {
+const UserTable = ({ showAlert, setBlurLoading }) => {
+  const { userSearchContext, setUserSearchContext } = useUserContext();
   const [filters, setFilters] = useState({
     page_size: 12,
     page: 1,
@@ -39,15 +42,42 @@ const UserTable = () => {
       navigate,
       async () => {
         const result = await searchUsers(f);
-        setSearchResults(result?.elements);
-        setPaginationResult({
-          totalPages: result.total_pages,
-          page: result.page,
-        });
+        if (result._isError) {
+          showAlert(ERROR, result.code, result.message);
+        } else {
+          setSearchResults(result?.elements);
+          setPaginationResult({
+            totalPages: result.total_pages,
+            page: result.page,
+          });
+
+          setUserSearchContext({ results: result, filters: filters });
+        }
       },
       () => setLoading(false)
     );
   };
+
+  useEffect(() => {
+    const fetchInitialData = () => {
+      setBlurLoading(true);
+
+      if (userSearchContext.results) {
+        const results = userSearchContext.results;
+        setSearchResults(results.elements);
+        setPaginationResult({
+          totalPages: results.total_pages,
+          page: results.page,
+        });
+
+        setFilters(userSearchContext.filters);
+      }
+
+      setBlurLoading(false);
+    };
+
+    fetchInitialData();
+  }, []);
 
   return (
     <div className="filter-table-container">
@@ -56,11 +86,13 @@ const UserTable = () => {
           size="sm"
           placeholder="Email"
           onChange={(e) => setFilters({ ...filters, email: e.target.value })}
+          value={filters?.email}
         ></Input>
         <Input
           size="sm"
           placeholder="Nickname"
           onChange={(e) => setFilters({ ...filters, nickname: e.target.value })}
+          value={filters?.nickname}
         />
         <Select
           size="sm"
@@ -68,6 +100,7 @@ const UserTable = () => {
           onChange={(e) => {
             setFilters({ ...filters, admin: e.target.value });
           }}
+          value={filters?.admin}
         >
           <option key={true} value={"true"}>
             ADMIN
@@ -80,7 +113,11 @@ const UserTable = () => {
           <MdSearch />
           Buscar
         </Button>
-        <Button size="sm" colorScheme="green" onClick={() => navigate("./new", { replace: true })}>
+        <Button
+          size="sm"
+          colorScheme="green"
+          onClick={() => navigate("./new", { replace: true })}
+        >
           <MdCreate />
           Crear
         </Button>
@@ -121,11 +158,16 @@ const UserTable = () => {
             </Table>
           </TableContainer>
         </div>
-        {loading &&
+        {loading && (
           <div className="spinner">
-            <Spinner className="spinner" size="xl" color="blue.500" thickness="4px" />
+            <Spinner
+              className="spinner"
+              size="xl"
+              color="blue.500"
+              thickness="4px"
+            />
           </div>
-        }
+        )}
         {paginationResult && (
           <PaginationFooter
             currentPage={paginationResult.page}
