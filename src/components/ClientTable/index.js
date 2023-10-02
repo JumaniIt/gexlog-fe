@@ -156,10 +156,10 @@ const ClientTable = ({ showAlert }) => {
                           </Td>
                           <Td>
                             <Menu>
-                              <MenuButton
+                              <MenuButton 
                                 as={IconButton}
                                 aria-label="Options"
-                                icon={<MdMoreVert />}
+                                icon={<MdMoreVert className="menu-button" />}
                                 variant="outline"
                               />
                               <MenuList>

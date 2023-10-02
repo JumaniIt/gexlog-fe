@@ -28,7 +28,7 @@ const FreeLoadModal = ({
   initialDestinations = [],
 }) => {
   const [destinations, setDestinations] = useState([]);
-  const [selectedDestination, setSelectedDestination] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState({});
   const [freeLoad, setFreeLoad] = useState({
     id: "",
     patent: "",

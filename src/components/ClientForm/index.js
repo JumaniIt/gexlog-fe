@@ -7,7 +7,6 @@ import {
   Input,
   Select,
   Text,
-  VStack,
 } from "@chakra-ui/react";
 import {
   search as searchUsers,
@@ -116,7 +115,7 @@ const ClientForm = ({ showAlert, setBlurLoading }) => {
   }, []);
 
   return (
-    <VStack spacing={4}>
+    <div className="client-form-container">
       {(id && (
         <Text fontSize="xl" fontWeight="bold">
           {"Editar cliente #" + id}
@@ -185,7 +184,7 @@ const ClientForm = ({ showAlert, setBlurLoading }) => {
       >
         Guardar
       </Button>
-    </VStack>
+    </div>
   );
 };
 

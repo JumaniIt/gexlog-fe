@@ -9,10 +9,13 @@ import {
 import ClientForm from "../../components/ClientForm";
 import { TIMEOUT_MS } from "../../app/utils/alertUtils";
 import LoadingBlur from "../../components/LoadingBlur/loadingBlur";
+import { getCurrentUser } from "../../app/utils/sessionUtils";
 
 const ClientPage = () => {
   const [isBlurLoading, setBlurLoading] = useState(true);
   const [alert, setAlert] = useState({});
+
+  const currentUser = getCurrentUser();
 
   const showAlert = (status, code, message) => {
     setAlert({ status, code, message });
@@ -26,7 +29,10 @@ const ClientPage = () => {
   }, [alert]);
 
   return (
-    <Layout>
+    <Layout
+      className="profile-view"
+      headingText={`Hola ${currentUser?.nickname}`}
+    >
       {alert.status && (
         <Alert status={alert.status} variant="left-accent">
           <AlertIcon />

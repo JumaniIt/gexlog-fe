@@ -90,7 +90,7 @@ const UserForm = ({ showAlert, setBlurLoading }) => {
   }, []);
 
   return (
-    <VStack spacing={4}>
+    <div className="user-form-container">
       {(id && (
         <Text fontSize="xl" fontWeight="bold">
           {"Editar usuario #" + id}
@@ -154,7 +154,7 @@ const UserForm = ({ showAlert, setBlurLoading }) => {
       >
         Guardar
       </Button>
-    </VStack>
+    </div>
   );
 };
 

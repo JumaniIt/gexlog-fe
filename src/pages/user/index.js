@@ -9,10 +9,13 @@ import {
 import UserForm from "../../components/UserForm";
 import { TIMEOUT_MS } from "../../app/utils/alertUtils";
 import LoadingBlur from "../../components/LoadingBlur/loadingBlur";
+import { getCurrentUser } from "../../app/utils/sessionUtils";
 
 const UserPage = () => {
   const [isBlurLoading, setBlurLoading] = useState(true);
   const [alert, setAlert] = useState({});
+
+  const currentUser = getCurrentUser();
 
   const showAlert = (status, code, message) => {
     setAlert({ status, code, message });
@@ -26,7 +29,10 @@ const UserPage = () => {
   }, [alert]);
 
   return (
-    <Layout>
+    <Layout
+      className="profile-view"
+      headingText={`Hola ${currentUser?.nickname}`}
+    >
       {alert.status && (
         <Alert status={alert.status}>
           <AlertIcon />
