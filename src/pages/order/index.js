@@ -853,6 +853,9 @@ const Order = ({ showAlert, setBlurLoading }) => {
                         filterOption={(option, input) =>
                           !input || containsLiteralPart(option.label, input)
                         }
+                        chakraStyles={{
+                          menu: (provided) => ({ ...provided, zIndex: 3 }),
+                        }}
                         size="sm"
                         useBasicStyles={true}
                         name="origin"
@@ -877,6 +880,9 @@ const Order = ({ showAlert, setBlurLoading }) => {
                         filterOption={(option, input) =>
                           !input || containsLiteralPart(option.label, input)
                         }
+                        chakraStyles={{
+                          menu: (provided) => ({ ...provided, zIndex: 3 }),
+                        }}
                         size="sm"
                         useBasicStyles={true}
                         name="target"
@@ -986,24 +992,32 @@ const Order = ({ showAlert, setBlurLoading }) => {
                     </Heading>
                     <Grid gap={4}>
                       <GridItem>
-                        <Input
-                          className="row-top-element"
-                          size="sm"
-                          name="name"
-                          placeholder="Nombre"
-                          value={order?.customs_data?.name}
-                          isDisabled={readOnly}
-                          onChange={modifyCustomsData}
+                        <LabeledItem
+                          item={
+                            <Input
+                              className="row-top-element"
+                              size="sm"
+                              name="name"
+                              value={order?.customs_data?.name}
+                              isDisabled={readOnly}
+                              onChange={modifyCustomsData}
+                            />
+                          }
+                          label="Nombre"
                         />
                       </GridItem>
                       <GridItem>
-                        <Input
-                          size="sm"
-                          name="phone"
-                          placeholder="Nombre"
-                          value={order?.customs_data?.phone}
-                          isDisabled={readOnly}
-                          onChange={modifyCustomsData}
+                        <LabeledItem
+                          item={
+                            <Input
+                              size="sm"
+                              name="phone"
+                              value={order?.customs_data?.phone}
+                              isDisabled={readOnly}
+                              onChange={modifyCustomsData}
+                            />
+                          }
+                          label="Teléfono"
                         />
                       </GridItem>
                     </Grid>
