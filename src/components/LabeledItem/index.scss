@@ -1,0 +1,15 @@
+.labeled-item {
+  position: relative;
+  width: fit-content;
+
+  label {
+    position: absolute;
+    top: -9px; /* Adjust this value to position the label as desired */
+    left: 6px;
+    color: #708096;
+    background-color: white;
+    padding: 0 4px; /* Adjust padding as needed */
+    font-size: 11px; /* Adjust the font size */
+    z-index: 2;
+  }
+}

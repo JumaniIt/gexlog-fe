@@ -33,7 +33,8 @@
         margin-left: 5px;
       }
 
-      .chakra-badge, .chakra-checkbox {
+      .chakra-badge,
+      .chakra-checkbox {
         margin-right: 10px;
       }
     }
@@ -48,7 +49,7 @@
 
     .chakra-heading {
       font-family: "Montserrat", sans-serif !important;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       color: #a0aec0;
       text-transform: uppercase;
     }
@@ -62,6 +63,14 @@
   .main-content {
     display: flex;
 
+    .row-heading {
+      padding-bottom: 10px;
+    }
+
+    .row-top-element {
+      margin-bottom: 6px;
+    }
+
     .chakra-heading {
       font-family: "Montserrat", sans-serif !important;
       margin: 20px 0 10px;
@@ -72,6 +81,7 @@
       width: 20vw;
 
       .second-row {
+        margin-top: 10px;
         .title {
           display: flex;
           align-items: center;
@@ -99,8 +109,10 @@
       }
 
       .second-row {
+        margin-top: 5px;
         .right-side {
           margin-left: 15px;
+          padding-top: 10px;
         }
       }
 

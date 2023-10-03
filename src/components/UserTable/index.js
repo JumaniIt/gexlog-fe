@@ -18,6 +18,7 @@ import PaginationFooter from "../Pagination/paginationFooter";
 import { withSession } from "../../app/utils/sessionUtils";
 import { useUserContext } from "../context/userContext";
 import { ERROR } from "../../app/utils/alertUtils";
+import LabeledItem from "../LabeledItem";
 
 const UserTable = ({ showAlert, setBlurLoading }) => {
   const { userSearchContext, setUserSearchContext } = useUserContext();
@@ -82,21 +83,34 @@ const UserTable = ({ showAlert, setBlurLoading }) => {
   return (
     <div className="filter-table-container">
       <div className="users-filter-bar">
-        <Input
-          size="sm"
-          placeholder="Email"
-          onChange={(e) => setFilters({ ...filters, email: e.target.value })}
-          value={filters?.email}
-        ></Input>
-        <Input
-          size="sm"
-          placeholder="Nickname"
-          onChange={(e) => setFilters({ ...filters, nickname: e.target.value })}
-          value={filters?.nickname}
+        <LabeledItem
+          item={
+            <Input
+              size="sm"
+              onChange={(e) =>
+                setFilters({ ...filters, email: e.target.value })
+              }
+              value={filters?.email}
+            />
+          }
+          label="Email"
         />
+        <LabeledItem
+          item={
+            <Input
+              size="sm"
+              onChange={(e) =>
+                setFilters({ ...filters, nickname: e.target.value })
+              }
+              value={filters?.nickname}
+            />
+          }
+          label="Nickname"
+        />
+        <LabeledItem item={
         <Select
           size="sm"
-          placeholder="Rol"
+          placeholder="-"
           onChange={(e) => {
             setFilters({ ...filters, admin: e.target.value });
           }}
@@ -108,7 +122,7 @@ const UserTable = ({ showAlert, setBlurLoading }) => {
           <option key={true} value={"false"}>
             CLIENTE
           </option>
-        </Select>
+        </Select> } label="Rol" />
         <Button className="search-button" size="sm" onClick={handleClick}>
           <MdSearch />
           Buscar

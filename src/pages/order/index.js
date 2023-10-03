@@ -70,6 +70,7 @@ import NotesModal from "../../components/NoteModal/noteModal";
 import CostModal from "../../components/CostModal/costModal";
 import { Select as FilteredSelect } from "chakra-react-select";
 import { containsLiteralPart } from "../../app/utils/stringUtils";
+import LabeledItem from "../../components/LabeledItem";
 
 const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
   <Menu>
@@ -294,7 +295,6 @@ const Order = ({ showAlert, setBlurLoading }) => {
         const processedFiles = await Promise.all(promises);
         const successfulFiles = processedFiles.filter((file) => file !== null);
 
-        // Update the order's documents array with the successful uploads
         setOrder({
           ...order,
           documents: [...order.documents, ...successfulFiles],
@@ -693,58 +693,69 @@ const Order = ({ showAlert, setBlurLoading }) => {
           <div className="main-content">
             <div className="left-column">
               <div className="first-row">
-                <Heading as="h6" size="sm">
+                <Heading as="h6" size="sm" className="row-heading">
                   Cliente
                 </Heading>
                 <Stack spacing={3}>
-                  <Select
-                    size="sm"
-                    placeholder="Cliente"
-                    name="client_id"
-                    value={order?.client_id}
-                    onFocus={loadClientOptions}
-                    onChange={onInputChange}
-                    isDisabled={readOnly || !currentUser?.admin}
-                  >
-                    <Spinner size="xs" color="blue.500" />
-                    {clientOptions.map((client) => (
-                      <option key={client.id} value={client.id}>
-                        {getNameAndCuit(client)}
-                      </option>
-                    ))}
-                  </Select>
+                  <LabeledItem
+                    item={
+                      <Select
+                        className="row-top-element"
+                        size="sm"
+                        name="client_id"
+                        value={order?.client_id}
+                        onFocus={loadClientOptions}
+                        onChange={onInputChange}
+                        isDisabled={readOnly || !currentUser?.admin}
+                        placeholder="-"
+                      >
+                        {clientOptions.map((client) => (
+                          <option key={client.id} value={client.id}>
+                            {getNameAndCuit(client)}
+                          </option>
+                        ))}
+                      </Select>
+                    }
+                    label="Cliente"
+                  />
 
-                  <Select
-                    size="sm"
-                    name="consignee"
-                    placeholder="Factura a"
-                    onChange={(e) =>
-                      setOrder({
-                        ...order,
-                        consignee: JSON.parse(e.target.value),
-                      })
+                  <LabeledItem
+                    item={
+                      <Select
+                        size="sm"
+                        name="consignee"
+                        onChange={(e) =>
+                          setOrder({
+                            ...order,
+                            consignee: JSON.parse(e.target.value),
+                          })
+                        }
+                        value={
+                          order?.consignee
+                            ? JSON.stringify(order.consignee)
+                            : ""
+                        }
+                        isDisabled={readOnly}
+                      >
+                        {consigneeOptions.map((consignee) => {
+                          return (
+                            <option
+                              key={JSON.stringify(consignee)}
+                              value={JSON.stringify(consignee)}
+                            >
+                              {getNameAndCuit(consignee)}
+                            </option>
+                          );
+                        })}
+                      </Select>
                     }
-                    value={
-                      order?.consignee ? JSON.stringify(order.consignee) : ""
-                    }
-                    isDisabled={readOnly}
-                  >
-                    {consigneeOptions.map((consignee) => {
-                      return (
-                        <option
-                          key={JSON.stringify(consignee)}
-                          value={JSON.stringify(consignee)}
-                        >
-                          {getNameAndCuit(consignee)}
-                        </option>
-                      );
-                    })}
-                  </Select>
+                    label="Factura a"
+                  />
                 </Stack>
               </div>
               <div className="second-row">
                 <div className="title">
-                  <Heading as="h6" size="sm">
+                  <Heading as="h6" size="sm" className="row-heading">
                     Documentación
                   </Heading>
                   <Input
@@ -765,6 +776,7 @@ const Order = ({ showAlert, setBlurLoading }) => {
                       fileInputRef.current.click();
                     }}
                     className="add-doc-icon"
+                    isDisabled={!order?.id}
                   />
                 </div>
                 <Stack spacing={2}>
@@ -796,161 +808,210 @@ const Order = ({ showAlert, setBlurLoading }) => {
             </div>
             <div className="right-column">
               <div className="first-row">
-                <Heading as="h6" size="sm">
+                <Heading as="h6" size="sm" className="row-heading">
                   Datos de servicio
                 </Heading>
                 <Stack spacing={3} className="first-row-stack">
-                  <input
-                    className="chakra-input css-1xt0hpo"
-                    placeholder="Fecha"
-                    value={order?.arrival_date}
-                    type="date"
-                    name="arrival_date"
-                    disabled={readOnly}
-                    onChange={onInputChange}
+                  <LabeledItem
+                    item={
+                      <input
+                        className="chakra-input css-1xt0hpo"
+                        value={order?.arrival_date}
+                        type="date"
+                        name="arrival_date"
+                        disabled={readOnly}
+                        onChange={onInputChange}
+                      />
+                    }
+                    label="Fecha"
                   />
-                  <Select
-                    size="sm"
-                    value={
-                      order?.arrival_time
-                        ? trimToMinutes(order.arrival_time)
-                        : null
+                  <LabeledItem
+                    item={
+                      <Select
+                        size="sm"
+                        value={
+                          order?.arrival_time
+                            ? trimToMinutes(order.arrival_time)
+                            : null
+                        }
+                        name="arrival_time"
+                        isDisabled={readOnly}
+                        onChange={onInputChange}
+                      >
+                        {getHalfHourOptions().map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </Select>
                     }
-                    name="arrival_time"
-                    placeholder="Hora"
-                    isDisabled={readOnly}
-                    onChange={onInputChange}
-                  >
-                    {getHalfHourOptions().map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </Select>
-                  <FilteredSelect
-                    filterOption={(option, input) =>
-                      !input || containsLiteralPart(option.label, input)
-                    }
-                    size="sm"
-                    useBasicStyles={true}
-                    placeholder={"Origen"}
-                    name="origin"
-                    isDisabled={readOnly}
-                    value={{
-                      label: order?.origin,
-                      value: order?.origin,
-                    }}
-                    onChange={(e) => modifyOrder("origin", e.value)}
-                    options={getOperativeSites().map((os) => ({
-                      label: os,
-                      value: os,
-                    }))}
-                    selectedOptionStyle="color"
+                    label="Hora"
                   />
-                  <FilteredSelect
-                    filterOption={(option, input) =>
-                      !input || containsLiteralPart(option.label, input)
+                  <LabeledItem
+                    item={
+                      <FilteredSelect
+                        filterOption={(option, input) =>
+                          !input || containsLiteralPart(option.label, input)
+                        }
+                        size="sm"
+                        useBasicStyles={true}
+                        name="origin"
+                        isDisabled={readOnly}
+                        value={{
+                          label: order?.origin,
+                          value: order?.origin,
+                        }}
+                        onChange={(e) => modifyOrder("origin", e.value)}
+                        options={getOperativeSites().map((os) => ({
+                          label: os,
+                          value: os,
+                        }))}
+                        selectedOptionStyle="color"
+                      />
                     }
-                    size="sm"
-                    useBasicStyles={true}
-                    placeholder={"Destino"}
-                    name="target"
-                    isDisabled={readOnly}
-                    value={{
-                      label: order?.target,
-                      value: order?.target,
-                    }}
-                    onChange={(e) => modifyOrder("target", e.value)}
-                    options={getOperativeSites().map((os) => ({
-                      label: os,
-                      value: os,
-                    }))}
-                    selectedOptionStyle="color"
+                    label="Origen"
+                  />
+                  <LabeledItem
+                    item={
+                      <FilteredSelect
+                        filterOption={(option, input) =>
+                          !input || containsLiteralPart(option.label, input)
+                        }
+                        size="sm"
+                        useBasicStyles={true}
+                        name="target"
+                        isDisabled={readOnly}
+                        value={{
+                          label: order?.target,
+                          value: order?.target,
+                        }}
+                        onChange={(e) => modifyOrder("target", e.value)}
+                        options={getOperativeSites().map((os) => ({
+                          label: os,
+                          value: os,
+                        }))}
+                        selectedOptionStyle="color"
+                      />
+                    }
+                    label="Destino"
                   />
                 </Stack>
               </div>
               <div className="second-row">
                 <Grid templateColumns="repeat(2, 1fr)" gap={4}>
                   <GridItem>
-                    <Heading as="h6" size="sm">
+                    <Heading as="h6" size="sm" className="row-heading">
                       Transporte
                     </Heading>
                     <Grid templateRows="repeat(3, 1fr)" gap={4}>
                       <GridItem colSpan={2}>
-                        <Input
-                          size="sm"
-                          placeholder="Nombre"
-                          name="name"
-                          value={order?.driver_data?.name}
-                          isDisabled={readOnly}
-                          onChange={modifyDriverData}
+                        <LabeledItem
+                          item={
+                            <Input
+                              className="row-top-element"
+                              size="sm"
+                              name="name"
+                              value={order?.driver_data?.name}
+                              isDisabled={readOnly}
+                              onChange={modifyDriverData}
+                            />
+                          }
+                          label="Nombre"
                         />
                       </GridItem>
                       <GridItem colSpan={2}>
-                        <Input
-                          size="sm"
-                          placeholder="Teléfono"
-                          name="phone"
-                          value={order?.driver_data?.phone}
-                          isDisabled={readOnly}
-                          onChange={modifyDriverData}
+                        <LabeledItem
+                          item={
+                            <Input
+                              className="row-top-element"
+                              size="sm"
+                              name="phone"
+                              value={order?.driver_data?.phone}
+                              isDisabled={readOnly}
+                              onChange={modifyDriverData}
+                            />
+                          }
+                          label="Teléfono"
                         />
                       </GridItem>
                       <GridItem colSpan={2}>
-                        <Input
-                          size="sm"
-                          placeholder="Chasis"
-                          name="chasis"
-                          value={order?.driver_data?.chasis}
-                          isDisabled={readOnly}
-                          onChange={modifyDriverData}
+                        <LabeledItem
+                          item={
+                            <Input
+                              className="row-top-element"
+                              size="sm"
+                              name="chasis"
+                              value={order?.driver_data?.chasis}
+                              isDisabled={readOnly}
+                              onChange={modifyDriverData}
+                            />
+                          }
+                          label="Chasis"
                         />
                       </GridItem>
                       <GridItem colSpan={2}>
-                        <Input
-                          size="sm"
-                          placeholder="Semi"
-                          name="semi"
-                          value={order?.driver_data?.semi}
-                          isDisabled={readOnly}
-                          onChange={modifyDriverData}
+                        <LabeledItem
+                          item={
+                            <Input
+                              className="row-top-element"
+                              size="sm"
+                              name="semi"
+                              value={order?.driver_data?.semi}
+                              isDisabled={readOnly}
+                              onChange={modifyDriverData}
+                            />
+                          }
+                          label="Semi"
                         />
                       </GridItem>
                       <GridItem colSpan={4}>
-                        <Input
-                          size="sm"
-                          placeholder="Empresa"
-                          name="company"
-                          value={order?.driver_data?.company}
-                          isDisabled={readOnly}
-                          onChange={modifyDriverData}
+                        <LabeledItem
+                          item={
+                            <Input
+                              size="sm"
+                              name="company"
+                              value={order?.driver_data?.company}
+                              isDisabled={readOnly}
+                              onChange={modifyDriverData}
+                            />
+                          }
+                          label="Empresa"
                         />
                       </GridItem>
                     </Grid>
                   </GridItem>
                   <GridItem>
-                    <Heading as="h6" size="sm">
+                    <Heading as="h6" size="sm" className="row-heading">
                       Comisionista
                     </Heading>
                     <Grid gap={4}>
                       <GridItem>
-                        <Input
-                          size="sm"
-                          placeholder="Nombre"
-                          name="name"
-                          value={order?.customs_data?.name}
-                          isDisabled={readOnly}
-                          onChange={modifyCustomsData}
+                        <LabeledItem
+                          item={
+                            <Input
+                              className="row-top-element"
+                              size="sm"
+                              name="name"
+                              value={order?.customs_data?.name}
+                              isDisabled={readOnly}
+                              onChange={modifyCustomsData}
+                            />
+                          }
+                          label="Nombre"
                         />
                       </GridItem>
                       <GridItem>
-                        <Input
-                          size="sm"
-                          placeholder="Teléfono"
-                          name="phone"
-                          value={order?.customs_data?.phone}
-                          isDisabled={readOnly}
-                          onChange={modifyCustomsData}
+                        <LabeledItem
+                          item={
+                            <Input
+                              size="sm"
+                              name="phone"
+                              value={order?.customs_data?.phone}
+                              isDisabled={readOnly}
+                              onChange={modifyCustomsData}
+                            />
+                          }
+                          label="Teléfono"
                         />
                       </GridItem>
                     </Grid>
@@ -1021,12 +1082,16 @@ const Order = ({ showAlert, setBlurLoading }) => {
                 ) : (
                   <>
                     <div className="subtitle">
-                      <Input
-                        size="sm"
-                        placeholder="PEMA"
-                        isDisabled={!currentUser?.admin}
-                        value={pemaCode}
-                        onChange={(e) => setPemaCode(e.target.value)}
+                      <LabeledItem
+                        item={
+                          <Input
+                            size="sm"
+                            isDisabled={!currentUser?.admin}
+                            value={pemaCode}
+                            onChange={(e) => setPemaCode(e.target.value)}
+                          />
+                        }
+                        label="PEMA"
                       />
                     </div>
                     <TableContainer>

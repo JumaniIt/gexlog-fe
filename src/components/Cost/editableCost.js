@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Heading, Input, Select } from "@chakra-ui/react";
-import { Text } from "@chakra-ui/react";
+import { Input, Select } from "@chakra-ui/react";
 import {
   Card,
   CardHeader,

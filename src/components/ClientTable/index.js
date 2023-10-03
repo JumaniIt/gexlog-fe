@@ -26,6 +26,7 @@ import { MdMoreVert } from "react-icons/md";
 import { IconButton } from "@chakra-ui/react";
 import { ERROR } from "../../app/utils/alertUtils";
 import { useClientContext } from "../context/clientContext";
+import LabeledItem from "../LabeledItem";
 
 const ClientTable = ({ showAlert, setBlurLoading }) => {
   const { clientSearchContext, setClientSearchContext } = useClientContext();
@@ -92,7 +93,7 @@ const ClientTable = ({ showAlert, setBlurLoading }) => {
 
         setFilters(clientSearchContext.filters);
       }
-      
+
       setBlurLoading(false);
     };
 
@@ -102,36 +103,57 @@ const ClientTable = ({ showAlert, setBlurLoading }) => {
   return (
     <div className="filter-table-container">
       <div className="clients-filter-bar">
-        <Input
-          size="sm"
-          placeholder="Nombre"
-          onChange={(e) => setFilters({ ...filters, name: e.target.value })}
-          value={filters?.name}
-        ></Input>
-        <Input
-          size="sm"
-          placeholder="Telefono"
-          onChange={(e) => setFilters({ ...filters, phone: e.target.value })}
-          value={filters?.phone}
+        <LabeledItem
+          item={
+            <Input
+              size="sm"
+              onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+              value={filters?.name}
+            />
+          }
+          label="Nombre"
         />
-        <Input
-          size="sm"
-          placeholder="CUIT"
-          onChange={(e) => setFilters({ ...filters, cuit: e.target.value })}
-          value={filters?.cuit}
+        <LabeledItem
+          item={
+            <Input
+              size="sm"
+              onChange={(e) =>
+                setFilters({ ...filters, phone: e.target.value })
+              }
+              value={filters?.phone}
+            />
+          }
+          label="Teléfono"
         />
-        <Select
-          size="sm"
-          placeholder="Usuario"
-          onChange={(e) => setFilters({ ...filters, user_id: e.target.value })}
-          value={filters?.user_id}
-        >
-          {userOptions.map((user) => (
-            <option key={user.id} value={user.id}>
-              {getIdAndName(user)}
-            </option>
-          ))}
-        </Select>
+        <LabeledItem
+          item={
+            <Input
+              size="sm"
+              onChange={(e) => setFilters({ ...filters, cuit: e.target.value })}
+              value={filters?.cuit}
+            />
+          }
+          label="CUIT"
+        />
+        <LabeledItem
+          item={
+            <Select
+              size="sm"
+              placeholder="-"
+              onChange={(e) =>
+                setFilters({ ...filters, user_id: e.target.value })
+              }
+              value={filters?.user_id}
+            >
+              {userOptions.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {getIdAndName(user)}
+                </option>
+              ))}
+            </Select>
+          }
+          label="Usuario"
+        />
         <Button className="search-button" size="sm" onClick={handleClick}>
           <MdSearch />
           Buscar

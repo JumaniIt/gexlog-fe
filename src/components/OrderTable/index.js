@@ -30,6 +30,7 @@ import { withSession, getCurrentUser } from "../../app/utils/sessionUtils";
 import { ERROR } from "../../app/utils/alertUtils";
 import { trimStringWithDot } from "../../app/utils/stringUtils";
 import { OrderProvider, useOrderContext } from "../context/orderContext";
+import LabeledItem from "../LabeledItem";
 
 const TableCellWithTooltip = ({ text, tooltipText }) => {
   return (
@@ -126,40 +127,62 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   return (
     <div className="filter-table-container">
       <div className="filter-bar">
-        <Select
-          size="sm"
-          placeholder={clientSelectionPlaceHolder || "Cliente"}
-          isDisabled={clientSelectionDisabled}
-          onChange={(e) =>
-            setFilters({ ...filters, client_id: e.target.value })
+        <LabeledItem
+          item={
+            <Select
+              size="sm"
+              isDisabled={clientSelectionDisabled}
+              onChange={(e) =>
+                setFilters({ ...filters, client_id: e.target.value })
+              }
+              value={filters?.client_id}
+              placeholder="-"
+            >
+              {clientOptions?.map((client) => (
+                <option key={client.id} value={client.id}>
+                  {getNameAndCuit(client)}
+                </option>
+              ))}
+            </Select>
           }
-          value={filters?.client_id}
-        >
-          {clientOptions?.map((client) => (
-            <option key={client.id} value={client.id}>
-              {getNameAndCuit(client)}
-            </option>
-          ))}
-        </Select>
-        <Input
-          size="sm"
-          placeholder="Legajo"
-          value={filters?.code}
-          onChange={(e) => setFilters({ ...filters, code: e.target.value })}
+          label="Cliente"
         />
-        <input
-          className="chakra-input css-1xt0hpo"
-          type="date"
-          value={filters?.date_from}
-          onChange={(e) =>
-            setFilters({ ...filters, date_from: e.target.value })
+
+        <LabeledItem
+          item={
+            <Input
+              size="sm"
+              value={filters?.code}
+              onChange={(e) => setFilters({ ...filters, code: e.target.value })}
+            />
           }
+          label="Legajo"
         />
-        <input
-          className="chakra-input css-1xt0hpo"
-          type="date"
-          value={filters?.date_to}
-          onChange={(e) => setFilters({ ...filters, date_to: e.target.value })}
+        <LabeledItem
+          item={
+            <input
+              className="chakra-input css-1xt0hpo"
+              type="date"
+              value={filters?.date_from}
+              onChange={(e) =>
+                setFilters({ ...filters, date_from: e.target.value })
+              }
+            />
+          }
+          label="Desde"
+        />
+        <LabeledItem
+          item={
+            <input
+              className="chakra-input css-1xt0hpo"
+              type="date"
+              value={filters?.date_to}
+              onChange={(e) =>
+                setFilters({ ...filters, date_to: e.target.value })
+              }
+            />
+          }
+          label="Hasta"
         />
         <Checkbox
           onChange={(e) => setFilters({ ...filters, pema: e.target.checked })}
@@ -181,18 +204,25 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
         >
           TTE
         </Checkbox>
-        <Select
-          size="sm"
-          placeholder="Estado"
-          onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          value={filters?.status}
-        >
-          {statuses.map((status) => (
-            <option key={status.value} value={status.value}>
-              {status.translation}
-            </option>
-          ))}
-        </Select>
+        <LabeledItem
+          item={
+            <Select
+              size="sm"
+              onChange={(e) =>
+                setFilters({ ...filters, status: e.target.value })
+              }
+              value={filters?.status}
+              placeholder="Seleccionar"
+            >
+              {statuses.map((status) => (
+                <option key={status.value} value={status.value}>
+                  {status.translation}
+                </option>
+              ))}
+            </Select>
+          }
+          label="Estado"
+        />
         <Button size="sm" className="search-button" onClick={handleClick}>
           <MdSearch />
           Buscar
