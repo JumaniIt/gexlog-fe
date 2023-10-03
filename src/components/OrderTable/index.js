@@ -212,7 +212,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                 setFilters({ ...filters, status: e.target.value })
               }
               value={filters?.status}
-              placeholder="Seleccionar"
+              placeholder="-"
             >
               {statuses.map((status) => (
                 <option key={status.value} value={status.value}>

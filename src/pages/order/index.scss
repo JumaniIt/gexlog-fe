@@ -125,4 +125,8 @@
       }
     }
   }
+
+  .chakra-react-select__menu-portal {
+    z-index: 100;
+  }
 }
