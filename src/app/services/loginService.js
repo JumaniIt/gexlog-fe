@@ -12,7 +12,7 @@ export const login = async (email, password) => {
     // const inTwoHours = new Date(new Date().getTime() + 1 * 60 * 1000); // this is a minute
     const inTwoHours = new Date(new Date().getTime() + 2 * 60 * 60 * 1000);
 
-    setCookie("jwtTokenTemp", resJson.token, { expires: inTwoHours });
+    // setCookie("jwtTokenTemp", resJson.token, { expires: inTwoHours });
     setCookie("currentUser", JSON.stringify(resJson.user), {
       expires: inTwoHours,
     });

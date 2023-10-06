@@ -36,7 +36,7 @@ const LoginForm = () => {
     setSubmitting(true);
 
     const loginResponse = await login(email, password);
-    
+
     setSubmitting(false);
 
     if (loginResponse?.message) {
@@ -59,9 +59,9 @@ const LoginForm = () => {
 
   return (
     <div className="login-form-container">
-      <div className="login-logo">
+      {/*       <div className="login-logo">
         <img src={logo} alt="gexlog" />
-      </div>
+      </div> */}
       <form className="login-form" onSubmit={handleSubmit}>
         <FormControl id="email" isRequired mt={10}>
           <FormLabel>E-mail</FormLabel>
@@ -83,7 +83,13 @@ const LoginForm = () => {
             size="md"
           />
         </FormControl>
-        <Button className="button" type="submit" w="100%" mt={8} isLoading={submitting}>
+        <Button
+          className="button"
+          type="submit"
+          w="100%"
+          mt={8}
+          isLoading={submitting}
+        >
           Iniciar sesión
         </Button>
         {errorMessage && (
