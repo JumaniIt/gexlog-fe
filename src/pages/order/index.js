@@ -267,7 +267,7 @@ const Order = ({ showAlert, setBlurLoading }) => {
     await withSession(navigate, async () => {
       const response = await getDocumentLink(order.id, docId);
       if (response._isError) {
-        showAlert(response.code, response.message);
+        showAlert(ERROR, response.code, response.message);
       } else {
         window.open(response.link, "_blank");
       }
@@ -282,7 +282,13 @@ const Order = ({ showAlert, setBlurLoading }) => {
         const promises = [...selectedFiles].map(async (file) => {
           try {
             const document = await addDocument(order.id, file);
-            return document;
+            if (document._isError) {
+              showAlert(ERROR, document.code, document.message);
+              return null;
+            } else {
+              return document;
+            }
+            
           } catch (error) {
             if (error === SESSION_EXPIRED_ERROR) {
               throw error;
