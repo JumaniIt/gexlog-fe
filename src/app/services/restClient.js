@@ -33,9 +33,9 @@ const perform = async (
     }
   });
 
-  // const jwtToken = getCookie("jwtTokenTemp");
+  const jwtToken = getCookie("jwtTokenTemp");
   const headers = new Headers();
-  // headers.append("x-auth-token", "Bearer " + jwtToken);
+  headers.append("x-auth-token", "Bearer " + jwtToken);
   headers.append("x-auth-origin", "gexlog-fe");
   
 
