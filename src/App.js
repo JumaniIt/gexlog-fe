@@ -24,56 +24,68 @@ import { ClientProvider } from "./components/context/clientContext";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Main />,
+    element: <Login />,
     errorElement: <ErrorPage />,
   },
   {
     path: "/login",
     element: <Login />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/orders",
     element: <Requests />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/orders/:id",
     element: <OrderPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/orders/new",
     element: <OrderPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/users",
     element: <UsersPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/users/:id",
     element: <UserPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/users/new",
     element: <UserPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/clients",
     element: <ClientsPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/clients/:id",
     element: <ClientPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/clients/new",
     element: <ClientPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/profile",
     element: <ProfilePage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/profile/:id",
     element: <ProfilePage />,
+    errorElement: <ErrorPage />,
   },
 ]);
 
