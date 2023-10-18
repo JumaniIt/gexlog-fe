@@ -72,6 +72,7 @@ import { Select as FilteredSelect } from "chakra-react-select";
 import { containsLiteralPart } from "../../app/utils/stringUtils";
 import LabeledItem from "../../components/LabeledItem";
 
+
 const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
   <Menu>
     <MenuButton

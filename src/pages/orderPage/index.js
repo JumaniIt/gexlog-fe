@@ -33,7 +33,7 @@ const OrderPage = () => {
   return (
     <Layout
       headingText={`Hola ${currentUser?.nickname}`}
-      className="orders-layout"
+      className="order-layout"
     >
       {alert.status && (
         <Alert status={alert.status} variant="left-accent">
