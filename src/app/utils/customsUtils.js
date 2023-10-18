@@ -14,7 +14,7 @@ const loadOperativeSites = () => {
     // Add leading zeros to the "CUSTOMS" column
     const customsWithZeros = "0".repeat(aggZerosQty) + customs;
 
-    const osStr = `${customsWithZeros}-${os.CODIGO}-${os.LUGAR}`;
+    const osStr = `${os.LUGAR}-${customsWithZeros}-${os.CODIGO}`;
     operativeSitesStr.push(osStr);
   });
 };

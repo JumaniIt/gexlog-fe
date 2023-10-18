@@ -175,11 +175,11 @@ const ContainerModal = ({
             <div className="row">
               <div className="code-input">
                 <Heading as="h6" size="sm">
-                  Código
+                  Contenedor
                 </Heading>
                 <Input
                   size="sm"
-                  placeholder="Código"
+                  placeholder="Contenedor"
                   name="code"
                   value={container?.code}
                   onChange={onInputChange}

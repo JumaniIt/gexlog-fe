@@ -46,6 +46,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   const { orderSearchContext, setOrderSearchContext } = useOrderContext();
 
   const [filters, setFilters] = useState({
+    date_from: new Date().toLocaleDateString("sv"),
     page_size: 10,
     page: 1,
   });
@@ -58,7 +59,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   const [loading, setLoading] = useState(false);
   const [currentSearchFilters, setCurrentSearchFilters] = useState({});
 
-  const handleClick = async () => {
+  const handleSearchClick = async () => {
     setCurrentSearchFilters(filters);
     await search(filters);
   };
@@ -89,17 +90,6 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   useEffect(() => {
     const fetchInitialData = async () => {
       setBlurLoading(true);
-      if (orderSearchContext.results) {
-        const results = orderSearchContext.results;
-        setSearchResults(results.elements);
-        setPaginationResult({
-          totalPages: results.total_pages,
-          page: results.page,
-        });
-
-        setFilters(orderSearchContext.filters);
-      }
-
       await withSession(navigate, async () => {
         const response = await searchClients({ page_size: 100 });
         if (response._isError) {
@@ -117,8 +107,22 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
             }
           }
         }
-        setBlurLoading(false);
       });
+
+      if (orderSearchContext.results) {
+        const results = orderSearchContext.results;
+        setSearchResults(results.elements);
+        setPaginationResult({
+          totalPages: results.total_pages,
+          page: results.page,
+        });
+
+        setFilters(orderSearchContext.filters);
+      } else {
+        await handleSearchClick();
+      }
+
+      setBlurLoading(false);
     };
 
     fetchInitialData();
@@ -223,7 +227,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           }
           label="Estado"
         />
-        <Button size="sm" className="search-button" onClick={handleClick}>
+        <Button size="sm" className="search-button" onClick={handleSearchClick}>
           <MdSearch />
           Buscar
         </Button>
@@ -277,7 +281,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                               trimToMinutes(result.arrival_time)}
                           </Td>
                           <TableCellWithTooltip
-                            text={trimStringWithDot(result?.origin || "",  15)}
+                            text={trimStringWithDot(result?.origin || "", 15)}
                             tooltipText={result.origin}
                           />
                           <TableCellWithTooltip

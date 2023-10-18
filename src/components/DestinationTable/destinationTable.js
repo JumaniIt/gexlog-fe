@@ -39,6 +39,7 @@ const DestinationTable = ({
                 name="type"
                 value={d.type}
                 onChange={(e) => onDestinationChange(e, index)}
+                placeholder="-"
               >
                 {getDestinationTypes().map((dt) => (
                   <option key={dt} value={dt}>

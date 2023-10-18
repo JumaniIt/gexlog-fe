@@ -174,6 +174,14 @@ const Order = ({ showAlert, setBlurLoading }) => {
     updateReadOnly();
   }, [order]);
 
+  useEffect(() => {
+    if (order.free_load) {
+      setOrder({ ...order, containers: [] });
+    } else {
+      setOrder({ ...order, free_loads: [] });
+    }
+  }, [order.free_load]);
+
   const loadClientOptions = async () => {
     await withSession(navigate, async () => {
       if (!clientOptionsLoaded) {
@@ -288,7 +296,6 @@ const Order = ({ showAlert, setBlurLoading }) => {
             } else {
               return document;
             }
-            
           } catch (error) {
             if (error === SESSION_EXPIRED_ERROR) {
               throw error;
@@ -1093,24 +1100,25 @@ const Order = ({ showAlert, setBlurLoading }) => {
                   </TableContainer>
                 ) : (
                   <>
-                    <div className="subtitle">
-                      <LabeledItem
-                        item={
-                          <Input
-                            size="sm"
-                            isDisabled={!currentUser?.admin}
-                            value={pemaCode}
-                            onChange={(e) => setPemaCode(e.target.value)}
-                          />
-                        }
-                        label="PEMA"
-                      />
-                    </div>
+                    {currentUser?.admin && (
+                      <div className="subtitle">
+                        <LabeledItem
+                          item={
+                            <Input
+                              size="sm"
+                              value={pemaCode}
+                              onChange={(e) => setPemaCode(e.target.value)}
+                            />
+                          }
+                          label="PEMA"
+                        />
+                      </div>
+                    )}
                     <TableContainer>
                       <Table size="sm" variant="striped">
                         <Thead>
                           <Tr>
-                            <Th>Código</Th>
+                            <Th>Contenedor</Th>
                             <Th>Tipo</Th>
                             <Th>BL</Th>
                             <Th>Destinación</Th>

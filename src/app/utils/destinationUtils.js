@@ -4,7 +4,8 @@ export const formatDestinations = (destinations) => {
 };
 
 export const toString = (destination) => {
-  let toString = destination.type + " - " + destination.code;
+  const type = destination.type || "(sin tipo)"
+  let toString = type  + " - " + destination.code;
   if (destination.fob) {
     toString += " - " + destination.fob + " - " + destination.currency;
   }
