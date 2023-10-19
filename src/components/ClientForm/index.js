@@ -22,7 +22,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { withSession } from "../../app/utils/sessionUtils";
 import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 
-const ClientForm = ({ showAlert, setBlurLoading }) => {
+const ClientForm = ({ showAlert, setBlurLoading, afterSave }) => {
   const { id } = useParams();
   const [client, setClient] = useState({
     name: "",
@@ -51,7 +51,7 @@ const ClientForm = ({ showAlert, setBlurLoading }) => {
         setError(null);
 
         let response;
-        if (id) {
+        if (id && !afterSave) {
           response = await updateClient(id, client);
         } else {
           response = await saveClient(client);
@@ -60,8 +60,12 @@ const ClientForm = ({ showAlert, setBlurLoading }) => {
         if (response._isError) {
           showAlert(ERROR, response.code, response.message);
         } else {
-          setClient(response);
-          navigate("/clients/" + response.id, { replace: true });
+          if (afterSave) {
+            afterSave(response)
+          } else {
+            setClient(response);
+            navigate("/clients/" + response.id, { replace: true });
+          }
           showAlert(SUCCESS, "Cliente guardado");
         }
       },
@@ -75,7 +79,7 @@ const ClientForm = ({ showAlert, setBlurLoading }) => {
 
       await withSession(navigate, async () => {
         let clientUserId;
-        if (id) {
+        if (id && !afterSave) {
           const client = await getClientById(id);
 
           if (client._isError) {
@@ -116,7 +120,7 @@ const ClientForm = ({ showAlert, setBlurLoading }) => {
 
   return (
     <div className="client-form-container">
-      {(id && (
+      {(id && !afterSave && (
         <Text fontSize="xl" fontWeight="bold">
           {"Editar cliente #" + id}
         </Text>

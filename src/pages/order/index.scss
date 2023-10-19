@@ -80,6 +80,25 @@
     .left-column {
       width: 20vw;
 
+      .first-row {
+        .client {
+          display: flex;
+          align-items: center;
+        }
+
+        .consignee {
+          display: flex;
+          align-items: center;
+        }
+
+        .add-icon {
+          background-color: #38a169;
+          border-radius: 20%;
+          color: white;
+          margin-left: 10px;
+        }
+      }
+
       .second-row {
         margin-top: 10px;
         .title {

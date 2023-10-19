@@ -44,6 +44,7 @@ import {
   search as searchClients,
   getById as getClientById,
   getOneByUserId as getClientByUserId,
+  addConsignee,
 } from "../../app/services/clientService";
 import { getNameAndCuit } from "../../app/utils/clientUtils";
 import {
@@ -71,7 +72,8 @@ import CostModal from "../../components/CostModal/costModal";
 import { Select as FilteredSelect } from "chakra-react-select";
 import { containsLiteralPart } from "../../app/utils/stringUtils";
 import LabeledItem from "../../components/LabeledItem";
-
+import NewClientModal from "../../components/NewClientModal/newClientModal";
+import ConsigneeModal from "../../components/ConsigneeModal/consigneeModal";
 
 const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
   <Menu>
@@ -112,6 +114,8 @@ const Order = ({ showAlert, setBlurLoading }) => {
   const [selectedFreeLoadIndex, setSelectedFreeLoadIndex] = useState(-1);
   const [openNoteModal, setOpenNoteModal] = useState(false);
   const [openCostModal, setOpenCostModal] = useState(false);
+  const [openNewClientModal, setOpenNewClientModal] = useState(false);
+  const [openNewConsigneeModal, setOpenNewConsigneeModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
   const navigate = useNavigate();
@@ -499,6 +503,28 @@ const Order = ({ showAlert, setBlurLoading }) => {
     }
   };
 
+  const onNewClientSave = (client) => {
+    setClientOptions([...clientOptions, client]);
+    setOrder({ ...order, client_id: client.id });
+  };
+
+  const onNewConsigneeSave = async (consignee) => {
+    await withSession(navigate, async () => {
+      const response = await addConsignee(order.client_id, consignee);
+      if (response._isError) {
+        showAlert(ERROR, response.code, response.message);
+      } else {
+        const orderConsignees = {
+          name: response.name,
+          cuit: response.cuit,
+        };
+        setConsigneeOptions([...consigneeOptions, orderConsignees])
+        setOrder({...order, consignee: orderConsignees})
+        showAlert(SUCCESS, "Consignatario guardado");
+      }
+    });
+  };
+
   return (
     <div className="order-container">
       <Card variant="outline" className="order-card">
@@ -652,6 +678,24 @@ const Order = ({ showAlert, setBlurLoading }) => {
           />
         )}
 
+        {openNewClientModal && (
+          <NewClientModal
+            isOpen={openNewClientModal}
+            onClose={() => setOpenNewClientModal(false)}
+            showAlert={showAlert}
+            setBlurLoading={() => {}}
+            afterSave={onNewClientSave}
+          />
+        )}
+
+        {openNewConsigneeModal && (
+          <ConsigneeModal
+            isOpen={openNewConsigneeModal}
+            onClose={() => setOpenNewConsigneeModal(false)}
+            onSave={onNewConsigneeSave}
+          />
+        )}
+
         <Divider className="order-divider" />
         <CardBody>
           <div className="top-row">
@@ -711,60 +755,79 @@ const Order = ({ showAlert, setBlurLoading }) => {
                   Cliente
                 </Heading>
                 <Stack spacing={3}>
-                  <LabeledItem
-                    item={
-                      <Select
-                        className="row-top-element"
-                        size="sm"
-                        name="client_id"
-                        value={order?.client_id}
-                        onFocus={loadClientOptions}
-                        onChange={onInputChange}
-                        isDisabled={readOnly || !currentUser?.admin}
-                        placeholder="-"
-                      >
-                        {clientOptions.map((client) => (
-                          <option key={client.id} value={client.id}>
-                            {getNameAndCuit(client)}
-                          </option>
-                        ))}
-                      </Select>
-                    }
-                    label="Cliente"
-                  />
-
-                  <LabeledItem
-                    item={
-                      <Select
-                        size="sm"
-                        name="consignee"
-                        onChange={(e) =>
-                          setOrder({
-                            ...order,
-                            consignee: JSON.parse(e.target.value),
-                          })
-                        }
-                        value={
-                          order?.consignee
-                            ? JSON.stringify(order.consignee)
-                            : ""
-                        }
-                        isDisabled={readOnly}
-                      >
-                        {consigneeOptions.map((consignee) => {
-                          return (
-                            <option
-                              key={JSON.stringify(consignee)}
-                              value={JSON.stringify(consignee)}
-                            >
-                              {getNameAndCuit(consignee)}
+                  <div className="client">
+                    <LabeledItem
+                      item={
+                        <Select
+                          className="row-top-element"
+                          size="sm"
+                          name="client_id"
+                          value={order?.client_id}
+                          onFocus={loadClientOptions}
+                          onChange={onInputChange}
+                          isDisabled={readOnly || !currentUser?.admin}
+                          placeholder="-"
+                        >
+                          {clientOptions.map((client) => (
+                            <option key={client.id} value={client.id}>
+                              {getNameAndCuit(client)}
                             </option>
-                          );
-                        })}
-                      </Select>
-                    }
-                    label="Factura a"
-                  />
+                          ))}
+                        </Select>
+                      }
+                      label="Cliente"
+                    />
+                    {currentUser?.admin && (
+                      <IconButton
+                        icon={<AddIcon />}
+                        size="xs"
+                        onClick={() => setOpenNewClientModal(true)}
+                        className="add-icon"
+                      />
+                    )}
+                  </div>
+                  <div className="consignee">
+                    <LabeledItem
+                      item={
+                        <Select
+                          size="sm"
+                          name="consignee"
+                          onChange={(e) =>
+                            setOrder({
+                              ...order,
+                              consignee: JSON.parse(e.target.value),
+                            })
+                          }
+                          value={
+                            order?.consignee
+                              ? JSON.stringify(order.consignee)
+                              : ""
+                          }
+                          isDisabled={readOnly}
+                          placeholder="-"
+                        >
+                          {consigneeOptions.map((consignee) => {
+                            return (
+                              <option
+                                key={JSON.stringify(consignee)}
+                                value={JSON.stringify(consignee)}
+                              >
+                                {getNameAndCuit(consignee)}
+                              </option>
+                            );
+                          })}
+                        </Select>
+                      }
+                      label="Factura a"
+                    />
+                    <IconButton
+                      icon={<AddIcon />}
+                      size="xs"
+                      isDisabled={!order?.client_id}
+                      onClick={() => setOpenNewConsigneeModal(true)}
+                      className="add-icon"
+                    />
+                  </div>
                 </Stack>
               </div>
               <div className="second-row">
