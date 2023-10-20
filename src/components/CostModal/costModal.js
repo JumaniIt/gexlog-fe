@@ -137,11 +137,11 @@ const CostModal = ({ isOpen, onClose, orderId, showAlert }) => {
                 </Button>
               </Box>
             )}
-            <Box>
+{/*             <Box>
               <Text as="b">
                 Total: ${costs.reduce((total, cost) => total + cost.amount, 0)}
               </Text>
-            </Box>
+            </Box> */}
           </div>
 
           <SimpleGrid columns={1} spacing={4}>

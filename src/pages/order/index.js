@@ -765,7 +765,7 @@ const Order = ({ showAlert, setBlurLoading }) => {
                                 }
                               : null
                           }
-                          isDisabled={readOnly}
+                          isDisabled={readOnly || !currentUser?.admin}
                           onChange={(e) =>
                             setOrder({ ...order, client_id: e.value })
                           }
@@ -829,7 +829,7 @@ const Order = ({ showAlert, setBlurLoading }) => {
                     <IconButton
                       icon={<AddIcon />}
                       size="xs"
-                      isDisabled={!order?.client_id}
+                      isDisabled={readOnly || !order?.client_id}
                       onClick={() => setOpenNewConsigneeModal(true)}
                       className="add-icon"
                     />

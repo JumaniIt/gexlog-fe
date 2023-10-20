@@ -62,13 +62,16 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   const { orderSearchContext, setOrderSearchContext } = useOrderContext();
 
   const defaultFilters = {
-    date_from: new Date().toLocaleDateString("sv"),
     page_size: 10,
-    page: 1,
-    sorts: "date:asc",
-  }
+    page: 1
+  };
 
-  const [filters, setFilters] = useState(defaultFilters);
+  const [filters, setFilters] = useState({
+    ...defaultFilters,
+    date_from: new Date().toLocaleDateString("sv"),
+    date_to: new Date().toLocaleDateString("sv"),
+    sorts: "date:asc",
+  });
   const [paginationResult, setPaginationResult] = useState();
   const [searchResults, setSearchResults] = useState();
   const [clientOptions, setClientOptions] = useState([]);
@@ -193,7 +196,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   return (
     <div className="filter-table-container">
       <div className="filter-bar-first-row">
-      <LabeledItem
+        <LabeledItem
           item={
             <FilteredSelect
               filterOption={(option, input) =>
@@ -206,24 +209,23 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
               useBasicStyles={true}
               name="client"
               value={
-                filters?.client_id ? {
-                  label: getNameAndCuit(
-                    clientOptions.find(
-                      (c) => c.id === filters.client_id
-                    )
-                  ),
-                  value: filters.client_id,
-                } : null
+                filters?.client_id
+                  ? {
+                      label: getNameAndCuit(
+                        clientOptions.find((c) => c.id === filters.client_id)
+                      ),
+                      value: filters.client_id,
+                    }
+                  : null
               }
-              onChange={(e) =>
-                setFilters({ ...filters, client_id: e.value })
-              }
+              onChange={(e) => setFilters({ ...filters, client_id: e.value })}
               options={clientOptions?.map((client) => ({
-                label: getCuitAndName(client),
+                label: getNameAndCuit(client),
                 value: client.id,
               }))}
               selectedOptionStyle="color"
-              placeholder=""
+              isDisabled={clientSelectionDisabled}
+              placeholder={clientSelectionPlaceHolder || ""}
             />
           }
           label="Cliente"
@@ -244,7 +246,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
             <input
               className="chakra-input css-1xt0hpo"
               type="date"
-              value={filters?.date_from}
+              value={filters?.date_from || ""}
               onChange={(e) =>
                 setFilters({ ...filters, date_from: e.target.value })
               }
@@ -319,14 +321,16 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
               useBasicStyles={true}
               name="target"
               value={
-                filters?.consignee_cuit ? {
-                  label: getCuitAndName(
-                    consigneeOptions.find(
-                      (c) => c.cuit === filters?.consignee_cuit
-                    )
-                  ),
-                  value: filters?.consignee_cuit,
-                } : null
+                filters?.consignee_cuit
+                  ? {
+                      label: getCuitAndName(
+                        consigneeOptions.find(
+                          (c) => c.cuit === filters?.consignee_cuit
+                        )
+                      ),
+                      value: filters?.consignee_cuit,
+                    }
+                  : null
               }
               onChange={(e) =>
                 setFilters({ ...filters, consignee_cuit: e.value })
@@ -424,7 +428,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
               onChange={(e) =>
                 setFilters({ ...filters, sorts: e.target.value })
               }
-              value={filters?.sorts}
+              value={filters?.sorts || ""}
               placeholder={"-"}
             >
               {sortOptions?.map((so) => (
@@ -439,7 +443,11 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
         <Button size="sm" className="search-button" onClick={handleSearchClick}>
           Buscar
         </Button>
-        <Button size="sm" className="clear-button" onClick={() => setFilters(defaultFilters)}>
+        <Button
+          size="sm"
+          className="clear-button"
+          onClick={() => setFilters(defaultFilters)}
+        >
           Limpiar
         </Button>
         <Button
