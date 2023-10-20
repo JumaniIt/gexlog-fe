@@ -46,7 +46,7 @@ import {
   getOneByUserId as getClientByUserId,
   addConsignee,
 } from "../../app/services/clientService";
-import { getNameAndCuit } from "../../app/utils/clientUtils";
+import { getCuitAndName, getNameAndCuit } from "../../app/utils/clientUtils";
 import {
   SESSION_EXPIRED_ERROR,
   withSession,
@@ -54,10 +54,7 @@ import {
 } from "../../app/utils/sessionUtils";
 
 import StatusModal from "../../components/StatusModal/statusModal";
-import {
-  getEnhancedStatus,
-  translateStatus,
-} from "../../app/utils/orderUtils";
+import { getEnhancedStatus, translateStatus } from "../../app/utils/orderUtils";
 import { getHalfHourOptions, trimToMinutes } from "../../app/utils/dateUtils";
 import { getOperativeSites } from "../../app/utils/customsUtils";
 import ContainerModal from "../../components/ContainerModal/containerModal";
@@ -741,23 +738,42 @@ const Order = ({ showAlert, setBlurLoading }) => {
                 <Stack spacing={3}>
                   <div className="client">
                     <LabeledItem
+                      className="row-top-element"
                       item={
-                        <Select
-                          className="row-top-element"
-                          size="sm"
-                          name="client_id"
-                          value={order?.client_id}
+                        <FilteredSelect
+                          filterOption={(option, input) =>
+                            !input || containsLiteralPart(option.label, input)
+                          }
+                          chakraStyles={{
+                            menu: (provided) => ({ ...provided, zIndex: 3 }),
+                          }}
                           onFocus={loadClientOptions}
-                          onChange={onInputChange}
-                          isDisabled={readOnly || !currentUser?.admin}
-                          placeholder="-"
-                        >
-                          {clientOptions.map((client) => (
-                            <option key={client.id} value={client.id}>
-                              {getNameAndCuit(client)}
-                            </option>
-                          ))}
-                        </Select>
+                          size="sm"
+                          useBasicStyles={true}
+                          name="client"
+                          value={
+                            order?.client_id
+                              ? {
+                                  label: getNameAndCuit(
+                                    clientOptions.find(
+                                      (c) => c.id === order.client_id
+                                    )
+                                  ),
+                                  value: order.client_id,
+                                }
+                              : null
+                          }
+                          isDisabled={readOnly}
+                          onChange={(e) =>
+                            setOrder({ ...order, client_id: e.value })
+                          }
+                          options={clientOptions?.map((client) => ({
+                            label: getNameAndCuit(client),
+                            value: client.id,
+                          }))}
+                          selectedOptionStyle="color"
+                          placeholder=""
+                        />
                       }
                       label="Cliente"
                     />
@@ -773,34 +789,38 @@ const Order = ({ showAlert, setBlurLoading }) => {
                   <div className="consignee">
                     <LabeledItem
                       item={
-                        <Select
+                        <FilteredSelect
+                          filterOption={(option, input) =>
+                            !input || containsLiteralPart(option.label, input)
+                          }
+                          chakraStyles={{
+                            menu: (provided) => ({ ...provided, zIndex: 3 }),
+                          }}
                           size="sm"
+                          useBasicStyles={true}
                           name="consignee"
+                          value={
+                            order?.consignee
+                              ? {
+                                  label: getCuitAndName(order.consignee),
+                                  value: JSON.stringify(order.consignee),
+                                }
+                              : null
+                          }
+                          isDisabled={readOnly}
                           onChange={(e) =>
                             setOrder({
                               ...order,
-                              consignee: JSON.parse(e.target.value),
+                              consignee: JSON.parse(e.value),
                             })
                           }
-                          value={
-                            order?.consignee
-                              ? JSON.stringify(order.consignee)
-                              : ""
-                          }
-                          isDisabled={readOnly}
-                          placeholder="-"
-                        >
-                          {consigneeOptions.map((consignee) => {
-                            return (
-                              <option
-                                key={JSON.stringify(consignee)}
-                                value={JSON.stringify(consignee)}
-                              >
-                                {getNameAndCuit(consignee)}
-                              </option>
-                            );
-                          })}
-                        </Select>
+                          options={consigneeOptions?.map((consignee) => ({
+                            label: getCuitAndName(consignee),
+                            value: JSON.stringify(consignee),
+                          }))}
+                          selectedOptionStyle="color"
+                          placeholder=""
+                        />
                       }
                       label="Factura a"
                     />
