@@ -14,6 +14,7 @@ import {
   ModalContent,
   ModalCloseButton,
   ModalBody,
+  Badge,
 } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { Checkbox } from "@chakra-ui/react";
@@ -30,7 +31,7 @@ import {
 import { search as searchClients } from "../../app/services/clientService";
 import { getNameAndCuit } from "../../app/utils/clientUtils";
 import { trimToMinutes } from "../../app/utils/dateUtils";
-import { translateStatus } from "../../app/utils/orderUtils";
+import { getEnhancedStatus, translateStatus } from "../../app/utils/orderUtils";
 import PaginationFooter from "../Pagination/paginationFooter";
 import { withSession, getCurrentUser } from "../../app/utils/sessionUtils";
 import { ERROR } from "../../app/utils/alertUtils";
@@ -305,10 +306,10 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                   <Th>Origen</Th>
                   <Th>Destino</Th>
                   <Th>CTR</Th>
-                  <Th>C.Suelta</Th>
+                  <Th>C.S</Th>
                   <Th>Dev</Th>
                   <Th>FC</Th>
-                  <Th>Estado</Th>
+                  <Th>Est</Th>
                   <Th>Ver</Th>
                 </Tr>
               </Thead>
@@ -316,6 +317,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                 <Tbody>
                   {searchResults?.length > 0 &&
                     searchResults.map((result) => {
+                      const enhancedStatus = getEnhancedStatus(result.status);
                       return (
                         <Tr className="table-row">
                           <Td>{result.id}</Td>
@@ -382,7 +384,14 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                               />
                             )}
                           </Td>
-                          <Td>{translateStatus(result.status)}</Td>
+                          <Td>
+                            {
+                              <Badge colorScheme={enhancedStatus.colorScheme}>
+                                {enhancedStatus.min}
+                              </Badge>
+                            }
+                          </Td>
+
                           <Td>
                             <Link to={`/orders/${result.id}`}>
                               <MdOutlineOpenInNew />

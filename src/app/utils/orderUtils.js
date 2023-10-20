@@ -1,7 +1,11 @@
 import { statuses } from "../services/orderService";
 
 export const translateStatus = (status) => {
-  return statuses.find((s) => s.value === status).translation;
+  return getEnhancedStatus(status).translation;
+};
+
+export const getEnhancedStatus = (status) => {
+  return statuses.find((s) => s.value === status);
 };
 
 export const DRAFT = "DRAFT";

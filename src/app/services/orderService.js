@@ -77,21 +77,31 @@ export const statuses = [
   {
     value: "DRAFT",
     translation: "BORRADOR",
+    min: "BOR",
+    colorScheme: "gray"
   },
   {
     value: "REVISION",
     translation: "ENVIADO",
+    min: "REV",
+    colorScheme: "orange"
   },
   {
     value: "PROCESSING",
     translation: "CONFIRMADO",
+    min: "CNF",
+    colorScheme: "blue"
   },
   {
     value: "FINISHED",
     translation: "FINALIZADO",
+    min: "FIN",
+    colorScheme: "green"
   },
   {
     value: "CANCELLED",
     translation: "CANCELADO",
+    min: "CAN",
+    colorScheme: "red"
   },
 ];

@@ -60,6 +60,7 @@ import {
   FINISHED,
   PROCESSING,
   REVISION,
+  getEnhancedStatus,
   translateStatus,
 } from "../../app/utils/orderUtils";
 import { getHalfHourOptions, trimToMinutes } from "../../app/utils/dateUtils";
@@ -484,25 +485,6 @@ const Order = ({ showAlert, setBlurLoading }) => {
     setOrder({ ...order, free_loads: updatedFreeLoads });
   };
 
-  const resolveStatusColorScheme = () => {
-    const status = order?.status || DRAFT;
-
-    switch (status) {
-      case DRAFT:
-        return "gray";
-      case REVISION:
-        return "orange";
-      case PROCESSING:
-        return "blue";
-      case FINISHED:
-        return "green";
-      case CANCELLED:
-        return "red";
-      default:
-        return "gray";
-    }
-  };
-
   const onNewClientSave = (client) => {
     setClientOptions([...clientOptions, client]);
     setOrder({ ...order, client_id: client.id });
@@ -518,8 +500,8 @@ const Order = ({ showAlert, setBlurLoading }) => {
           name: response.name,
           cuit: response.cuit,
         };
-        setConsigneeOptions([...consigneeOptions, orderConsignees])
-        setOrder({...order, consignee: orderConsignees})
+        setConsigneeOptions([...consigneeOptions, orderConsignees]);
+        setOrder({ ...order, consignee: orderConsignees });
         showAlert(SUCCESS, "Consignatario guardado");
       }
     });
@@ -544,7 +526,14 @@ const Order = ({ showAlert, setBlurLoading }) => {
             />
           </div>
           <div>
-            <Badge colorScheme={resolveStatusColorScheme()} variant="subtle">
+            <Badge
+              colorScheme={
+                order?.status
+                  ? getEnhancedStatus(order.status).colorScheme
+                  : "grey"
+              }
+              variant="subtle"
+            >
               {order?.status ? translateStatus(order.status) : "BORRADOR"}
             </Badge>
             {currentUser?.admin && (
