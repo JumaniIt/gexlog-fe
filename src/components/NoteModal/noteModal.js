@@ -25,12 +25,12 @@ import { ADMIN, CLIENT } from "../../app/utils/noteUtils";
 import EditableNote from "../Note/editableNote";
 import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 
-const NoteModal = ({ isOpen, onClose, orderId, showAlert }) => {
+const NoteModal = ({ isOpen, onClose, orderId, showAlert, onNoteSaved }) => {
   const [loading, setLoading] = useState(false);
   const [notes, setNotes] = useState([]);
   const [editedNoteId, setEditedNoteId] = useState(null);
   const [showSystemNotes, setShowSystemNotes] = useState(false);
-  const [isAddingNote, setIsAddingNote] = useState(false);
+  const [isAddingNote, setIsAddingNote] = useState(true);
 
   const navigate = useNavigate();
   const currentUser = getCurrentUser(navigate);
@@ -53,7 +53,7 @@ const NoteModal = ({ isOpen, onClose, orderId, showAlert }) => {
       setLoading(false);
     };
 
-    fetchInitialData();
+    // fetchInitialData();
   }, []);
 
   const handleDelete = async (noteId) => {
@@ -70,6 +70,7 @@ const NoteModal = ({ isOpen, onClose, orderId, showAlert }) => {
           setNotes((prevNotes) =>
             prevNotes.filter((note) => note.id !== noteId)
           );
+
           showAlert(SUCCESS, "Nota eliminada");
         }
       });
@@ -81,6 +82,7 @@ const NoteModal = ({ isOpen, onClose, orderId, showAlert }) => {
   };
 
   const handleCancelEdit = () => {
+    onClose();
     setEditedNoteId(null);
     setIsAddingNote(false); // Cancel adding a new note
   };
@@ -96,6 +98,7 @@ const NoteModal = ({ isOpen, onClose, orderId, showAlert }) => {
             note.id === updatedNote.id ? updatedNote : note
           )
         );
+
         showAlert(SUCCESS, "Nota guardada");
       }
     });
@@ -117,6 +120,8 @@ const NoteModal = ({ isOpen, onClose, orderId, showAlert }) => {
 
         setNotes(updatedNotes);
         showAlert(SUCCESS, "Nota guardada");
+        onNoteSaved(savedNote);
+        onClose();
       }
     });
 
@@ -127,8 +132,7 @@ const NoteModal = ({ isOpen, onClose, orderId, showAlert }) => {
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
       <ModalContent className="note-modal-content">
-        <ModalHeader>Notas</ModalHeader>
-        <ModalCloseButton />
+        {/*<ModalHeader>Notas</ModalHeader>*/}
         <ModalBody>
           <div className="options-row">
             <Box>
@@ -138,14 +142,14 @@ const NoteModal = ({ isOpen, onClose, orderId, showAlert }) => {
                 </Button>
               )}
             </Box>
-            {currentUser?.admin && (
+{/*             {currentUser?.admin && (
               <Checkbox
                 isChecked={showSystemNotes}
                 onChange={() => setShowSystemNotes((prev) => !prev)}
               >
                 Mostrar notas de sistema
               </Checkbox>
-            )}
+            )} */}
           </div>
           <SimpleGrid columns={1} spacing={4}>
             {isAddingNote && (
@@ -155,43 +159,50 @@ const NoteModal = ({ isOpen, onClose, orderId, showAlert }) => {
               />
             )}
 
-            {notes
-              .filter((note) => showSystemNotes || note.author !== "SYSTEM")
-              .map((note) => (
-                <Box key={note.id}>
-                  {editedNoteId === note.id ? (
-                    <EditableNote
-                      initialValue={note}
-                      onCancel={handleCancelEdit}
-                      onSave={handleSaveEdit}
-                    />
-                  ) : (
-                    <Note
-                      id={note.id}
-                      author={note.author}
-                      date={note.created_at}
-                      content={note.content}
-                      onDelete={() => handleDelete(note.id)}
-                      onEdit={handleEdit}
-                      editable={
-                        note.author === CLIENT ||
-                        (note.author === ADMIN && currentUser?.admin)
-                      }
-                    />
-                  )}
-                </Box>
-              ))}
+            {
+              //notes
+              []
+                .filter((note) => showSystemNotes || note.author !== "SYSTEM")
+                .map((note) => (
+                  <Box key={note.id}>
+                    {editedNoteId === note.id ? (
+                      <EditableNote
+                        initialValue={note}
+                        onCancel={handleCancelEdit}
+                        onSave={handleSaveEdit}
+                      />
+                    ) : (
+                      <Note
+                        id={note.id}
+                        author={note.author}
+                        date={note.created_at}
+                        content={note.content}
+                        onDelete={() => handleDelete(note.id)}
+                        onEdit={handleEdit}
+                        s
+                        editable={
+                          note.author === CLIENT ||
+                          (note.author === ADMIN && currentUser?.admin)
+                        }
+                      />
+                    )}
+                  </Box>
+                ))
+            }
           </SimpleGrid>
-          {loading && (
-            <div className="spinner">
-              <Spinner
-                className="spinner"
-                size="lg"
-                color="blue.500"
-                thickness="2px"
-              />
-            </div>
-          )}
+          {
+            // loading
+            false && (
+              <div className="spinner">
+                <Spinner
+                  className="spinner"
+                  size="lg"
+                  color="blue.500"
+                  thickness="2px"
+                />
+              </div>
+            )
+          }
         </ModalBody>
       </ModalContent>
     </Modal>

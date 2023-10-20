@@ -67,6 +67,7 @@ import { containsLiteralPart } from "../../app/utils/stringUtils";
 import LabeledItem from "../../components/LabeledItem";
 import NewClientModal from "../../components/NewClientModal/newClientModal";
 import ConsigneeModal from "../../components/ConsigneeModal/consigneeModal";
+import NotePreview from "../../components/NotePreview";
 
 const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
   <Menu>
@@ -501,6 +502,13 @@ const Order = ({ showAlert, setBlurLoading }) => {
     });
   };
 
+  const onNoteSaved = (note) => {
+    const updatedNotes = order.notes ? order.notes : [];
+    updatedNotes.push(note);
+
+    setOrder({ ...order, notes: updatedNotes });
+  };
+
   return (
     <div className="order-container">
       <Card variant="outline" className="order-card">
@@ -574,9 +582,6 @@ const Order = ({ showAlert, setBlurLoading }) => {
                   Enviar
                 </MenuItem>
               )}
-              <MenuItem onClick={openNotes} isDisabled={!id}>
-                Notas
-              </MenuItem>
               <MenuItem onClick={openCosts} isDisabled={!id}>
                 Costos
               </MenuItem>
@@ -649,6 +654,7 @@ const Order = ({ showAlert, setBlurLoading }) => {
             onClose={() => setOpenNoteModal(false)}
             orderId={order?.id}
             showAlert={showAlert}
+            onNoteSaved={onNoteSaved}
           />
         )}
 
@@ -887,6 +893,21 @@ const Order = ({ showAlert, setBlurLoading }) => {
                     </div>
                   ))}
                 </Stack>
+              </div>
+              <div className="third-row">
+                <div className="title">
+                  <Heading as="h6" size="sm" className="row-heading">
+                    Notas
+                  </Heading>
+                  <IconButton
+                    icon={<AddIcon />}
+                    size="xs"
+                    onClick={() => setOpenNoteModal(true)}
+                    className="add-note-icon"
+                    isDisabled={!order?.id}
+                  />
+                </div>
+                <NotePreview notes={order?.notes || []} />
               </div>
             </div>
             <div className="right-column">
