@@ -46,7 +46,6 @@ import ContainerTable from "../ContainerTable";
 import FreeLoadTable from "../FreeLoadTable";
 import { Select as FilteredSelect } from "chakra-react-select";
 import { getOperativeSites } from "../../app/utils/customsUtils";
-import { MultiSelect } from "chakra-multiselect";
 
 const TableCellWithTooltip = ({ text, tooltipText }) => {
   return (
