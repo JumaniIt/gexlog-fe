@@ -310,7 +310,9 @@ const Order = ({ showAlert, setBlurLoading }) => {
           ...order,
           documents: [...order.documents, ...successfulFiles],
         });
-        showAlert(SUCCESS, "Documentos guardados");
+        if (processedFiles.length === successfulFiles.length) {
+          showAlert(SUCCESS, "Documentos guardados");
+        }
       },
       () => setLoadingFiles(false)
     );
