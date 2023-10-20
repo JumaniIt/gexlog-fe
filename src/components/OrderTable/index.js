@@ -15,6 +15,7 @@ import {
   ModalCloseButton,
   ModalBody,
   Badge,
+  filter,
 } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { Checkbox } from "@chakra-ui/react";
@@ -29,17 +30,23 @@ import {
   getById,
 } from "../../app/services/orderService";
 import { search as searchClients } from "../../app/services/clientService";
-import { getNameAndCuit } from "../../app/utils/clientUtils";
+import { getCuitAndName, getNameAndCuit } from "../../app/utils/clientUtils";
 import { trimToMinutes } from "../../app/utils/dateUtils";
 import { getEnhancedStatus, translateStatus } from "../../app/utils/orderUtils";
 import PaginationFooter from "../Pagination/paginationFooter";
 import { withSession, getCurrentUser } from "../../app/utils/sessionUtils";
 import { ERROR } from "../../app/utils/alertUtils";
-import { trimStringWithDot } from "../../app/utils/stringUtils";
+import {
+  containsLiteralPart,
+  trimStringWithDot,
+} from "../../app/utils/stringUtils";
 import { OrderProvider, useOrderContext } from "../context/orderContext";
 import LabeledItem from "../LabeledItem";
 import ContainerTable from "../ContainerTable";
 import FreeLoadTable from "../FreeLoadTable";
+import { Select as FilteredSelect } from "chakra-react-select";
+import { getOperativeSites } from "../../app/utils/customsUtils";
+import { MultiSelect } from "chakra-multiselect";
 
 const TableCellWithTooltip = ({ text, tooltipText }) => {
   return (
@@ -54,14 +61,18 @@ const TableCellWithTooltip = ({ text, tooltipText }) => {
 const OrderTable = ({ showAlert, setBlurLoading }) => {
   const { orderSearchContext, setOrderSearchContext } = useOrderContext();
 
-  const [filters, setFilters] = useState({
+  const defaultFilters = {
     date_from: new Date().toLocaleDateString("sv"),
     page_size: 10,
     page: 1,
-  });
+    sorts: "date:asc",
+  }
+
+  const [filters, setFilters] = useState(defaultFilters);
   const [paginationResult, setPaginationResult] = useState();
   const [searchResults, setSearchResults] = useState();
   const [clientOptions, setClientOptions] = useState([]);
+  const [consigneeOptions, setConsigneeOptions] = useState([]);
   const [clientSelectionDisabled, setClientSelectionDisabled] = useState(false);
   const [clientSelectionPlaceHolder, setClientSelectionPlaceHolder] =
     useState();
@@ -69,6 +80,24 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   const [currentSearchFilters, setCurrentSearchFilters] = useState({});
   const [selectedContainers, setSelectedContainers] = useState();
   const [selectedFreeLoads, setSelectedFreeLoads] = useState();
+  const sortOptions = [
+    {
+      value: "date:asc",
+      label: "fecha-asc",
+    },
+    {
+      value: "date:desc",
+      label: "fecha-desc",
+    },
+    {
+      value: "load_code:asc",
+      label: "ctr/patente-asc",
+    },
+    {
+      value: "load_code:desc",
+      label: "ctr/patente-desc",
+    },
+  ];
 
   const handleSearchClick = async () => {
     setCurrentSearchFilters(filters);
@@ -102,12 +131,18 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
     const fetchInitialData = async () => {
       setBlurLoading(true);
       await withSession(navigate, async () => {
-        const response = await searchClients({ page_size: 100 });
+        const response = await searchClients({
+          page_size: 100,
+          with_consignees: true,
+        });
         if (response._isError) {
           showAlert(ERROR, response.code, response.message);
         } else {
           const clients = response.elements;
           setClientOptions(clients);
+          const consignees = [];
+          clients.forEach((client) => consignees.push(...client.consignees));
+          setConsigneeOptions(consignees);
           const currentUser = getCurrentUser(navigate);
           if (!currentUser?.admin) {
             setClientSelectionDisabled(true);
@@ -140,6 +175,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   }, []);
 
   const openModal = async (type, orderId) => {
+    console.log(consigneeOptions);
     await withSession(navigate, async () => {
       const response = await getById(orderId);
       if (response._isError) {
@@ -156,24 +192,39 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
 
   return (
     <div className="filter-table-container">
-      <div className="filter-bar">
-        <LabeledItem
+      <div className="filter-bar-first-row">
+      <LabeledItem
           item={
-            <Select
-              size="sm"
-              isDisabled={clientSelectionDisabled}
-              onChange={(e) =>
-                setFilters({ ...filters, client_id: e.target.value })
+            <FilteredSelect
+              filterOption={(option, input) =>
+                !input || containsLiteralPart(option.label, input)
               }
-              value={filters?.client_id}
-              placeholder={clientSelectionPlaceHolder || "-"}
-            >
-              {clientOptions?.map((client) => (
-                <option key={client.id} value={client.id}>
-                  {getNameAndCuit(client)}
-                </option>
-              ))}
-            </Select>
+              chakraStyles={{
+                menu: (provided) => ({ ...provided, zIndex: 3 }),
+              }}
+              size="sm"
+              useBasicStyles={true}
+              name="client"
+              value={
+                filters?.client_id ? {
+                  label: getNameAndCuit(
+                    clientOptions.find(
+                      (c) => c.id === filters.client_id
+                    )
+                  ),
+                  value: filters.client_id,
+                } : null
+              }
+              onChange={(e) =>
+                setFilters({ ...filters, client_id: e.value })
+              }
+              options={clientOptions?.map((client) => ({
+                label: getCuitAndName(client),
+                value: client.id,
+              }))}
+              selectedOptionStyle="color"
+              placeholder=""
+            />
           }
           label="Cliente"
         />
@@ -206,7 +257,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
             <input
               className="chakra-input css-1xt0hpo"
               type="date"
-              value={filters?.date_to}
+              value={filters?.date_to || ""}
               onChange={(e) =>
                 setFilters({ ...filters, date_to: e.target.value })
               }
@@ -216,13 +267,13 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
         />
         <Checkbox
           onChange={(e) => setFilters({ ...filters, pema: e.target.checked })}
-          isChecked={filters?.pema}
+          isChecked={filters?.pema || false}
         >
           PEMA
         </Checkbox>
         <Checkbox
           onChange={(e) => setFilters({ ...filters, port: e.target.checked })}
-          isChecked={filters?.port}
+          isChecked={filters?.port || false}
         >
           G. PTO
         </Checkbox>
@@ -230,7 +281,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           onChange={(e) =>
             setFilters({ ...filters, transport: e.target.checked })
           }
-          isChecked={filters?.transport}
+          isChecked={filters?.transport || false}
         >
           TTE
         </Checkbox>
@@ -241,7 +292,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
               onChange={(e) =>
                 setFilters({ ...filters, status: e.target.value })
               }
-              value={filters?.status}
+              value={filters.status ? filter.status : ""}
               placeholder="-"
             >
               {statuses.map((status) => (
@@ -253,16 +304,149 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           }
           label="Estado"
         />
+      </div>
+      <div className="filter-bar-second-row">
+        <LabeledItem
+          item={
+            <FilteredSelect
+              filterOption={(option, input) =>
+                !input || containsLiteralPart(option.label, input)
+              }
+              chakraStyles={{
+                menu: (provided) => ({ ...provided, zIndex: 3 }),
+              }}
+              size="sm"
+              useBasicStyles={true}
+              name="target"
+              value={
+                filters?.consignee_cuit ? {
+                  label: getCuitAndName(
+                    consigneeOptions.find(
+                      (c) => c.cuit === filters?.consignee_cuit
+                    )
+                  ),
+                  value: filters?.consignee_cuit,
+                } : null
+              }
+              onChange={(e) =>
+                setFilters({ ...filters, consignee_cuit: e.value })
+              }
+              options={consigneeOptions?.map((consignee) => ({
+                label: getCuitAndName(consignee),
+                value: consignee.cuit,
+              }))}
+              selectedOptionStyle="color"
+              placeholder=""
+            />
+          }
+          label="Factura a"
+        />
+        <LabeledItem
+          item={
+            <FilteredSelect
+              filterOption={(option, input) =>
+                !input || containsLiteralPart(option.label, input)
+              }
+              chakraStyles={{
+                menu: (provided) => ({ ...provided, zIndex: 3 }),
+              }}
+              size="sm"
+              useBasicStyles={true}
+              name="origin"
+              value={{
+                label: filters?.origin,
+                value: filters?.origin,
+              }}
+              onChange={(e) => setFilters({ ...filters, origin: e.value })}
+              options={getOperativeSites().map((os) => ({
+                label: os,
+                value: os,
+              }))}
+              selectedOptionStyle="color"
+            />
+          }
+          label="Origen"
+        />
+        <LabeledItem
+          item={
+            <FilteredSelect
+              filterOption={(option, input) =>
+                !input || containsLiteralPart(option.label, input)
+              }
+              chakraStyles={{
+                menu: (provided) => ({ ...provided, zIndex: 3 }),
+              }}
+              size="sm"
+              useBasicStyles={true}
+              name="target"
+              value={{
+                label: filters?.target,
+                value: filters?.target,
+              }}
+              onChange={(e) => setFilters({ ...filters, target: e.value })}
+              options={getOperativeSites().map((os) => ({
+                label: os,
+                value: os,
+              }))}
+              selectedOptionStyle="color"
+            />
+          }
+          label="Destino"
+        />
+        <LabeledItem
+          item={
+            <Input
+              size="sm"
+              value={filters.load_code ? filters.load_code : ""}
+              onChange={(e) =>
+                setFilters({ ...filters, load_code: e.target.value })
+              }
+            />
+          }
+          label="Ctr/Patente"
+        />
+        <LabeledItem
+          item={
+            <Input
+              size="sm"
+              value={filters.destination_code ? filters.destination_code : ""}
+              onChange={(e) =>
+                setFilters({ ...filters, destination_code: e.target.value })
+              }
+            />
+          }
+          label="Destinación"
+        />
+        <LabeledItem
+          item={
+            <Select
+              size="sm"
+              onChange={(e) =>
+                setFilters({ ...filters, sorts: e.target.value })
+              }
+              value={filters?.sorts}
+              placeholder={"-"}
+            >
+              {sortOptions?.map((so) => (
+                <option key={so.value} value={so.value}>
+                  {so.label}
+                </option>
+              ))}
+            </Select>
+          }
+          label="Ordenar por"
+        />
         <Button size="sm" className="search-button" onClick={handleSearchClick}>
-          <MdSearch />
           Buscar
+        </Button>
+        <Button size="sm" className="clear-button" onClick={() => setFilters(defaultFilters)}>
+          Limpiar
         </Button>
         <Button
           size="sm"
-          colorScheme="green"
+          className="create-button"
           onClick={() => navigate(`/orders/new`, { replace: true })}
         >
-          <MdCreate />
           Crear
         </Button>
       </div>

@@ -55,11 +55,6 @@ import {
 
 import StatusModal from "../../components/StatusModal/statusModal";
 import {
-  CANCELLED,
-  DRAFT,
-  FINISHED,
-  PROCESSING,
-  REVISION,
   getEnhancedStatus,
   translateStatus,
 } from "../../app/utils/orderUtils";
