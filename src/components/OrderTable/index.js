@@ -9,6 +9,11 @@ import {
   TableContainer,
   Text,
   Tooltip,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalCloseButton,
+  ModalBody,
 } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { Checkbox } from "@chakra-ui/react";
@@ -20,6 +25,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   search as searchOrders,
   statuses,
+  getById,
 } from "../../app/services/orderService";
 import { search as searchClients } from "../../app/services/clientService";
 import { getNameAndCuit } from "../../app/utils/clientUtils";
@@ -31,6 +37,8 @@ import { ERROR } from "../../app/utils/alertUtils";
 import { trimStringWithDot } from "../../app/utils/stringUtils";
 import { OrderProvider, useOrderContext } from "../context/orderContext";
 import LabeledItem from "../LabeledItem";
+import ContainerTable from "../ContainerTable";
+import FreeLoadTable from "../FreeLoadTable";
 
 const TableCellWithTooltip = ({ text, tooltipText }) => {
   return (
@@ -58,6 +66,8 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
     useState();
   const [loading, setLoading] = useState(false);
   const [currentSearchFilters, setCurrentSearchFilters] = useState({});
+  const [selectedContainers, setSelectedContainers] = useState();
+  const [selectedFreeLoads, setSelectedFreeLoads] = useState();
 
   const handleSearchClick = async () => {
     setCurrentSearchFilters(filters);
@@ -128,6 +138,21 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
     fetchInitialData();
   }, []);
 
+  const openModal = async (type, orderId) => {
+    await withSession(navigate, async () => {
+      const response = await getById(orderId);
+      if (response._isError) {
+        showAlert(ERROR, response.code, response.message);
+      } else {
+        if (type === "containers") {
+          setSelectedContainers(response.containers);
+        } else {
+          setSelectedFreeLoads(response.free_loads);
+        }
+      }
+    });
+  };
+
   return (
     <div className="filter-table-container">
       <div className="filter-bar">
@@ -140,7 +165,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                 setFilters({ ...filters, client_id: e.target.value })
               }
               value={filters?.client_id}
-              placeholder="-"
+              placeholder={clientSelectionPlaceHolder || "-"}
             >
               {clientOptions?.map((client) => (
                 <option key={client.id} value={client.id}>
@@ -240,6 +265,33 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           Crear
         </Button>
       </div>
+
+      <Modal
+        isOpen={selectedContainers}
+        onClose={() => setSelectedContainers(null)}
+      >
+        <ModalOverlay />
+        <ModalContent className="order-table-modal">
+          <ModalCloseButton />
+          <ModalBody>
+            <ContainerTable containers={selectedContainers} />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        isOpen={selectedFreeLoads}
+        onClose={() => setSelectedFreeLoads(null)}
+      >
+        <ModalOverlay />
+        <ModalContent className="order-table-modal">
+          <ModalCloseButton />
+          <ModalBody>
+            <FreeLoadTable freeLoads={selectedFreeLoads} />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
       <div>
         <div className="results-table">
           <TableContainer>
@@ -288,8 +340,22 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                             text={trimStringWithDot(result?.target || "", 15)}
                             tooltipText={result.target}
                           />
-                          <Td>{result.container_qty}</Td>
-                          <Td>{result.free_load_qty}</Td>
+                          <Td
+                            className={
+                              result.container_qty > 0 ? "button-td" : ""
+                            }
+                            onClick={() => openModal("containers", result.id)}
+                          >
+                            {result.container_qty}
+                          </Td>
+                          <Td
+                            className={
+                              result.free_load_qty > 0 ? "button-td" : ""
+                            }
+                            onClick={() => openModal("free_loads", result.id)}
+                          >
+                            {result.free_load_qty}
+                          </Td>
                           <Td>
                             {result.returned ? (
                               <CheckIcon
@@ -351,7 +417,6 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           />
         )}
       </div>
-      {/* )} */}
     </div>
   );
 };

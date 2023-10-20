@@ -80,11 +80,11 @@ export const statuses = [
   },
   {
     value: "REVISION",
-    translation: "REVISION",
+    translation: "ENVIADO",
   },
   {
     value: "PROCESSING",
-    translation: "PROCESANDO",
+    translation: "CONFIRMADO",
   },
   {
     value: "FINISHED",
