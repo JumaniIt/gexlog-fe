@@ -1226,11 +1226,20 @@ const Order = ({ showAlert, setBlurLoading }) => {
                       <div className="subtitle">
                         <LabeledItem
                           item={
-                            <Input
+                            <Select
                               size="sm"
                               value={pemaCode}
                               onChange={(e) => setPemaCode(e.target.value)}
-                            />
+                              placeholder="-"
+                            >
+                              {["SAETECH", "CONTROLCARGO", "SISTELCOM"].map(
+                                (p) => (
+                                  <option key={p} value={p}>
+                                    {p}
+                                  </option>
+                                )
+                              )}
+                            </Select>
                           }
                           label="PEMA"
                         />
