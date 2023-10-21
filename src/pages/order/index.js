@@ -106,6 +106,7 @@ const Order = ({ showAlert, setBlurLoading }) => {
   const [selectedContainerIndex, setSelectedContainerIndex] = useState(-1);
   const [openFreeLoadModal, setOpenFreeLoadModal] = useState(false);
   const [selectedFreeLoadIndex, setSelectedFreeLoadIndex] = useState(-1);
+  const [showSystemNotes, setShowSystemNotes] = useState(false);
   const [openNoteModal, setOpenNoteModal] = useState(false);
   const [openCostModal, setOpenCostModal] = useState(false);
   const [openNewClientModal, setOpenNewClientModal] = useState(false);
@@ -896,18 +897,32 @@ const Order = ({ showAlert, setBlurLoading }) => {
               </div>
               <div className="third-row">
                 <div className="title">
-                  <Heading as="h6" size="sm" className="row-heading">
-                    Notas
-                  </Heading>
-                  <IconButton
-                    icon={<AddIcon />}
-                    size="xs"
-                    onClick={() => setOpenNoteModal(true)}
-                    className="add-note-icon"
-                    isDisabled={!order?.id}
-                  />
+                  <div className="left-part">
+                    <Heading as="h6" size="sm" className="row-heading">
+                      Notas
+                    </Heading>
+                    <IconButton
+                      icon={<AddIcon />}
+                      size="xs"
+                      onClick={() => setOpenNoteModal(true)}
+                      className="add-note-icon"
+                      isDisabled={!order?.id}
+                    />
+                  </div>
+                  {currentUser?.admin && (
+                    <Checkbox
+                      isChecked={showSystemNotes}
+                      isDisabled={!order?.id}
+                      onChange={() => setShowSystemNotes((prev) => !prev)}
+                    >
+                      Sistema
+                    </Checkbox>
+                  )}
                 </div>
-                <NotePreview notes={order?.notes || []} />
+                <NotePreview
+                  notes={order?.notes || []}
+                  showSystemNotes={showSystemNotes}
+                />
               </div>
             </div>
             <div className="right-column">

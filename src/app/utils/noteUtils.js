@@ -12,7 +12,7 @@ const AUTHORS = [
   },
   {
     value: ADMIN,
-    translation: "Administrador",
+    translation: "Admin",
   },
   {
     value: CLIENT,

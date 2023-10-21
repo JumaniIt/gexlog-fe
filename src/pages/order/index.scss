@@ -119,6 +119,12 @@
         .title {
           display: flex;
           align-items: center;
+          justify-content: space-between;
+
+          .left-part {
+            display: flex;
+            align-items: center;
+          }
         }
 
         .add-note-icon {

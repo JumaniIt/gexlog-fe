@@ -1,8 +1,9 @@
 import React, { useRef, useEffect } from "react";
 import { Box, SimpleGrid } from "@chakra-ui/react";
 import { toLocalDateString } from "../../app/utils/dateUtils";
+import { translateAuthor } from "../../app/utils/noteUtils";
 
-const NotePreview = ({ notes }) => {
+const NotePreview = ({ notes, showSystemNotes }) => {
   const containerRef = useRef(null);
 
   // Scroll to the end when the component mounts or when the notes change
@@ -10,10 +11,10 @@ const NotePreview = ({ notes }) => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
-  }, [notes]);
+  }, [notes, showSystemNotes]);
 
   return (
-    <div style={{ maxHeight: "200px", overflowY: "scroll" }} ref={containerRef}>
+    <div style={{ maxHeight: "400px", overflowY: "scroll" }} ref={containerRef}>
       <SimpleGrid columns={1} spacing={4}>
         <Box
           className="note-box"
@@ -23,31 +24,34 @@ const NotePreview = ({ notes }) => {
           overflow="hidden"
         >
           {notes
-            .filter((note) => note.author !== "SYSTEM")
+            .filter((note) => showSystemNotes || note.author !== "SYSTEM")
             .map((note) => {
               const date = new Date(note.created_at);
-              const title = `${note.author === "ADMIN" ? "Admin" : "Cliente"} - ${toLocalDateString(date)}`
+              const title = `${translateAuthor(
+                note.author
+              )} - ${toLocalDateString(date)}`;
               return (
-              <Box
-                className={
-                  note.author === "ADMIN" ? "admin-note-box" : "user-note-box"
-                }
-                maxW="sm"
-                borderWidth="0px"
-                overflow="hidden"
-              >
-                <div className="box-content">
-                  <Box
-                    color="gray.500"
-                    fontWeight="semibold"
-                    mt="2"
-                  >
-                    {title}
-                  </Box>
-                  <Box>{note.content}</Box>
-                </div>
-              </Box>
-            )})}
+                <Box
+                  className={
+                    note.author === "ADMIN"
+                      ? "admin-note-box"
+                      : note.author === "SYSTEM"
+                      ? "system-note-box"
+                      : "user-note-box"
+                  }
+                  maxW="sm"
+                  borderWidth="0px"
+                  overflow="hidden"
+                >
+                  <div className="box-content">
+                    <Box color="gray.500" fontWeight="semibold" mt="2">
+                      {title}
+                    </Box>
+                    <Box>{note.content}</Box>
+                  </div>
+                </Box>
+              );
+            })}
         </Box>
       </SimpleGrid>
     </div>
