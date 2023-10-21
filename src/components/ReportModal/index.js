@@ -101,7 +101,7 @@ const ReportModal = ({
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleSave}>
+          <Button colorScheme="blue" mr={3} onClick={handleSave} isDisabled={!request.date_from || !request.date_to}>
             Descargar
           </Button>
           <Button onClick={onClose}>Cancelar</Button>
