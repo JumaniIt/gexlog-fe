@@ -46,6 +46,7 @@ import ContainerTable from "../ContainerTable";
 import FreeLoadTable from "../FreeLoadTable";
 import { Select as FilteredSelect } from "chakra-react-select";
 import { getOperativeSites } from "../../app/utils/customsUtils";
+import ReportModal from "../ReportModal";
 
 const TableCellWithTooltip = ({ text, tooltipText }) => {
   return (
@@ -80,6 +81,8 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   const [currentSearchFilters, setCurrentSearchFilters] = useState({});
   const [selectedContainers, setSelectedContainers] = useState();
   const [selectedFreeLoads, setSelectedFreeLoads] = useState();
+  const [openReportModal, setOpenReportModal] = useState(false);
+
   const sortOptions = [
     {
       value: "date:asc",
@@ -302,6 +305,13 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           }
           label="Estado"
         />
+        <Button
+          size="sm"
+          className="download-button"
+          onClick={() => setOpenReportModal(true)}
+        >
+          Descargar
+        </Button>
       </div>
       <div className="filter-bar-second-row">
         <LabeledItem
@@ -486,7 +496,13 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           </ModalBody>
         </ModalContent>
       </Modal>
-
+      <ReportModal
+        isOpen={openReportModal}
+        onClose={() => setOpenReportModal(false)}
+        showAlert={showAlert}
+        setBlurLoading={setBlurLoading}
+        initial={{ date_from: filters.date_from, date_to: filters.date_to }}
+      />
       <div>
         <div className="results-table">
           <TableContainer>

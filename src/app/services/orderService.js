@@ -71,6 +71,10 @@ export const updateCost = async (orderId, costId, cost) =>
 export const deleteCost = async (orderId, costId) =>
   await doDelete(BASE_PATH + "/" + orderId + COSTS + "/" + costId);
 
+export const generateReport = async (request) => 
+  await post(BASE_PATH + "/generate-report", request)
+
+
 // ---- END COSTS ----
 
 export const statuses = [

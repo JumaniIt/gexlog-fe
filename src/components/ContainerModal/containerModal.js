@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 
 import { AddIcon } from "@chakra-ui/icons";
-import { TRM, toString } from "../../app/utils/destinationUtils";
+import { PRIV, TRM, toString } from "../../app/utils/destinationUtils";
 import DestinationTable from "../DestinationTable/destinationTable";
 import { getContainerTypes } from "../../app/utils/containerUtils";
 import { Select as FilteredSelect, CreatableSelect } from "chakra-react-select";
@@ -63,7 +63,7 @@ const ContainerModal = ({
   const validate = () => {
     const updatedDestinations = container.destinations.map((destination) => {
       // Check if the destination has a code attribute defined and its length is not 16
-      const _isInvalid = destination.code && destination.code.length !== 16;
+      const _isInvalid = destination.type !== PRIV && destination.code && destination.code.length !== 16;
 
       // Update the destination with the validation status
       return {
@@ -148,6 +148,13 @@ const ContainerModal = ({
         ...updatedDestinations[index],
         [name]: value,
         _isInvalid: false,
+      };
+    }
+
+    if (name === "type" && value === PRIV) {
+      updatedDestinations[index] = {
+        ...updatedDestinations[index],
+        code: "-",
       };
     }
 

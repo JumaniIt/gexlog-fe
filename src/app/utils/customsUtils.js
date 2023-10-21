@@ -2802,4 +2802,14 @@ const operativeSites = [
     CODIGO: "88002",
     LUGAR: "ZONA FRANCA BUENOS AIRES SUR SA",
   },
+  {
+    ADUANA: "",
+    CODIGO: "11Z08",
+    LUGAR: "GEMEZ SA BARRACAS",
+  },
+  {
+    ADUANA: "",
+    CODIGO: "11Z09",
+    LUGAR: "GEMEZ SA",
+  }
 ];

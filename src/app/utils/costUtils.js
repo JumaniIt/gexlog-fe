@@ -18,6 +18,10 @@ const COST_TYPES = [
     translation: "G.PTO",
   },
   {
+    value: "BILL",
+    translation: "FACTURA"
+  },
+  {
     value: "OTHER",
     translation: "OTROS",
   },

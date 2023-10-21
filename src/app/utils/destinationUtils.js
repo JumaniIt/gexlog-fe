@@ -16,5 +16,6 @@ export const toString = (destination) => {
 export const getDestinationTypes = () => destinationTypes;
 
 export const TRM = "TRM";
+export const PRIV = "PRIV";
 
-const destinationTypes = ["TLAT", TRM, "TLEA"];
+const destinationTypes = ["TLAT", TRM, "TLEA", "PRIV"];

@@ -11,8 +11,8 @@ import {
   IconButton,
   Tooltip,
 } from "@chakra-ui/react";
-import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
-import { TRM, getDestinationTypes } from "../../app/utils/destinationUtils";
+import { DeleteIcon } from "@chakra-ui/icons";
+import { PRIV, TRM, getDestinationTypes } from "../../app/utils/destinationUtils";
 
 const DestinationTable = ({
   destinations,
@@ -56,6 +56,7 @@ const DestinationTable = ({
                   isInvalid={d._isInvalid}
                   size="sm"
                   name="code"
+                  disabled={d.type === PRIV}
                   value={d.code}
                   onChange={(e) => onDestinationChange(e, index)}
                 />

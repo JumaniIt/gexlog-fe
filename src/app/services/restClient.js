@@ -63,7 +63,11 @@ const perform = async (
     } else if (status === 204) {
       return { _isError: false };
     } else {
-      return await response.json();
+      if (response.headers.get("Content-Type") === 'application/json') {
+        return await response.json();
+      } else {
+        return response;
+      }
     }
   } catch (error) {
     if (error === SESSION_EXPIRED_ERROR) {

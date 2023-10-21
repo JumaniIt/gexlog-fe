@@ -14,7 +14,7 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
-import { TRM, toString } from "../../app/utils/destinationUtils";
+import { PRIV, TRM, toString } from "../../app/utils/destinationUtils";
 import DestinationTable from "../DestinationTable/destinationTable";
 import { getFreeLoadTypes } from "../../app/utils/freeLoadUtils";
 import { Select as FilteredSelect } from "chakra-react-select";
@@ -53,7 +53,7 @@ const FreeLoadModal = ({
   const validate = () => {
     const updatedDestinations = freeLoad.destinations.map((destination) => {
       // Check if the destination has a code attribute defined and its length is not 16
-      const _isInvalid = destination.code && destination.code.length !== 16;
+      const _isInvalid = destination.type !== PRIV && destination.code && destination.code.length !== 16;
 
       // Update the destination with the validation status
       return {
@@ -134,6 +134,13 @@ const FreeLoadModal = ({
         ...updatedDestinations[index],
         [name]: value,
         _isInvalid: false,
+      };
+    }
+
+    if (name === "type" && value === PRIV) {
+      updatedDestinations[index] = {
+        ...updatedDestinations[index],
+        code: "-",
       };
     }
 
@@ -219,7 +226,7 @@ const FreeLoadModal = ({
               </div>
             </div>
           </div>
-          <Divider className="Divider"/>
+          <Divider className="Divider" />
           <div className="table-heading">
             <Heading className="second-heading" as="h6" size="sm">
               Destinaciones
