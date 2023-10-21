@@ -535,15 +535,15 @@ const Order = ({ showAlert, setBlurLoading }) => {
             <div className="center-actions">
               <Badge
                 fontSize="m"
-                className={currentUser?.admin && "editable-status"}
+                className={currentUser?.admin && id && "editable-status"}
                 colorScheme={
                   order?.status
                     ? getEnhancedStatus(order.status).colorScheme
-                    : "grey"
+                    : "gray"
                 }
                 variant="subtle"
                 onClick={() => {
-                  if (currentUser?.admin) {
+                  if (currentUser?.admin && id) {
                     openStatus();
                   }
                 }}

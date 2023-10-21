@@ -32,7 +32,6 @@ const OrderPage = () => {
 
   return (
     <Layout
-      headingText={`Hola ${currentUser?.nickname}`}
       className="order-layout"
     >
       {alert.status && (
