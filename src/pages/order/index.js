@@ -320,7 +320,7 @@ const Order = ({ showAlert, setBlurLoading }) => {
     );
   };
 
-  const handleSave = async () => {
+  const handleSave = async (finalAction = true) => {
     setActionLoading(true);
     await withSession(
       navigate,
@@ -354,22 +354,24 @@ const Order = ({ showAlert, setBlurLoading }) => {
           showAlert(ERROR, response.code, response.message);
         } else {
           setOrder(response);
-          showAlert(SUCCESS, "Cambios guardados");
-          if (!id) {
-            navigate("/orders/" + response.id);
+          if (finalAction) {
+            showAlert(SUCCESS, "Cambios guardados");
+            if (!id) {
+              navigate("/orders/" + response.id);
+            }
           }
         }
       },
-      () => setActionLoading(false)
+      () => {
+        if (finalAction) {
+          setActionLoading(false);
+        }
+      }
     );
   };
 
   const openStatus = () => {
     setOpenStatusModal(true);
-  };
-
-  const openNotes = () => {
-    setOpenNoteModal(true);
   };
 
   const openCosts = () => {
@@ -382,6 +384,7 @@ const Order = ({ showAlert, setBlurLoading }) => {
     );
 
     if (confirm) {
+      await handleSave(false);
       await handleStatusChange("REVISION");
     }
   };
@@ -528,66 +531,79 @@ const Order = ({ showAlert, setBlurLoading }) => {
               disabled={readOnly}
             />
           </div>
-          <div>
-            <Badge
-              colorScheme={
-                order?.status
-                  ? getEnhancedStatus(order.status).colorScheme
-                  : "grey"
-              }
-              variant="subtle"
-            >
-              {order?.status ? translateStatus(order.status) : "BORRADOR"}
-            </Badge>
-            {currentUser?.admin && (
-              <Checkbox
-                className="services-checkbox"
-                name="dev"
-                isChecked={order.returned}
-                onChange={onReturned}
-                disabled={!id}
+          <div className="order-actions">
+            <div className="center-actions">
+              <Badge
+                fontSize="m"
+                className={currentUser?.admin && "editable-status"}
+                colorScheme={
+                  order?.status
+                    ? getEnhancedStatus(order.status).colorScheme
+                    : "grey"
+                }
+                variant="subtle"
+                onClick={() => {
+                  if (currentUser?.admin) {
+                    openStatus();
+                  }
+                }}
               >
-                DEV
-              </Checkbox>
-            )}
-            {currentUser?.admin && (
-              <Checkbox
-                className="services-checkbox"
-                name="dev"
-                isChecked={order.billed}
-                onChange={onBilled}
-                disabled={!id}
-              >
-                FC
-              </Checkbox>
-            )}
-          </div>
-          <Menu className="header-menu">
-            <MenuButton
-              as={IconButton}
-              aria-label="Options"
-              icon={<MdMoreVert />}
-              variant="outline"
-              isLoading={actionLoading}
-            />
-            <MenuList loading={true}>
-              <MenuItem onClick={handleSave} isDisabled={readOnly}>
-                Guardar
-              </MenuItem>
-              {(currentUser?.admin && (
-                <MenuItem onClick={openStatus} isDisabled={!id}>
-                  Estado
-                </MenuItem>
-              )) || (
-                <MenuItem onClick={handleSend} isDisabled={!id || readOnly}>
-                  Enviar
-                </MenuItem>
+                {order?.status ? translateStatus(order.status) : "BORRADOR"}
+              </Badge>
+              {currentUser?.admin && (
+                <Checkbox
+                  className="services-checkbox"
+                  name="dev"
+                  isChecked={order.returned}
+                  onChange={onReturned}
+                  disabled={!id}
+                >
+                  DEV
+                </Checkbox>
               )}
-              <MenuItem onClick={openCosts} isDisabled={!id}>
-                Costos
-              </MenuItem>
-            </MenuList>
-          </Menu>
+              {currentUser?.admin && (
+                <Checkbox
+                  className="services-checkbox"
+                  name="dev"
+                  isChecked={order.billed}
+                  onChange={onBilled}
+                  disabled={!id}
+                >
+                  FC
+                </Checkbox>
+              )}
+            </div>
+            <div className="right-actions">
+              <Button
+                size="sm"
+                className="save-button"
+                isDisabled={readOnly}
+                onClick={handleSave}
+                isLoading={actionLoading}
+              >
+                Guardar
+              </Button>
+              {currentUser?.admin ? (
+                <Button
+                  size="sm"
+                  className="costs-button"
+                  isDisabled={!id}
+                  onClick={openCosts}
+                >
+                  Costos
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  className="send-button"
+                  isDisabled={!id || readOnly}
+                  onClick={handleSend}
+                >
+                  Enviar
+                </Button>
+              )}
+            </div>
+          </div>
         </CardHeader>
         <StatusModal
           isOpen={openStatusModal}

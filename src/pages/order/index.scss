@@ -7,6 +7,53 @@
     color: #a0aec0;
   }
 
+  .order-actions {
+    display: grid;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    grid-template-columns: repeat(3, 1fr);
+
+    .center-actions {
+      gap: 10px;
+      grid-row: 1;
+      grid-column: 2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .editable-status {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .right-actions {
+    grid-row: 1;
+    grid-column: 3;
+    justify-content: end;
+    display: flex;
+
+    .save-button {
+      margin-right: 10px;
+      width: 100px;
+      background-color: #006fb7;
+      color: white;
+    }
+
+    .costs-button {
+      width: 100px;
+      background-color: #5f6468;
+      color: white;
+    }
+
+    .send-button {
+      width: 100px;
+      background-color: #38a169;
+      color: white;
+    }
+  }
+
   .order-card {
     margin: 12px 30px;
 

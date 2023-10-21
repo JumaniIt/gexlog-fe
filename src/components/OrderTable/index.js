@@ -62,7 +62,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
 
   const defaultFilters = {
     page_size: 10,
-    page: 1
+    page: 1,
   };
 
   const [filters, setFilters] = useState({
@@ -76,8 +76,6 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   const [clientOptions, setClientOptions] = useState([]);
   const [consigneeOptions, setConsigneeOptions] = useState([]);
   const [clientSelectionDisabled, setClientSelectionDisabled] = useState(false);
-  const [clientSelectionPlaceHolder, setClientSelectionPlaceHolder] =
-    useState();
   const [loading, setLoading] = useState(false);
   const [currentSearchFilters, setCurrentSearchFilters] = useState({});
   const [selectedContainers, setSelectedContainers] = useState();
@@ -107,6 +105,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   };
 
   const navigate = useNavigate();
+  const currentUser = getCurrentUser(navigate);
 
   const search = async (f) => {
     setLoading(true);
@@ -145,12 +144,10 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           const consignees = [];
           clients.forEach((client) => consignees.push(...client.consignees));
           setConsigneeOptions(consignees);
-          const currentUser = getCurrentUser(navigate);
           if (!currentUser?.admin) {
             setClientSelectionDisabled(true);
             const client = clients.length > 0 ? clients[0] : null;
             if (client) {
-              setClientSelectionPlaceHolder(getNameAndCuit(client));
               setFilters({ ...filters, client_id: client.id });
             }
           }
@@ -224,7 +221,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
               }))}
               selectedOptionStyle="color"
               isDisabled={clientSelectionDisabled}
-              placeholder={clientSelectionPlaceHolder || ""}
+              placeholder="-"
             />
           }
           label="Cliente"
@@ -445,7 +442,13 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
         <Button
           size="sm"
           className="clear-button"
-          onClick={() => setFilters(defaultFilters)}
+          onClick={() => {
+            let clearFilters = defaultFilters;
+            if (!currentUser?.admin) {
+              clearFilters = { ...clearFilters, client_id: filters.client_id };
+            }
+            setFilters(clearFilters);
+          }}
         >
           Limpiar
         </Button>
