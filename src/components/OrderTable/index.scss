@@ -1,14 +1,41 @@
 .filter-bar-first-row {
   margin-top: 20px;
   display: grid;
-  grid-template-columns: repeat(2, 1fr) auto auto auto auto auto repeat(1, 1fr) auto;
+  grid-template-columns: repeat(2, 1fr) auto auto auto auto auto auto auto repeat(1, 1fr);
   grid-column-gap: 10px;
 }
 
 .filter-bar-second-row {
   margin-top: 20px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr) auto auto auto auto auto repeat(1, 1fr);
+  grid-template-columns: auto auto auto auto auto auto;
+  grid-column-gap: 10px;
+
+  .search-button {
+    background-color: #006fb7;
+    color: white;
+
+    svg {
+      margin-right: 7px;
+    }
+  }
+
+  .clear-button {
+    background-color: #5f6468;
+    color: white;
+
+  }
+
+  .create-button {
+    background-color: #38a169;
+    color: white;
+  }
+}
+
+.filter-bar-third-row {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 100px);
   grid-column-gap: 10px;
 
   .search-button {

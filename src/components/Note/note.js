@@ -10,7 +10,7 @@ import {
   Box,
   Button,
 } from "@chakra-ui/react";
-import { toLocalDateString } from "../../app/utils/dateUtils";
+import { toLocalDateTimeString } from "../../app/utils/dateUtils";
 import { translateAuthor } from "../../app/utils/noteUtils";
 import { MdEdit, MdDelete } from "react-icons/md";
 
@@ -20,7 +20,7 @@ const Note = ({ id, author, date, content, editable, onEdit, onDelete }) => {
     <Card>
       <CardHeader display="flex" justifyContent="space-between">
         <Heading size="sm">
-          {toLocalDateString(date)} - {translateAuthor(author)}
+          {toLocalDateTimeString(date)} - {translateAuthor(author)}
         </Heading>
         <div>
           <div>

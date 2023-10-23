@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { Box, SimpleGrid } from "@chakra-ui/react";
-import { toLocalDateString } from "../../app/utils/dateUtils";
+import { toLocalDateTimeString } from "../../app/utils/dateUtils";
 import { translateAuthor } from "../../app/utils/noteUtils";
 
 const NotePreview = ({ notes, showSystemNotes }) => {
@@ -29,7 +29,7 @@ const NotePreview = ({ notes, showSystemNotes }) => {
               const date = new Date(note.created_at);
               const title = `${translateAuthor(
                 note.author
-              )} - ${toLocalDateString(date)}`;
+              )} - ${toLocalDateTimeString(date)}`;
               return (
                 <Box
                   className={

@@ -23,7 +23,7 @@ export const trimStringWithDot = (str, num) => {
   // Check if the string length is greater than the specified number
   if (str.length > num) {
     // Trim the string to the specified number of characters and add a dot
-    return str.substring(0, num) + "...";
+    return str.substring(0, num);
   }
 
   // If the string length is less than or equal to the specified number, return the original string

@@ -10,7 +10,7 @@ import {
   Box,
   Button,
 } from "@chakra-ui/react";
-import { toLocalDateString } from "../../app/utils/dateUtils";
+import { toLocalDateTimeString } from "../../app/utils/dateUtils";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { translateCostType } from "../../app/utils/costUtils";
 
@@ -28,7 +28,7 @@ const Cost = ({
     <Card>
       <CardHeader display="flex" justifyContent="space-between">
         <Heading size="sm">
-          {toLocalDateString(date)} - {translateCostType(type)} - ${amount}
+          {toLocalDateTimeString(date)} - {translateCostType(type)} - ${amount}
         </Heading>
         {editable && (
           <div>

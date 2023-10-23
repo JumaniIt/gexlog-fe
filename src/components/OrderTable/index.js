@@ -21,7 +21,7 @@ import { Select } from "@chakra-ui/react";
 import { Checkbox } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
 import { Button, Spinner } from "@chakra-ui/react";
-import { MdSearch, MdOutlineOpenInNew, MdCreate } from "react-icons/md";
+import { MdOutlineOpenInNew } from "react-icons/md";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -31,7 +31,11 @@ import {
 } from "../../app/services/orderService";
 import { search as searchClients } from "../../app/services/clientService";
 import { getCuitAndName, getNameAndCuit } from "../../app/utils/clientUtils";
-import { trimToMinutes } from "../../app/utils/dateUtils";
+import {
+  toLocalDateString,
+  toLocalDateTimeString,
+  trimToMinutes,
+} from "../../app/utils/dateUtils";
 import { getEnhancedStatus, translateStatus } from "../../app/utils/orderUtils";
 import PaginationFooter from "../Pagination/paginationFooter";
 import { withSession, getCurrentUser } from "../../app/utils/sessionUtils";
@@ -67,6 +71,8 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   const [filters, setFilters] = useState({
     ...defaultFilters,
     sorts: "creation_date:desc",
+    creation_date_from: new Date().toLocaleDateString("sv"),
+    creation_date_to: new Date().toLocaleDateString("sv"),
   });
 
   const [paginationResult, setPaginationResult] = useState();
@@ -237,26 +243,52 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
             <input
               className="chakra-input css-1xt0hpo"
               type="date"
-              value={filters?.date_from || ""}
+              value={filters?.creation_date_from || ""}
               onChange={(e) =>
-                setFilters({ ...filters, date_from: e.target.value })
+                setFilters({ ...filters, creation_date_from: e.target.value })
               }
             />
           }
-          label="Desde"
+          label="Creado desde"
         />
         <LabeledItem
           item={
             <input
               className="chakra-input css-1xt0hpo"
               type="date"
-              value={filters?.date_to || ""}
+              value={filters?.creation_date_to || ""}
               onChange={(e) =>
-                setFilters({ ...filters, date_to: e.target.value })
+                setFilters({ ...filters, creation_date_to: e.target.value })
               }
             />
           }
-          label="Hasta"
+          label="Creado hasta"
+        />
+        <LabeledItem
+          item={
+            <input
+              className="chakra-input css-1xt0hpo"
+              type="date"
+              value={filters?.arrival_date_from || ""}
+              onChange={(e) =>
+                setFilters({ ...filters, arrival_date_from: e.target.value })
+              }
+            />
+          }
+          label="Arrivo desde"
+        />
+        <LabeledItem
+          item={
+            <input
+              className="chakra-input css-1xt0hpo"
+              type="date"
+              value={filters?.arrival_date_to || ""}
+              onChange={(e) =>
+                setFilters({ ...filters, arrival_date_to: e.target.value })
+              }
+            />
+          }
+          label="Arrivo hasta"
         />
         <Checkbox
           onChange={(e) => setFilters({ ...filters, pema: e.target.checked })}
@@ -297,13 +329,6 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           }
           label="Estado"
         />
-        <Button
-          size="sm"
-          className="download-button"
-          onClick={() => setOpenReportModal(true)}
-        >
-          Descargar
-        </Button>
       </div>
       <div className="filter-bar-second-row">
         <LabeledItem
@@ -438,6 +463,8 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           }
           label="Ordenar por"
         />
+      </div>
+      <div className="filter-bar-third-row">
         <Button size="sm" className="search-button" onClick={handleSearchClick}>
           Buscar
         </Button>
@@ -447,12 +474,22 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           onClick={() => {
             let clearFilters = defaultFilters;
             if (!currentUser?.admin) {
-              clearFilters = { ...clearFilters, client_id: filters.client_id };
+              clearFilters = {
+                ...clearFilters,
+                client_id: filters.client_id,
+              };
             }
             setFilters(clearFilters);
           }}
         >
           Limpiar
+        </Button>
+        <Button
+          size="sm"
+          className="download-button"
+          onClick={() => setOpenReportModal(true)}
+        >
+          Descargar
         </Button>
         <Button
           size="sm"
@@ -493,7 +530,10 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
         onClose={() => setOpenReportModal(false)}
         showAlert={showAlert}
         setBlurLoading={setBlurLoading}
-        initial={{ date_from: filters.date_from, date_to: filters.date_to }}
+        initial={{
+          date_from: filters.creation_date_from,
+          date_to: filters.creation_date_to,
+        }}
       />
       <div>
         <div className="results-table">
@@ -502,9 +542,10 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
               <Thead>
                 <Tr>
                   <Th>ID</Th>
+                  <Th>F.Creación</Th>
                   <Th>Cliente</Th>
-                  <Th>Fecha</Th>
-                  <Th>Hora</Th>
+                  <Th>F.Arrivo</Th>
+                  <Th>H.Arrivo</Th>
                   <Th>Origen</Th>
                   <Th>Destino</Th>
                   <Th>CTR</Th>
@@ -522,7 +563,13 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                       const enhancedStatus = getEnhancedStatus(result.status);
                       return (
                         <Tr className="table-row">
-                          <Td>{result.id}</Td>
+                          <Td
+                            className="button-td"
+                            onClick={() => navigate(`/orders/${result.id}`)}
+                          >
+                            {result.id}
+                          </Td>
+                          <Td>{toLocalDateTimeString(result.created_at)}</Td>
                           {clientOptions
                             .filter((c) => c.id === result.client_id)
                             .map((c) => (
@@ -531,17 +578,17 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                                 tooltipText={"CUIT: " + c.cuit}
                               />
                             ))}
-                          <Td>{result.arrival_date}</Td>
+                          <Td>{toLocalDateString(result.arrival_date)}</Td>
                           <Td>
                             {result.arrival_time &&
                               trimToMinutes(result.arrival_time)}
                           </Td>
                           <TableCellWithTooltip
-                            text={trimStringWithDot(result?.origin || "", 15)}
+                            text={trimStringWithDot(result?.origin || "", 12)}
                             tooltipText={result.origin}
                           />
                           <TableCellWithTooltip
-                            text={trimStringWithDot(result?.target || "", 15)}
+                            text={trimStringWithDot(result?.target || "", 12)}
                             tooltipText={result.target}
                           />
                           <Td

@@ -11,7 +11,7 @@ import {
   Button,
   Textarea,
 } from "@chakra-ui/react";
-import { toLocalDateString } from "../../app/utils/dateUtils";
+import { toLocalDateTimeString } from "../../app/utils/dateUtils";
 import { translateAuthor } from "../../app/utils/noteUtils";
 import { MdSave, MdCancel } from "react-icons/md";
 
@@ -47,7 +47,7 @@ const EditableNote = ({ initialValue, onSave, onCancel }) => {
       <CardHeader>
         {note.id ? (
           <Heading size="sm">
-            {toLocalDateString(note.created_at)} -{" "}
+            {toLocalDateTimeString(note.created_at)} -{" "}
             {translateAuthor(note.author)}
           </Heading>
         ) : (
