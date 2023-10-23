@@ -59,8 +59,6 @@ const TableCellWithTooltip = ({ text, tooltipText }) => {
 };
 
 const OrderTable = ({ showAlert, setBlurLoading }) => {
-  const { orderSearchContext, setOrderSearchContext } = useOrderContext();
-
   const defaultFilters = {
     page_size: 10,
     page: 1,
@@ -68,10 +66,9 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
 
   const [filters, setFilters] = useState({
     ...defaultFilters,
-    date_from: new Date().toLocaleDateString("sv"),
-    date_to: new Date().toLocaleDateString("sv"),
-    sorts: "date:asc",
+    sorts: "creation_date:desc",
   });
+
   const [paginationResult, setPaginationResult] = useState();
   const [searchResults, setSearchResults] = useState();
   const [clientOptions, setClientOptions] = useState([]);
@@ -85,12 +82,20 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
 
   const sortOptions = [
     {
-      value: "date:asc",
+      value: "creation_date:asc",
       label: "fecha-asc",
     },
     {
-      value: "date:desc",
+      value: "creation_date:desc",
       label: "fecha-desc",
+    },
+    {
+      value: "arrival_date:asc",
+      label: "arrivo-asc",
+    },
+    {
+      value: "arrival_date:desc",
+      label: "arrivo-desc",
     },
     {
       value: "load_code:asc",
@@ -124,7 +129,6 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
             totalPages: response.total_pages,
             page: response.page,
           });
-          setOrderSearchContext({ results: response, filters: filters });
         }
       },
       () => setLoading(false)
@@ -157,19 +161,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
         }
       });
 
-      if (orderSearchContext.results) {
-        const results = orderSearchContext.results;
-        setSearchResults(results.elements);
-        setPaginationResult({
-          totalPages: results.total_pages,
-          page: results.page,
-        });
-
-        setFilters(orderSearchContext.filters);
-      } else {
-        await handleSearchClick();
-      }
-
+      await handleSearchClick();
       setBlurLoading(false);
     };
 
