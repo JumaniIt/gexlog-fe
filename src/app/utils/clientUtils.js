@@ -1,7 +1,9 @@
 export const getNameAndCuit = client => {
-    return `${client?.name} - ${client?.cuit}`
+    const cuit = client?.cuit || "(sin cuit)";
+    return `${client?.name} - ${cuit}`
 }
 
 export const getCuitAndName = client => {
-    return `${client?.cuit} - ${client?.name}`
+    const cuit = client?.cuit || "(sin cuit)";
+    return `${cuit} - ${client?.name}`
 }

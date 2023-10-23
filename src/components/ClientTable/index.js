@@ -188,8 +188,8 @@ const ClientTable = ({ showAlert, setBlurLoading }) => {
                         <Tr className="table-row">
                           <Td>{result.id}</Td>
                           <Td>{result.name}</Td>
-                          <Td>{result.phone}</Td>
-                          <Td>{result.cuit}</Td>
+                          <Td>{result.phone || "-"}</Td>
+                          <Td>{result.cuit || "-"}</Td>
                           <Td>
                             {(result.user_id &&
                               getIdAndName(

@@ -139,7 +139,7 @@ const ClientForm = ({ showAlert, setBlurLoading, afterSave }) => {
           placeholder="Nombre"
         />
       </FormControl>
-      <FormControl isRequired>
+      <FormControl>
         <FormLabel>Teléfono</FormLabel>
         <Input
           type="text"
@@ -149,7 +149,7 @@ const ClientForm = ({ showAlert, setBlurLoading, afterSave }) => {
           placeholder="Teléfono"
         />
       </FormControl>
-      <FormControl isRequired>
+      <FormControl>
         <FormLabel>CUIT</FormLabel>
         <Input
           type="number"
