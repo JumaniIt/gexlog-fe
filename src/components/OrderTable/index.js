@@ -97,11 +97,11 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
     },
     {
       value: "arrival_date:asc",
-      label: "arrivo-asc",
+      label: "arribo-asc",
     },
     {
       value: "arrival_date:desc",
-      label: "arrivo-desc",
+      label: "arribo-desc",
     },
     {
       value: "load_code:asc",
@@ -275,7 +275,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
               }
             />
           }
-          label="Arrivo desde"
+          label="Arribo desde"
         />
         <LabeledItem
           item={
@@ -288,7 +288,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
               }
             />
           }
-          label="Arrivo hasta"
+          label="Arribo hasta"
         />
         <Checkbox
           onChange={(e) => setFilters({ ...filters, pema: e.target.checked })}
@@ -544,8 +544,8 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                   <Th>ID</Th>
                   <Th>F.Creación</Th>
                   <Th>Cliente</Th>
-                  <Th>F.Arrivo</Th>
-                  <Th>H.Arrivo</Th>
+                  <Th>F.Arribo</Th>
+                  <Th>H.Arribo</Th>
                   <Th>Origen</Th>
                   <Th>Destino</Th>
                   <Th>CTR</Th>
