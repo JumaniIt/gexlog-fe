@@ -1009,6 +1009,11 @@ const operativeSites = [
   },
   {
     ADUANA: "33",
+    CODIGO: "1000C",
+    LUGAR: "TECPLATA SA",
+  },
+  {
+    ADUANA: "33",
     CODIGO: "11002",
     LUGAR: "DEPO FIS II CABECERA RIO SANTIAGO",
   },
@@ -2811,5 +2816,5 @@ const operativeSites = [
     ADUANA: "",
     CODIGO: "11Z09",
     LUGAR: "GEMEZ SA",
-  }
+  },
 ];
