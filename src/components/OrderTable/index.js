@@ -465,39 +465,45 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
         />
       </div>
       <div className="filter-bar-third-row">
-        <Button size="sm" className="search-button" onClick={handleSearchClick}>
-          Buscar
-        </Button>
-        <Button
-          size="sm"
-          className="clear-button"
-          onClick={() => {
-            let clearFilters = defaultFilters;
-            if (!currentUser?.admin) {
-              clearFilters = {
-                ...clearFilters,
-                client_id: filters.client_id,
-              };
-            }
-            setFilters(clearFilters);
-          }}
-        >
-          Limpiar
-        </Button>
-        <Button
-          size="sm"
-          className="download-button"
-          onClick={() => setOpenReportModal(true)}
-        >
-          Descargar
-        </Button>
-        <Button
-          size="sm"
-          className="create-button"
-          onClick={() => navigate(`/orders/new`, { replace: true })}
-        >
-          Crear
-        </Button>
+        <div className="buttons">
+          <Button
+            size="sm"
+            className="search-button"
+            onClick={handleSearchClick}
+          >
+            Buscar
+          </Button>
+          <Button
+            size="sm"
+            className="clear-button"
+            onClick={() => {
+              let clearFilters = defaultFilters;
+              if (!currentUser?.admin) {
+                clearFilters = {
+                  ...clearFilters,
+                  client_id: filters.client_id,
+                };
+              }
+              setFilters(clearFilters);
+            }}
+          >
+            Limpiar
+          </Button>
+          <Button
+            size="sm"
+            className="download-button"
+            onClick={() => setOpenReportModal(true)}
+          >
+            Descargar
+          </Button>
+          <Button
+            size="sm"
+            className="create-button"
+            onClick={() => navigate(`/orders/new`, { replace: true })}
+          >
+            Crear
+          </Button>
+        </div>
       </div>
 
       <Modal

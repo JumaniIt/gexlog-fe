@@ -34,29 +34,40 @@
 
 .filter-bar-third-row {
   margin-top: 20px;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
   display: grid;
-  grid-template-columns: repeat(4, 100px);
-  grid-column-gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  
+  .buttons {
+    justify-content: end;
+    display: flex;
+    grid-row: 1;
+    grid-column: 3;
+    gap: 10px;
 
-  .search-button {
-    background-color: #006fb7;
-    color: white;
-
-    svg {
-      margin-right: 7px;
+    .search-button {
+      width: 100px;
+      background-color: #006fb7;
+      color: white;
+    }
+  
+    .clear-button {
+      width: 100px;
+      background-color: #5f6468;
+      color: white;
+  
+    }
+  
+    .create-button {
+      width: 100px;
+      background-color: #38a169;
+      color: white;
     }
   }
 
-  .clear-button {
-    background-color: #5f6468;
-    color: white;
-
-  }
-
-  .create-button {
-    background-color: #38a169;
-    color: white;
-  }
+  
 }
 
 .chakra-modal__content.order-table-modal.css-pv22qu {
