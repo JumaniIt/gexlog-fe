@@ -12,7 +12,12 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { PRIV, TRM, getDestinationTypes } from "../../app/utils/destinationUtils";
+import {
+  PRIV,
+  TRM,
+  getDestinationTypes,
+} from "../../app/utils/destinationUtils";
+import { getCurrencies } from "../../app/utils/currencyUtils";
 
 const DestinationTable = ({
   destinations,
@@ -72,13 +77,19 @@ const DestinationTable = ({
               />
             </Td>
             <Td>
-              <Input
+              <Select
                 size="sm"
                 name="currency"
                 value={d.currency}
-                disabled={d.type !== TRM}
                 onChange={(e) => onDestinationChange(e, index)}
-              />
+                placeholder="-"
+              >
+                {getCurrencies().map((c) => (
+                  <option key={c.name} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </Select>
             </Td>
             <Td>
               <Input

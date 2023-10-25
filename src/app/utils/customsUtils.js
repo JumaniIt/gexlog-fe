@@ -1030,7 +1030,7 @@ const operativeSites = [
   {
     ADUANA: "33",
     CODIGO: "20021",
-    LUGAR: "ZPCA ZF LA PLATA",
+    LUGAR: "ZONA FRANCA LA PLATA ZFLP",
   },
   {
     ADUANA: "33",
@@ -2536,11 +2536,6 @@ const operativeSites = [
     ADUANA: "92",
     CODIGO: "10057",
     LUGAR: "TERMINAL 1, 2 y 3",
-  },
-  {
-    ADUANA: "92",
-    CODIGO: "10073",
-    LUGAR: "TERMINAL SUR",
   },
   {
     ADUANA: "92",

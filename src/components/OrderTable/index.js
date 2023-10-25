@@ -232,7 +232,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           item={
             <Input
               size="sm"
-              value={filters?.code}
+              value={filters?.code || ""}
               onChange={(e) => setFilters({ ...filters, code: e.target.value })}
             />
           }
