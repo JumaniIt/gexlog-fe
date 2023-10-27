@@ -28,6 +28,9 @@ import {
   search as searchOrders,
   statuses,
   getById,
+  markReturned,
+  markBilled,
+  changeStatus,
 } from "../../app/services/orderService";
 import { search as searchClients } from "../../app/services/clientService";
 import { getCuitAndName, getNameAndCuit } from "../../app/utils/clientUtils";
@@ -39,7 +42,7 @@ import {
 import { getEnhancedStatus, translateStatus } from "../../app/utils/orderUtils";
 import PaginationFooter from "../Pagination/paginationFooter";
 import { withSession, getCurrentUser } from "../../app/utils/sessionUtils";
-import { ERROR } from "../../app/utils/alertUtils";
+import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
 import {
   containsLiteralPart,
   trimStringWithDot,
@@ -51,6 +54,8 @@ import FreeLoadTable from "../FreeLoadTable";
 import { Select as FilteredSelect } from "chakra-react-select";
 import { getOperativeSites } from "../../app/utils/customsUtils";
 import ReportModal from "../ReportModal";
+import ConfirmDialog from "../ConfirmDialog";
+import StatusModal from "../StatusModal/statusModal";
 
 const TableCellWithTooltip = ({ text, tooltipText }) => {
   return (
@@ -64,7 +69,7 @@ const TableCellWithTooltip = ({ text, tooltipText }) => {
 
 const OrderTable = ({ showAlert, setBlurLoading }) => {
   const defaultFilters = {
-    page_size: 10,
+    page_size: 12,
     page: 1,
   };
 
@@ -85,6 +90,18 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   const [selectedContainers, setSelectedContainers] = useState();
   const [selectedFreeLoads, setSelectedFreeLoads] = useState();
   const [openReportModal, setOpenReportModal] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    message: "",
+    onClose: () => setConfirmDialog({ ...confirmDialog, open: false }),
+    onConfirm: () => {},
+  });
+  const [statusModal, setStatusModal] = useState({
+    open: false,
+    currentStatus: "",
+    index: "",
+    id: "",
+  });
 
   const sortOptions = [
     {
@@ -188,6 +205,92 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
         }
       }
     });
+  };
+
+  const handleReturnedChange = (index) => {
+    const toUpdate = searchResults[index];
+    setConfirmDialog({
+      ...confirmDialog,
+      open: true,
+      message:
+        "¿Deseas modificar el valor de DEV de la operación #" +
+        toUpdate.id +
+        "?",
+      onConfirm: async () =>
+        await withSession(navigate, async () => {
+          setBlurLoading(true);
+          const newReturned = !toUpdate.returned;
+
+          const response = await markReturned(toUpdate.id, newReturned);
+          if (response._isError) {
+            showAlert(ERROR, response.code, response.message);
+          } else {
+            const updatedSearchResults = [...searchResults];
+            updatedSearchResults[index] = {
+              ...updatedSearchResults[index],
+              returned: newReturned,
+            };
+            setSearchResults(updatedSearchResults);
+            console.log(updatedSearchResults);
+            showAlert(SUCCESS, "Cambios guardados");
+          }
+          setBlurLoading(false);
+        }),
+    });
+  };
+
+  const handleBilledChange = (index) => {
+    const toUpdate = searchResults[index];
+    setConfirmDialog({
+      ...confirmDialog,
+      open: true,
+      message:
+        "¿Deseas modificar el valor de FC de la operación #" +
+        toUpdate.id +
+        "?",
+      onConfirm: async () =>
+        await withSession(navigate, async () => {
+          setBlurLoading(true);
+          const newBilled = !toUpdate.billed;
+
+          const response = await markBilled(toUpdate.id, newBilled);
+          if (response._isError) {
+            showAlert(ERROR, response.code, response.message);
+          } else {
+            const updatedSearchResults = [...searchResults];
+            updatedSearchResults[index] = {
+              ...updatedSearchResults[index],
+              billed: newBilled,
+            };
+            setSearchResults(updatedSearchResults);
+            showAlert(SUCCESS, "Cambios guardados");
+          }
+          setBlurLoading(false);
+        }),
+    });
+  };
+
+  const handleStatusChange = async (status) => {
+    setBlurLoading(true);
+    const toUpdate = searchResults[statusModal.index];
+    await withSession(
+      navigate,
+      async () => {
+        const response = await changeStatus(toUpdate.id, status);
+        if (response._isError) {
+          showAlert(ERROR, response.code, response.message);
+        } else {
+          const updatedSearchResults = [...searchResults];
+          updatedSearchResults[statusModal.index] = {
+            ...updatedSearchResults[statusModal.index],
+            status: response.status,
+          };
+          setSearchResults(updatedSearchResults);
+          showAlert(SUCCESS, "Estado de solicitud cambiado");
+        }
+      },
+      () => setBlurLoading(false)
+    );
   };
 
   return (
@@ -541,6 +644,34 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           date_to: filters.creation_date_to,
         }}
       />
+      <StatusModal
+        id={statusModal.id}
+        isOpen={statusModal.open}
+        onClose={() =>
+          setStatusModal({
+            open: false,
+            currentStatus: "",
+            index: "",
+            id: "",
+          })
+        }
+        onSave={async (status) => {
+          await handleStatusChange(status);
+          setStatusModal({
+            open: false,
+            currentStatus: "",
+            index: "",
+            id: "",
+          });
+        }}
+        currentStatus={statusModal.currentStatus}
+      />
+      <ConfirmDialog
+        isOpen={confirmDialog.open}
+        message={confirmDialog.message}
+        onConfirm={confirmDialog.onConfirm}
+        onClose={confirmDialog.onClose}
+      />
       <div>
         <div className="results-table">
           <TableContainer>
@@ -565,7 +696,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
               {!loading && (
                 <Tbody>
                   {searchResults?.length > 0 &&
-                    searchResults.map((result) => {
+                    searchResults.map((result, index) => {
                       const enhancedStatus = getEnhancedStatus(result.status);
                       return (
                         <Tr className="table-row">
@@ -613,7 +744,13 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                           >
                             {result.free_load_qty}
                           </Td>
-                          <Td>
+                          <Td
+                            className={currentUser?.admin ? "button-td" : ""}
+                            onClick={() => {
+                              if (currentUser?.admin)
+                                handleReturnedChange(index);
+                            }}
+                          >
                             {result.returned ? (
                               <CheckIcon
                                 color="green.500"
@@ -626,7 +763,12 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                               />
                             )}
                           </Td>
-                          <Td>
+                          <Td
+                            className={currentUser?.admin ? "button-td" : ""}
+                            onClick={() => {
+                              if (currentUser?.admin) handleBilledChange(index);
+                            }}
+                          >
                             {result.billed ? (
                               <CheckIcon
                                 color="green.500"
@@ -639,7 +781,19 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                               />
                             )}
                           </Td>
-                          <Td>
+                          <Td
+                            className={currentUser?.admin ? "button-td" : ""}
+                            onClick={() => {
+                              if (currentUser?.admin)
+                                setStatusModal({
+                                  ...statusModal,
+                                  open: true,
+                                  index: index,
+                                  currentStatus: enhancedStatus.value,
+                                  id: result.id,
+                                });
+                            }}
+                          >
                             {
                               <Badge colorScheme={enhancedStatus.colorScheme}>
                                 {enhancedStatus.min}

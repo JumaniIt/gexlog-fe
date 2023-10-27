@@ -12,8 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { statuses } from "../../app/services/orderService";
 
-const StatusModal = ({ isOpen, onClose, onSave, currentStatus }) => {
-    
+const StatusModal = ({ id, isOpen, onClose, onSave, currentStatus }) => {
   const [selectedOption, setSelectedOption] = useState("");
 
   const handleSave = async () => {
@@ -25,15 +24,24 @@ const StatusModal = ({ isOpen, onClose, onSave, currentStatus }) => {
     <Modal isOpen={isOpen} onClose={onClose} size="md">
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Estado</ModalHeader>
+        {id ? (
+          <ModalHeader>{"Estado solicitud #" + id} </ModalHeader>
+        ) : (
+          <ModalHeader>{"Estado"} </ModalHeader>
+        )}
+
         <ModalCloseButton />
         <ModalBody>
           <Select
             value={selectedOption || currentStatus}
             onChange={(e) => setSelectedOption(e.target.value)}
           >
-            {statuses.map(s => {
-                return <option key={s.value} value={s.value}>{s.translation}</option>
+            {statuses.map((s) => {
+              return (
+                <option key={s.value} value={s.value}>
+                  {s.translation}
+                </option>
+              );
             })}
           </Select>
         </ModalBody>
@@ -50,8 +58,3 @@ const StatusModal = ({ isOpen, onClose, onSave, currentStatus }) => {
 };
 
 export default StatusModal;
-
-
-
-
-
