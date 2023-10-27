@@ -732,7 +732,10 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                             className={
                               result.container_qty > 0 ? "button-td" : ""
                             }
-                            onClick={() => openModal("containers", result.id)}
+                            onClick={() => {
+                              if (result.container_qty > 0)
+                                openModal("containers", result.id);
+                            }}
                           >
                             {result.container_qty}
                           </Td>
@@ -740,7 +743,10 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                             className={
                               result.free_load_qty > 0 ? "button-td" : ""
                             }
-                            onClick={() => openModal("free_loads", result.id)}
+                            onClick={() => {
+                              if (result.free_load_qty > 0)
+                                openModal("free_loads", result.id);
+                            }}
                           >
                             {result.free_load_qty}
                           </Td>
