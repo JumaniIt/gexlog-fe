@@ -89,19 +89,19 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   const sortOptions = [
     {
       value: "creation_date:asc",
-      label: "fecha-asc",
+      label: "f.creacion-asc",
     },
     {
       value: "creation_date:desc",
-      label: "fecha-desc",
+      label: "f.creacion-desc",
     },
     {
       value: "arrival_date:asc",
-      label: "arribo-asc",
+      label: "f.turno-asc",
     },
     {
       value: "arrival_date:desc",
-      label: "arribo-desc",
+      label: "f.turno-desc",
     },
     {
       value: "load_code:asc",
@@ -275,7 +275,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
               }
             />
           }
-          label="Arribo desde"
+          label="Turno desde"
         />
         <LabeledItem
           item={
@@ -288,7 +288,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
               }
             />
           }
-          label="Arribo hasta"
+          label="Turno hasta"
         />
         <Checkbox
           onChange={(e) => setFilters({ ...filters, pema: e.target.checked })}
@@ -550,8 +550,8 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                   <Th>ID</Th>
                   <Th>F.Creación</Th>
                   <Th>Cliente</Th>
-                  <Th>F.Arribo</Th>
-                  <Th>H.Arribo</Th>
+                  <Th>F.Turno</Th>
+                  <Th>H.Turno</Th>
                   <Th>Origen</Th>
                   <Th>Destino</Th>
                   <Th>CTR</Th>

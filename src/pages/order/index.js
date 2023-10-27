@@ -977,7 +977,7 @@ const Order = ({ showAlert, setBlurLoading }) => {
                         onChange={onInputChange}
                       />
                     }
-                    label="Fecha"
+                    label="F.Turno"
                   />
                   <LabeledItem
                     item={
@@ -999,7 +999,7 @@ const Order = ({ showAlert, setBlurLoading }) => {
                         ))}
                       </Select>
                     }
-                    label="Hora"
+                    label="H.Turno"
                   />
                   <LabeledItem
                     item={
