@@ -68,6 +68,7 @@ import LabeledItem from "../../components/LabeledItem";
 import NewClientModal from "../../components/NewClientModal/newClientModal";
 import ConsigneeModal from "../../components/ConsigneeModal/consigneeModal";
 import NotePreview from "../../components/NotePreview";
+import ConfirmDialog from "../../components/ConfirmDialog";
 
 const ExpandButton = ({ isDisabled, onEdit, onDelete }) => (
   <Menu>
@@ -113,6 +114,12 @@ const Order = ({ showAlert, setBlurLoading }) => {
   const [openNewConsigneeModal, setOpenNewConsigneeModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    message: "",
+    onClose: () => setConfirmDialog({ ...confirmDialog, open: false }),
+    onConfirm: () => {},
+  });
   const navigate = useNavigate();
   const currentUser = getCurrentUser(navigate);
 
@@ -246,29 +253,30 @@ const Order = ({ showAlert, setBlurLoading }) => {
   };
 
   const onDeleteDocument = async (docId, docName) => {
-    const confirmed = window.confirm(
-      `¿Estás seguro de que deseas eliminar el documento "${docName}"?\nEsta acción es irreversible!`
-    );
-
-    if (confirmed) {
-      await withSession(
-        navigate,
-        async () => {
-          setLoadingFiles(true);
-          const response = await deleteDocument(order.id, docId);
-          if (response._isError) {
-            showAlert(ERROR, response.code, response.message);
-          } else {
-            const updatedDocuments = order.documents.filter(
-              (document) => document.id !== docId
-            );
-            setOrder({ ...order, documents: updatedDocuments });
-            showAlert(SUCCESS, "Documento eliminado");
-          }
-        },
-        () => setLoadingFiles(false)
-      );
-    }
+    setConfirmDialog({
+      ...confirmDialog,
+      open: true,
+      message: `¿Deseas eliminar el documento "${docName}"?\n ¡Esta acción es irreversible!`,
+      onConfirm: async () => {
+        await withSession(
+          navigate,
+          async () => {
+            setLoadingFiles(true);
+            const response = await deleteDocument(order.id, docId);
+            if (response._isError) {
+              showAlert(ERROR, response.code, response.message);
+            } else {
+              const updatedDocuments = order.documents.filter(
+                (document) => document.id !== docId
+              );
+              setOrder({ ...order, documents: updatedDocuments });
+              showAlert(SUCCESS, "Documento eliminado");
+            }
+          },
+          () => setLoadingFiles(false)
+        );
+      },
+    });
   };
 
   const onOpenDocument = async (docId) => {
@@ -379,14 +387,16 @@ const Order = ({ showAlert, setBlurLoading }) => {
   };
 
   const handleSend = async () => {
-    const confirm = window.confirm(
-      "¿Estás seguro que deseas enviar para revisión?\n Esta acción no puede revertirse"
-    );
-
-    if (confirm) {
-      await handleSave(false);
-      await handleStatusChange("REVISION");
-    }
+    setConfirmDialog({
+      ...confirmDialog,
+      open: true,
+      message:
+        "¿Deseas enviar la solicitud para su revisión?\n ¡Esta acción no puede revertirse!",
+      onConfirm: async () => {
+        await handleSave(false);
+        await handleStatusChange("REVISION");
+      },
+    });
   };
 
   const handleStatusChange = async (status) => {
@@ -409,43 +419,45 @@ const Order = ({ showAlert, setBlurLoading }) => {
   };
 
   const onReturned = async () => {
-    const confirm = window.confirm(
-      "¿Estás seguro que deseas modificar el valor de DEV?"
-    );
+    setConfirmDialog({
+      ...confirmDialog,
+      open: true,
+      message: "¿Deseas modificar el valor de DEV?",
+      onConfirm: async () => {
+        setActionLoading(true);
+        const newReturned = !order.returned;
 
-    if (confirm) {
-      setActionLoading(true);
-      const newReturned = !order.returned;
-
-      const response = await markReturned(order.id, newReturned);
-      if (response._isError) {
-        showAlert(ERROR, response.code, response.message);
-      } else {
-        setOrder({ ...order, returned: newReturned });
-        showAlert(SUCCESS, "Cambios guardados");
-      }
-      setActionLoading(false);
-    }
+        const response = await markReturned(order.id, newReturned);
+        if (response._isError) {
+          showAlert(ERROR, response.code, response.message);
+        } else {
+          setOrder({ ...order, returned: newReturned });
+          showAlert(SUCCESS, "Cambios guardados");
+        }
+        setActionLoading(false);
+      },
+    });
   };
 
   const onBilled = async () => {
-    const confirm = window.confirm(
-      "¿Estás seguro que deseas modificar el valor de FC?"
-    );
+    setConfirmDialog({
+      ...confirmDialog,
+      open: true,
+      message: "¿Deseas modificar el valor de FC?",
+      onConfirm: async () => {
+        setActionLoading(true);
+        const newBilled = !order.billed;
 
-    if (confirm) {
-      setActionLoading(true);
-      const newBilled = !order.billed;
-
-      const response = await markBilled(order.id, newBilled);
-      if (response._isError) {
-        showAlert(ERROR, response.code, response.message);
-      } else {
-        setOrder({ ...order, billed: newBilled });
-        showAlert(SUCCESS, "Cambios guardados");
-      }
-      setActionLoading(false);
-    }
+        const response = await markBilled(order.id, newBilled);
+        if (response._isError) {
+          showAlert(ERROR, response.code, response.message);
+        } else {
+          setOrder({ ...order, billed: newBilled });
+          showAlert(SUCCESS, "Cambios guardados");
+        }
+        setActionLoading(false);
+      },
+    });
   };
 
   const handleContainerSave = (container) => {
@@ -613,6 +625,13 @@ const Order = ({ showAlert, setBlurLoading }) => {
             setOpenStatusModal(false);
           }}
           currentStatus={order?.status}
+        />
+
+        <ConfirmDialog
+          isOpen={confirmDialog.open}
+          message={confirmDialog.message}
+          onConfirm={confirmDialog.onConfirm}
+          onClose={confirmDialog.onClose}
         />
 
         {openContainerModal && (

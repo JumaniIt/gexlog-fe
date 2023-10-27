@@ -10,7 +10,7 @@ import {
   SimpleGrid,
   Button,
   Text,
-  Spinner
+  Spinner,
 } from "@chakra-ui/react";
 import { withSession, getCurrentUser } from "../../app/utils/sessionUtils";
 import {
@@ -23,12 +23,19 @@ import { useNavigate } from "react-router-dom";
 import EditableCost from "../Cost/editableCost";
 import Cost from "../Cost/cost";
 import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
+import ConfirmDialog from "../ConfirmDialog";
 
 const CostModal = ({ isOpen, onClose, orderId, showAlert }) => {
   const [loading, setLoading] = useState(false);
   const [costs, setCosts] = useState([]);
   const [editedCostId, setEditCostId] = useState(null);
   const [isAddingCost, setIsAddingCost] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    message: "",
+    onClose: () => setConfirmDialog({ ...confirmDialog, open: false }),
+    onConfirm: () => {},
+  });
 
   const navigate = useNavigate();
   const currentUser = getCurrentUser(navigate);
@@ -55,23 +62,24 @@ const CostModal = ({ isOpen, onClose, orderId, showAlert }) => {
   }, []);
 
   const handleDelete = async (costId) => {
-    const confirmed = window.confirm(
-      `¿Estás seguro de que deseas eliminar este costo?\nEsta acción es irreversible!`
-    );
-
-    if (confirmed) {
-      await withSession(navigate, async () => {
-        const response = await deleteCost(orderId, costId);
-        if (response._isError) {
-          showAlert(ERROR, response.code, response.message);
-        } else {
-          setCosts((prevCosts) =>
-            prevCosts.filter((cost) => cost.id !== costId)
-          );
-          showAlert(SUCCESS, "Costo eliminado");
-        }
-      });
-    }
+    setConfirmDialog({
+      ...confirmDialog,
+      open: true,
+      message: `¿Deseas eliminar este costo?\n ¡Esta acción es irreversible!`,
+      onConfirm: async () => {
+        await withSession(navigate, async () => {
+          const response = await deleteCost(orderId, costId);
+          if (response._isError) {
+            showAlert(ERROR, response.code, response.message);
+          } else {
+            setCosts((prevCosts) =>
+              prevCosts.filter((cost) => cost.id !== costId)
+            );
+            showAlert(SUCCESS, "Costo eliminado");
+          }
+        });
+      },
+    });
   };
 
   const handleEdit = (costId) => {
@@ -123,70 +131,78 @@ const CostModal = ({ isOpen, onClose, orderId, showAlert }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="xl">
-      <ModalOverlay />
-      <ModalContent className="cost-modal-content">
-        <ModalHeader>Costos</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <div className="options-row">
-            {!editedCostId && !isAddingCost && currentUser?.admin && (
-              <Box>
-                <Button size="sm" onClick={handleAddCost} colorScheme="green">
-                  + Añadir
-                </Button>
-              </Box>
-            )}
-{/*             <Box>
+    <>
+      <ConfirmDialog
+        isOpen={confirmDialog.open}
+        message={confirmDialog.message}
+        onConfirm={confirmDialog.onConfirm}
+        onClose={confirmDialog.onClose}
+      />
+      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+        <ModalOverlay />
+        <ModalContent className="cost-modal-content">
+          <ModalHeader>Costos</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <div className="options-row">
+              {!editedCostId && !isAddingCost && currentUser?.admin && (
+                <Box>
+                  <Button size="sm" onClick={handleAddCost} colorScheme="green">
+                    + Añadir
+                  </Button>
+                </Box>
+              )}
+              {/*             <Box>
               <Text as="b">
                 Total: ${costs.reduce((total, cost) => total + cost.amount, 0)}
               </Text>
             </Box> */}
-          </div>
-
-          <SimpleGrid columns={1} spacing={4}>
-            {isAddingCost && currentUser?.admin && (
-              <EditableCost
-                onCancel={handleCancelEdit}
-                onSave={handleSaveNew}
-              />
-            )}
-            {costs.map((cost) => (
-              <Box key={cost.id}>
-                {editedCostId === cost.id ? (
-                  <EditableCost
-                    initialValue={cost}
-                    onCancel={handleCancelEdit}
-                    onSave={handleSaveEdit}
-                  />
-                ) : (
-                  <Cost
-                    id={cost.id}
-                    type={cost.type}
-                    date={cost.created_at}
-                    description={cost.description}
-                    amount={cost.amount}
-                    onDelete={() => handleDelete(cost.id)}
-                    onEdit={handleEdit}
-                    editable={currentUser?.admin}
-                  />
-                )}
-              </Box>
-            ))}
-          </SimpleGrid>
-          {loading && (
-            <div className="spinner">
-              <Spinner
-                className="spinner"
-                size="lg"
-                color="blue.500"
-                thickness="2px"
-              />
             </div>
-          )}
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+
+            <SimpleGrid columns={1} spacing={4}>
+              {isAddingCost && currentUser?.admin && (
+                <EditableCost
+                  onCancel={handleCancelEdit}
+                  onSave={handleSaveNew}
+                />
+              )}
+              {costs.map((cost) => (
+                <Box key={cost.id}>
+                  {editedCostId === cost.id ? (
+                    <EditableCost
+                      initialValue={cost}
+                      onCancel={handleCancelEdit}
+                      onSave={handleSaveEdit}
+                    />
+                  ) : (
+                    <Cost
+                      id={cost.id}
+                      type={cost.type}
+                      date={cost.created_at}
+                      description={cost.description}
+                      amount={cost.amount}
+                      onDelete={() => handleDelete(cost.id)}
+                      onEdit={handleEdit}
+                      editable={currentUser?.admin}
+                    />
+                  )}
+                </Box>
+              ))}
+            </SimpleGrid>
+            {loading && (
+              <div className="spinner">
+                <Spinner
+                  className="spinner"
+                  size="lg"
+                  color="blue.500"
+                  thickness="2px"
+                />
+              </div>
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 

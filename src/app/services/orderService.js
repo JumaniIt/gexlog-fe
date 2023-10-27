@@ -104,8 +104,8 @@ export const statuses = [
   },
   {
     value: "CANCELLED",
-    translation: "CANCELADO",
-    min: "CAN",
+    translation: "ANULADO",
+    min: "ANU",
     colorScheme: "red"
   },
 ];
