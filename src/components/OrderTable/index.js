@@ -33,7 +33,7 @@ import {
   changeStatus,
 } from "../../app/services/orderService";
 import { search as searchClients } from "../../app/services/clientService";
-import { getCuitAndName, getNameAndCuit } from "../../app/utils/clientUtils";
+import { getCuitAndName, getNameAndCuit, userWithoutClientAlert } from "../../app/utils/clientUtils";
 import {
   toLocalDateString,
   toLocalDateTimeString,
@@ -179,6 +179,8 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
             const client = clients.length > 0 ? clients[0] : null;
             if (client) {
               setFilters({ ...filters, client_id: client.id });
+            } else {
+              showAlert(userWithoutClientAlert.status, userWithoutClientAlert.code, userWithoutClientAlert.message);
             }
           }
         }
@@ -573,6 +575,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
             size="sm"
             className="search-button"
             onClick={handleSearchClick}
+            isDisabled={!currentUser.admin && !filters.client_id}
           >
             Buscar
           </Button>
@@ -589,6 +592,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
               }
               setFilters(clearFilters);
             }}
+            isDisabled={!currentUser.admin && !filters.client_id}
           >
             Limpiar
           </Button>
@@ -596,6 +600,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
             size="sm"
             className="download-button"
             onClick={() => setOpenReportModal(true)}
+            isDisabled={!currentUser.admin && !filters.client_id}
           >
             Descargar
           </Button>
@@ -603,6 +608,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
             size="sm"
             className="create-button"
             onClick={() => navigate(`/orders/new`, { replace: true })}
+            isDisabled={!currentUser.admin && !filters.client_id}
           >
             Crear
           </Button>

@@ -22,7 +22,8 @@ import {
 } from "../../app/services/clientService";
 import ConsigneeModal from "../ConsigneeModal/consigneeModal";
 import { getById as getUserById } from "../../app/services/userService";
-import { ERROR, SUCCESS } from "../../app/utils/alertUtils";
+import { ERROR, SUCCESS, WARNING } from "../../app/utils/alertUtils";
+import { userWithoutClientAlert } from "../../app/utils/clientUtils";
 
 const ProfileView = ({ showAlert, setBlurLoading }) => {
   const navigate = useNavigate();
@@ -76,20 +77,24 @@ const ProfileView = ({ showAlert, setBlurLoading }) => {
           });
           if (result._isError) {
             showAlert(ERROR, result.code, result.message);
+          } else if (!result.elements?.length) {
+            showAlert(
+              userWithoutClientAlert.status,
+              userWithoutClientAlert.code,
+              userWithoutClientAlert.message
+            );
           } else {
-            if (result.elements) {
-              const client = result.elements[0];
-              setProfile({
-                ...profile,
-                client_id: client.id,
-                name: client.name,
-                phone: client.phone,
-                cuit: client.cuit,
-                consignees: client.consignees,
-                nickname: currentUser.nickname,
-                email: currentUser.email,
-              });
-            }
+            const client = result.elements[0];
+            setProfile({
+              ...profile,
+              client_id: client.id,
+              name: client.name,
+              phone: client.phone,
+              cuit: client.cuit,
+              consignees: client.consignees,
+              nickname: currentUser.nickname,
+              email: currentUser.email,
+            });
           }
         }
       });
@@ -162,7 +167,12 @@ const ProfileView = ({ showAlert, setBlurLoading }) => {
         <Heading className="second-heading" as="h6" size="sm">
           Consignatarios
         </Heading>
-        <Button size="sm" colorScheme="green" onClick={openConsigneeModal}>
+        <Button
+          isDisabled={!profile.client_id}
+          size="sm"
+          colorScheme="green"
+          onClick={openConsigneeModal}
+        >
           <MdCreate />
           Añadir
         </Button>

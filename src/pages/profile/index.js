@@ -21,6 +21,7 @@ const ProfilePage = () => {
   const [alert, setAlert] = useState({});
 
   const showAlert = (status, code, message) => {
+    console.log(status, code, message)
     setAlert({ status, code, message });
   };
 
