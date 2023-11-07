@@ -955,7 +955,11 @@ const Order = ({ showAlert, setBlurLoading }) => {
                   )}
                 </div>
                 <NotePreview
-                  notes={order?.notes || []}
+                  notes={
+                    order?.notes?.sort((a, b) =>
+                      b.created_at.localeCompare(a.created_at)
+                    ) || []
+                  }
                   showSystemNotes={showSystemNotes}
                 />
               </div>

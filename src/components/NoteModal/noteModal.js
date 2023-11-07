@@ -44,7 +44,7 @@ const NoteModal = ({ isOpen, onClose, orderId, showAlert, onNoteSaved }) => {
           showAlert(ERROR, response.code, response.message);
         } else {
           const orderedNotes = response.elements.sort((a, b) =>
-            b.created_at.localeCompare(a.created_at)
+            a.created_at.localeCompare(b.created_at)
           );
 
           setNotes(orderedNotes);

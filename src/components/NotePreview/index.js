@@ -6,13 +6,6 @@ import { translateAuthor } from "../../app/utils/noteUtils";
 const NotePreview = ({ notes, showSystemNotes }) => {
   const containerRef = useRef(null);
 
-  // Scroll to the end when the component mounts or when the notes change
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
-    }
-  }, [notes, showSystemNotes]);
-
   return (
     <div style={{ maxHeight: "400px", overflowY: "scroll" }} ref={containerRef}>
       <SimpleGrid columns={1} spacing={4}>

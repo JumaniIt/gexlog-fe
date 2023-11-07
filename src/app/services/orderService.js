@@ -87,7 +87,7 @@ export const statuses = [
   {
     value: "REVISION",
     translation: "ENVIADO",
-    min: "REV",
+    min: "ENV",
     colorScheme: "orange"
   },
   {

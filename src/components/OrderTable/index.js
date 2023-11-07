@@ -33,7 +33,11 @@ import {
   changeStatus,
 } from "../../app/services/orderService";
 import { search as searchClients } from "../../app/services/clientService";
-import { getCuitAndName, getNameAndCuit, userWithoutClientAlert } from "../../app/utils/clientUtils";
+import {
+  getCuitAndName,
+  getNameAndCuit,
+  userWithoutClientAlert,
+} from "../../app/utils/clientUtils";
 import {
   toLocalDateString,
   toLocalDateTimeString,
@@ -56,6 +60,7 @@ import { getOperativeSites } from "../../app/utils/customsUtils";
 import ReportModal from "../ReportModal";
 import ConfirmDialog from "../ConfirmDialog";
 import StatusModal from "../StatusModal/statusModal";
+import YesNoSelect from "../YesNoSelect";
 
 const TableCellWithTooltip = ({ text, tooltipText }) => {
   return (
@@ -77,7 +82,6 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
     ...defaultFilters,
     sorts: "creation_date:desc",
     creation_date_from: new Date().toLocaleDateString("sv"),
-    creation_date_to: new Date().toLocaleDateString("sv"),
   });
 
   const [paginationResult, setPaginationResult] = useState();
@@ -180,7 +184,11 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
             if (client) {
               setFilters({ ...filters, client_id: client.id });
             } else {
-              showAlert(userWithoutClientAlert.status, userWithoutClientAlert.code, userWithoutClientAlert.message);
+              showAlert(
+                userWithoutClientAlert.status,
+                userWithoutClientAlert.code,
+                userWithoutClientAlert.message
+              );
             }
           }
         }
@@ -194,7 +202,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
   }, []);
 
   const openModal = async (type, orderId) => {
-    console.log(consigneeOptions);
+    setBlurLoading(true);
     await withSession(navigate, async () => {
       const response = await getById(orderId);
       if (response._isError) {
@@ -207,6 +215,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
         }
       }
     });
+    setBlurLoading(false);
   };
 
   const handleReturnedChange = (index) => {
@@ -335,13 +344,40 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
 
         <LabeledItem
           item={
-            <Input
+            <FilteredSelect
+              filterOption={(option, input) =>
+                !input || containsLiteralPart(option.label, input)
+              }
+              chakraStyles={{
+                menu: (provided) => ({ ...provided, zIndex: 3 }),
+              }}
               size="sm"
-              value={filters?.code || ""}
-              onChange={(e) => setFilters({ ...filters, code: e.target.value })}
+              useBasicStyles={true}
+              name="target"
+              value={
+                filters?.consignee_cuit
+                  ? {
+                      label: getCuitAndName(
+                        consigneeOptions.find(
+                          (c) => c.cuit === filters?.consignee_cuit
+                        )
+                      ),
+                      value: filters?.consignee_cuit,
+                    }
+                  : null
+              }
+              onChange={(e) =>
+                setFilters({ ...filters, consignee_cuit: e.value })
+              }
+              options={consigneeOptions?.map((consignee) => ({
+                label: getCuitAndName(consignee),
+                value: consignee.cuit,
+              }))}
+              selectedOptionStyle="color"
+              placeholder=""
             />
           }
-          label="Legajo"
+          label="Factura a"
         />
         <LabeledItem
           item={
@@ -395,84 +431,8 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           }
           label="Turno hasta"
         />
-        <Checkbox
-          onChange={(e) => setFilters({ ...filters, pema: e.target.checked })}
-          isChecked={filters?.pema || false}
-        >
-          PEMA
-        </Checkbox>
-        <Checkbox
-          onChange={(e) => setFilters({ ...filters, port: e.target.checked })}
-          isChecked={filters?.port || false}
-        >
-          G. PTO
-        </Checkbox>
-        <Checkbox
-          onChange={(e) =>
-            setFilters({ ...filters, transport: e.target.checked })
-          }
-          isChecked={filters?.transport || false}
-        >
-          TTE
-        </Checkbox>
-        <LabeledItem
-          item={
-            <Select
-              size="sm"
-              onChange={(e) =>
-                setFilters({ ...filters, status: e.target.value })
-              }
-              value={filters.status ? filter.status : ""}
-              placeholder="-"
-            >
-              {statuses.map((status) => (
-                <option key={status.value} value={status.value}>
-                  {status.translation}
-                </option>
-              ))}
-            </Select>
-          }
-          label="Estado"
-        />
       </div>
       <div className="filter-bar-second-row">
-        <LabeledItem
-          item={
-            <FilteredSelect
-              filterOption={(option, input) =>
-                !input || containsLiteralPart(option.label, input)
-              }
-              chakraStyles={{
-                menu: (provided) => ({ ...provided, zIndex: 3 }),
-              }}
-              size="sm"
-              useBasicStyles={true}
-              name="target"
-              value={
-                filters?.consignee_cuit
-                  ? {
-                      label: getCuitAndName(
-                        consigneeOptions.find(
-                          (c) => c.cuit === filters?.consignee_cuit
-                        )
-                      ),
-                      value: filters?.consignee_cuit,
-                    }
-                  : null
-              }
-              onChange={(e) =>
-                setFilters({ ...filters, consignee_cuit: e.value })
-              }
-              options={consigneeOptions?.map((consignee) => ({
-                label: getCuitAndName(consignee),
-                value: consignee.cuit,
-              }))}
-              selectedOptionStyle="color"
-              placeholder=""
-            />
-          }
-          label="Factura a"
-        />
         <LabeledItem
           item={
             <FilteredSelect
@@ -549,6 +509,67 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           }
           label="Destinación"
         />
+      </div>
+      <div className="filter-bar-third-row">
+        <LabeledItem
+          item={
+            <Input
+              size="sm"
+              value={filters?.code || ""}
+              onChange={(e) => setFilters({ ...filters, code: e.target.value })}
+            />
+          }
+          label="Legajo"
+        />
+        <LabeledItem
+          item={
+            <Select
+              size="sm"
+              onChange={(e) =>
+                setFilters({ ...filters, status: e.target.value })
+              }
+              value={filters.status ? filter.status : ""}
+              placeholder="-"
+            >
+              {statuses.map((status) => (
+                <option key={status.value} value={status.value}>
+                  {status.translation}
+                </option>
+              ))}
+            </Select>
+          }
+          label="Estado"
+        />
+        <LabeledItem
+          item={
+            <YesNoSelect
+              onChange={(e) => setFilters({ ...filters, pema: e.target.value })}
+              value={filters?.pema}
+            />
+          }
+          label="PEMA"
+        />
+
+        <LabeledItem
+          item={
+            <YesNoSelect
+              onChange={(e) => setFilters({ ...filters, port: e.target.value })}
+              value={filters?.port}
+            />
+          }
+          label="G.PTO"
+        />
+        <LabeledItem
+          item={
+            <YesNoSelect
+              onChange={(e) =>
+                setFilters({ ...filters, transport: e.target.value })
+              }
+              value={filters?.transport}
+            />
+          }
+          label="TTE"
+        />
         <LabeledItem
           item={
             <Select
@@ -569,13 +590,13 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
           label="Ordenar por"
         />
       </div>
-      <div className="filter-bar-third-row">
+      <div className="filter-bar-buttons-row">
         <div className="buttons">
           <Button
             size="sm"
             className="search-button"
             onClick={handleSearchClick}
-            isDisabled={!currentUser.admin && !filters.client_id}
+            isDisabled={!currentUser?.admin && !filters.client_id}
           >
             Buscar
           </Button>
@@ -592,7 +613,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
               }
               setFilters(clearFilters);
             }}
-            isDisabled={!currentUser.admin && !filters.client_id}
+            isDisabled={!currentUser?.admin && !filters.client_id}
           >
             Limpiar
           </Button>
@@ -600,7 +621,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
             size="sm"
             className="download-button"
             onClick={() => setOpenReportModal(true)}
-            isDisabled={!currentUser.admin && !filters.client_id}
+            isDisabled={!currentUser?.admin && !filters.client_id}
           >
             Descargar
           </Button>
@@ -608,7 +629,7 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
             size="sm"
             className="create-button"
             onClick={() => navigate(`/orders/new`, { replace: true })}
-            isDisabled={!currentUser.admin && !filters.client_id}
+            isDisabled={!currentUser?.admin && !filters.client_id}
           >
             Crear
           </Button>
@@ -691,12 +712,11 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                   <Th>H.Turno</Th>
                   <Th>Origen</Th>
                   <Th>Destino</Th>
-                  <Th>CTR</Th>
-                  <Th>C.S</Th>
+                  <Th>C.Suelta</Th>
+                  <Th>Cargas</Th>
                   <Th>Dev</Th>
                   <Th>FC</Th>
                   <Th>Est</Th>
-                  <Th>Ver</Th>
                 </Tr>
               </Thead>
               {!loading && (
@@ -717,8 +737,10 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                             .filter((c) => c.id === result.client_id)
                             .map((c) => (
                               <TableCellWithTooltip
-                                text={c.name}
-                                tooltipText={"CUIT: " + c.cuit}
+                                text={trimStringWithDot(c.name, 12)}
+                                tooltipText={
+                                  c.name + (c.cuit ? " - " + c.cuit : "")
+                                }
                               />
                             ))}
                           <Td>{toLocalDateString(result.arrival_date)}</Td>
@@ -734,28 +756,44 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                             text={trimStringWithDot(result?.target || "", 12)}
                             tooltipText={result.target}
                           />
-                          <Td
-                            className={
-                              result.container_qty > 0 ? "button-td" : ""
-                            }
-                            onClick={() => {
-                              if (result.container_qty > 0)
-                                openModal("containers", result.id);
-                            }}
-                          >
-                            {result.container_qty}
+                          <Td>
+                            {result.free_load ? (
+                              <CheckIcon
+                                color="green.500"
+                                style={{ pointerEvents: "none" }}
+                              />
+                            ) : (
+                              <CloseIcon
+                                color="red.500"
+                                style={{ pointerEvents: "none" }}
+                              />
+                            )}
                           </Td>
-                          <Td
-                            className={
-                              result.free_load_qty > 0 ? "button-td" : ""
-                            }
-                            onClick={() => {
-                              if (result.free_load_qty > 0)
-                                openModal("free_loads", result.id);
-                            }}
-                          >
-                            {result.free_load_qty}
-                          </Td>
+                          {result.free_load ? (
+                            <Td
+                              className={
+                                result.free_load_qty > 0 ? "button-td" : ""
+                              }
+                              onClick={() => {
+                                if (result.free_load_qty > 0)
+                                  openModal("free_loads", result.id);
+                              }}
+                            >
+                              {result.free_load_qty}
+                            </Td>
+                          ) : (
+                            <Td
+                              className={
+                                result.container_qty > 0 ? "button-td" : ""
+                              }
+                              onClick={() => {
+                                if (result.container_qty > 0)
+                                  openModal("containers", result.id);
+                              }}
+                            >
+                              {result.container_qty}
+                            </Td>
+                          )}
                           <Td
                             className={currentUser?.admin ? "button-td" : ""}
                             onClick={() => {
@@ -811,12 +849,6 @@ const OrderTable = ({ showAlert, setBlurLoading }) => {
                                 {enhancedStatus.min}
                               </Badge>
                             }
-                          </Td>
-
-                          <Td>
-                            <Link to={`/orders/${result.id}`}>
-                              <MdOutlineOpenInNew />
-                            </Link>
                           </Td>
                         </Tr>
                       );
